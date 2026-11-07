@@ -1,10 +1,10 @@
 ---
 name: Việc cần làm
-about: Một việc trong bảng việc của nhóm
+about: Một việc cần làm
 labels: ''
 ---
 
-**Chức năng / mã việc:** (ví dụ B3, hoặc N2 nếu là việc chung)
+**Chức năng hoặc phần nào của Remi:**
 
 ### Bối cảnh
 

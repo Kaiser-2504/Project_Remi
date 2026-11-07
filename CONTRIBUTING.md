@@ -16,7 +16,7 @@ Mở http://localhost:3000. Chưa có `ANTHROPIC_API_KEY` thì câu nói chưa �
 
 | Lệnh | Kiểm gì | Cần trình duyệt |
 |---|---|---|
-| `npm test` | Máy chủ, bộ tính định lượng, bộ hiểu câu, bảng việc | Không |
+| `npm test` | Máy chủ, bộ tính định lượng, bộ hiểu câu, cấu hình repo | Không |
 | `npm run test:e2e` | Đăng ký, AI, đồng bộ hai thiết bị, thông báo, đăng xuất | Có |
 | `npm run test:responsive` | Bố cục ở 7 cỡ màn hình | Có |
 | `npm run test:features` | Chia lượng nước, bộ chọn ngày giờ | Có |
@@ -26,10 +26,10 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 
 ## Quy trình mỗi việc
 
-1. Nhận một issue. Mỗi người phụ trách trọn một chức năng (xem `docs/TASKS.md`), việc nào trong chức năng của mình thì tự nhận, việc chung (N0 đến N7) thì ai xong phần mình thì nhận thêm.
+1. Nhận một issue đã được gán cho bạn trên GitHub (cả nhóm trao đổi và thống nhất phân công trước).
 2. Tách nhánh từ `main`, đặt tên `<mã việc>-<mô tả ngắn>`, ví dụ `A1-quen-mat-khau`.
 3. Commit nhỏ, thông điệp nói rõ làm gì và vì sao.
-4. Mở pull request theo mẫu. **Đề xuất mặc định:** ít nhất một người khác duyệt, CI xanh mới gộp, gộp kiểu squash. Cả nhóm chốt lại ở quyết định D-6.
+4. Mở pull request theo mẫu. **Đề xuất mặc định:** ít nhất một người khác duyệt, CI xanh mới gộp, gộp kiểu squash. Cả nhóm chốt lại quy ước này khi họp.
 5. Người duyệt chạy thử thật phần giao diện, không chỉ đọc mã.
 
 ## Quy tắc
@@ -37,7 +37,6 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 - **Mỗi thay đổi có test.** Việc không thể test tự động thì ghi cách kiểm tra bằng tay trong pull request.
 - **Test phải đỏ khi mã sai.** Khi viết test, thử làm hỏng mã một chút và xem test có đỏ không. Nhiều lỗi của dự án này được bắt bằng cách đó.
 - **Không đưa vào repo:** tệp `.env`, thư mục `data/`, khóa API, mật khẩu, dữ liệu người dùng thật, ảnh chụp có thông tin cá nhân.
-- **Không sửa tay `docs/TASKS.md`.** Sửa `docs/tasks.json` rồi chạy `npm run tasks:doc`. Test sẽ báo nếu lệch.
 - **Nói rõ điều chưa kiểm tra được.** Chưa thử trên điện thoại thật, chưa thử thông báo đẩy thật... thì ghi thẳng trong pull request.
 - **Đụng giao diện thì xem ở hai cỡ:** điện thoại dọc (390px) và màn hình máy tính (1440px), cùng kiểu 320px nếu có bộ chọn hay danh sách mới.
 - **Đụng thời gian thì test với đồng hồ cố định**, đừng viết test chỉ đúng vào một giờ nhất định trong ngày.
@@ -51,8 +50,8 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 | `ml/` | Dữ liệu huấn luyện, bộ đo chất lượng, kịch bản tinh chỉnh model |
 | `e2e/` | Các bộ test trình duyệt |
 | `standalone/` | Bản HTML đơn chạy không cần máy chủ (ảnh chụp, xem README trong đó) |
-| `docs/` | Bảng việc: 5 chức năng cho 5 người cộng việc chung |
-| `scripts/` | Công cụ nhỏ: dựng bảng việc, tạo issue, xuất biểu tượng |
+| `docs/` | Hướng dẫn đưa lên GitHub |
+| `scripts/` | Công cụ nhỏ: xuất biểu tượng |
 
 ## Mẹo khi dùng terminal
 
