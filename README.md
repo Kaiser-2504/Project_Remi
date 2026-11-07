@@ -28,6 +28,7 @@ Không chạy `npm install` thì mọi thứ vẫn chạy, chỉ riêng thông b
 - **Chọn ngày giờ bằng nút bấm**: ngày nhanh, giờ có nút + và −, giờ chọn nhanh, nhắc trước, lặp lại.
 - Danh sách đi chợ có gợi ý, tìm kiếm, định lượng chỉnh bằng nút và co giãn theo số người ăn.
 - Thanh ngủ và thức dậy, gọi dậy buổi sáng, thói quen theo ngày trong tuần, Lịch có ghi chú.
+- **Bếp** (nhóm B): thực đơn tuần 7 ngày x 3 bữa, gộp nguyên liệu cả tuần thành một danh sách đi chợ đã trừ đồ có sẵn, tủ đồ nhà có hạn dùng và nhắc trước khi hết hạn, gợi ý "hôm nay nấu gì" theo đồ trong tủ, món của riêng mình. Chi tiết ở `docs/NHOM-B-THUC-DON-TU-DO.md`.
 - Đồng bộ nhiều thiết bị, thông báo đẩy, cài như app, chạy tốt từ điện thoại tới máy tính.
 
 ## Kiểm thử
@@ -38,6 +39,10 @@ npm run test:e2e       # trình duyệt thật + máy chủ thật + "Anthropic"
 ```
 
 `npm run test:features` kiểm chia lượng nước và bộ chọn ngày giờ, kèm việc dữ liệu và lịch nhắc có lên máy chủ đúng không.
+
+`npm run test:kitchen` đi hết luồng tab Bếp: tủ đồ và hạn dùng, gợi ý món, lên thực đơn, gộp danh sách đi chợ đã trừ tủ, nấu xong trừ tủ, món của tôi, cất đồ sau khi đi chợ, đồng bộ hai máy, bố cục ở 320px, 390px, 1440px.
+
+`npm run test:mutation` kiểm thử đột biến cho logic tab Bếp: tự làm hỏng mã từng chút và đếm số lần test bắt được.
 
 `npm run test:responsive` kiểm bố cục ở 7 cỡ màn hình (320px đến 1440px, cả xoay ngang): không tràn ngang, đúng kiểu điều hướng và số cột, cửa sổ chi tiết nằm đúng chỗ.
 
@@ -103,6 +108,12 @@ Khi AI lỗi, hết lượt hoặc mất mạng, app báo rõ nguyên nhân và 
 - **Số người ăn** co giãn mọi định lượng theo tỉ lệ rồi làm tròn gọn: gam và ml tròn đến 5 hoặc 10, kg và lít tròn đến 0,25, còn củ, quả, gói, hộp tròn số nguyên (không bao giờ ra "1,5 gói").
 - Remi nhớ danh sách và số người của từng món; lần sau nấu lại món đó, định lượng tự co giãn theo số người mới.
 - Logic nằm ở `web/js/qty.js`, có test riêng.
+
+### Bếp: thực đơn tuần và tủ đồ
+
+- Logic thuần ở `web/js/kitchen.js` (chạy cả trong Node để test), giao diện ở `web/js/kitchen-ui.js`, kho món ở `web/data/dishes.json`.
+- Gộp nguyên liệu quy đổi g với kg, ml với lít, co giãn theo số người, làm tròn lên để mua đủ, rồi trừ đồ còn hạn trong tủ.
+- Dữ liệu nằm trong `state.kitchen`, đồng bộ như phần còn lại: tủ đồ và món của tôi gộp theo từng mục, thực đơn gộp theo từng bữa (`meta.mealU`).
 
 ## API
 
