@@ -2,563 +2,661 @@
 
 Tệp này được **sinh tự động** từ `docs/tasks.json` bằng `npm run tasks:doc`. Sửa ở `tasks.json`, đừng sửa tay ở đây.
 
-Điểm là mức công sức tương đối (1 nhỏ, 2 nhỏ vừa, 3 vừa, 5 lớn), **không phải số ngày**. Năm nhóm có tổng điểm bằng nhau; có test kiểm tra điều này.
+**Cách chia:** mỗi thành viên phụ trách trọn **một chức năng mới** của Remi, từ dữ liệu, máy chủ, giao diện tới test và tài liệu. Năm chức năng độc lập với nhau nên làm song song được, ngoài vài chỗ phụ thuộc ghi rõ bên dưới.
+
+Điểm là mức công sức tương đối (1 nhỏ, 2 nhỏ vừa, 3 vừa, 5 lớn), **không phải số ngày**. Năm chức năng có tổng điểm bằng nhau; có test kiểm tra điều này.
 
 ## Phân công
 
-| Nhóm | Phụ trách | Trọng tâm | Số việc | Tổng điểm |
-|---|---|---|---|---|
-| A | Tài khoản và máy chủ | Đăng nhập, bảo mật tài khoản, dữ liệu phía máy chủ | 6 | 19 |
-| B | Di động và thông báo | App trên điện thoại, thông báo, gọi dậy | 5 | 19 |
-| C | AI và dữ liệu | Hiểu câu nói trên máy, kho món ăn, huấn luyện model | 5 | 19 |
-| D | Giao diện và trải nghiệm | Màn hình, trợ năng, chia sẻ, đa ngôn ngữ | 5 | 19 |
-| E | Nền tảng và chất lượng | Triển khai, CI, công cụ, bảo mật, giám sát | 6 | 19 |
+| Nhóm | Chức năng | Gồm | Số việc | Tổng điểm | Thành viên (tài khoản GitHub) |
+|---|---|---|---|---|---|
+| A | **Chia sẻ với gia đình** | Mời người thân, danh sách đi chợ dùng chung, giao việc cho nhau, thói quen chung | 5 | 19 | |
+| B | **Thực đơn tuần và tủ đồ nhà** | Lên thực đơn cả tuần, gộp danh sách đi chợ, quản lý đồ có sẵn và hạn dùng | 5 | 19 | |
+| C | **Thống kê, chuỗi ngày và phần thưởng** | Chuỗi ngày liên tiếp, biểu đồ tuần tháng, huy hiệu, Remi đổi biểu cảm | 5 | 19 | |
+| D | **Lịch nâng cao** | Xem tuần và ngày dạng dòng thời gian, kéo thả, báo trùng giờ, xuất nhập lịch .ics | 5 | 19 | |
+| E | **Nhập nhanh thông minh** | Nhiều việc trong một câu, chụp ảnh thành danh sách, việc hay dùng, nói liên tục, hoàn tác | 5 | 19 | |
 
-Mỗi nhóm giao cho một thành viên. Tên thành viên điền vào bảng dưới khi chốt:
-
-| Nhóm | Thành viên (tài khoản GitHub) |
-|---|---|
-| A | |
-| B | |
-| C | |
-| D | |
-| E | |
+Điền tên thành viên vào cột cuối khi chốt.
 
 ## Quyết định cần chốt trước khi bắt đầu
 
-Cả nhóm nên họp một lần để chốt các mục này; nhiều việc bên dưới phụ thuộc vào chúng.
+Cả nhóm nên họp một lần để chốt các mục này.
 
 | Mã | Quyết định | Nội dung | Ai chốt |
 |---|---|---|---|
-| D-1 | Kiến trúc riêng tư | Chỉ câu nói không rời máy (giữ đồng bộ và thông báo qua máy chủ), hay mọi dữ liệu không rời máy (local-first, cần app native, thông báo cục bộ)? Ảnh hưởng B2, C1, D1 và nhóm A. | cả nhóm |
+| D-1 | Kiến trúc riêng tư | Chỉ câu nói không rời máy (giữ đồng bộ và máy chủ), hay mọi dữ liệu không rời máy? Chức năng A (chia sẻ) và D5 (liên kết lịch) cần máy chủ nên phải chốt trước; E2 gửi ảnh tới Claude nên cũng phải nêu rõ cho người dùng. | cả nhóm |
 | D-2 | Giấy phép mã nguồn | Hiện package.json ghi UNLICENSED và chưa có tệp LICENSE. Chọn giấy phép trước khi mở repo cho người ngoài. | người đứng tên repo |
-| D-3 | Tài khoản cửa hàng ứng dụng | Cần tài khoản Apple Developer và Google Play Developer (kiểm tra phí hiện hành) và người đứng tên. | người đứng tên repo |
-| D-4 | Hosting và dịch vụ email | Chọn nơi chạy máy chủ và dịch vụ gửi email giao dịch cho A1, A2. | cả nhóm |
-| D-5 | Chính sách dữ liệu và điều khoản | Soạn chính sách quyền riêng tư trước khi thu dữ liệu huấn luyện (C4) hay mở cho người dùng thật. | cả nhóm |
-| D-6 | Quy ước làm việc | Quy ước nhánh, số người duyệt mỗi pull request, bắt buộc CI xanh. Đề xuất mặc định trong CONTRIBUTING.md. | cả nhóm |
+| D-3 | Có làm N0 trước hay không | Khuyến nghị: một người làm N0 (tách app.js) trong lúc cả nhóm đọc mã và chốt thiết kế, rồi mới chia nhánh làm chức năng. Nếu bỏ qua, chấp nhận xung đột khi gộp và gộp nhỏ, gộp thường xuyên. | cả nhóm |
+| D-4 | Thứ tự ưu tiên khi chỉ kịp làm một phần | Mỗi chức năng chia từng việc nhỏ theo thứ tự, việc đầu của mỗi nhóm đã có giá trị riêng. Chốt xem nếu thiếu thời gian thì chức năng nào cắt bớt phần cuối trước. | cả nhóm |
+| D-5 | Chính sách dữ liệu và điều khoản | Soạn trước khi mở cho người dùng thật: chia sẻ gia đình (A), gửi ảnh cho Claude (E2), liên kết lịch (D5). | cả nhóm |
+| D-6 | Quy ước làm việc | Quy ước nhánh, số người duyệt, bắt buộc CI xanh. Đề xuất mặc định trong CONTRIBUTING.md. | cả nhóm |
 
-## Thứ tự làm theo phụ thuộc
+## Thứ tự làm trong mỗi chức năng
 
-**Đợt 1** (làm song song được, không phụ thuộc việc khác): A1 (5), A3 (3), A4 (2), A5 (3), A6 (3), B1 (5), B3 (3), C1 (3), C2 (3), C3 (3), C4 (5), D1 (5), D2 (3), D3 (3), D4 (3), D5 (5), E1 (5), E2 (3), E3 (2), E4 (3), E5 (3), E6 (3)
+**Đợt 1** (làm ngay được, không phụ thuộc việc khác): A1 (5), B1 (5), B3 (5), B5 (2), C1 (5), D1 (5), D4 (3), E1 (5), E2 (5), E3 (3), E5 (3)
 
-**Đợt 2**: A2 (3), B2 (5), B4 (3), C5 (5)
+**Đợt 2**: A2 (5), A3 (3), A4 (3), B2 (5), B4 (2), C2 (5), C3 (3), D2 (5), D3 (3), D5 (3), E4 (3)
 
-**Đợt 3**: B5 (3)
+**Đợt 3**: A5 (3), C4 (3), C5 (3)
 
-## Nhóm A: Tài khoản và máy chủ
+Việc đầu của mỗi chức năng đều có giá trị dùng được riêng, nên nếu thiếu thời gian có thể dừng ở giữa chừng mà không bỏ phí.
 
-Đăng nhập, bảo mật tài khoản, dữ liệu phía máy chủ. Tổng 19 điểm.
+## Chức năng A: Chia sẻ với gia đình
 
-### A1. Quên mật khẩu và đặt lại qua email (5 điểm)
+Mời người thân, danh sách đi chợ dùng chung, giao việc cho nhau, thói quen chung. Tổng 19 điểm.
 
-Phụ thuộc: không. Nhãn: backend, security.
+### A1. Gia đình và lời mời (5 điểm)
 
-**Bối cảnh.** Hiện người dùng quên mật khẩu là mất tài khoản. Chưa có dịch vụ gửi email.
+Phụ thuộc: không. Nhãn: feature, backend, frontend.
 
-**Việc cần làm**
-- Thêm POST /api/auth/forgot và POST /api/auth/reset.
-- Bảng password_resets: token lưu dạng băm, hết hạn sau 60 phút, chỉ dùng một lần.
-- Bộ gửi email tách riêng (cấu hình SMTP bằng biến môi trường MAIL_*) để test thay được bằng bộ giả.
-- Thêm liên kết Quên mật khẩu vào màn đăng nhập.
-- Đổi mật khẩu xong thì huỷ mọi phiên đang đăng nhập.
-
-**Tiêu chí nghiệm thu**
-- [ ] Trả lời giống hệt dù email có tài khoản hay không (không lộ email nào có tài khoản)
-- [ ] Token dùng lần hai bị từ chối, token quá hạn bị từ chối
-- [ ] Có giới hạn số lần yêu cầu theo email và IP
-- [ ] Có test máy chủ cho các trường hợp trên và một test đầu-cuối đổi mật khẩu
-
-**Tệp liên quan:** `server/routes.js`, `server/auth.js`, `server/db.js`, `web/js/app.js`
-
-### A2. Xác minh email khi đăng ký (3 điểm)
-
-Phụ thuộc: A1. Nhãn: backend.
-
-**Bối cảnh.** Hiện đăng ký bằng email bất kỳ, kể cả email không phải của mình.
+**Bối cảnh.** Mỗi tài khoản hiện là một ngăn riêng, dữ liệu nằm trong một tài liệu JSON theo từng người (bảng states). Chia sẻ cần mô hình mới, không nhét vào tài liệu cá nhân.
 
 **Việc cần làm**
-- Thêm cột verified_at và liên kết xác minh gửi qua bộ gửi email của A1.
-- Chưa xác minh vẫn dùng được nhưng có banner nhắc, cấu hình ALLOW_UNVERIFIED để siết chặt.
-- Gửi lại email xác minh có giới hạn tần suất.
+- Bảng families, family_members (vai trò chủ hoặc thành viên) và invites (mã dùng một lần, hết hạn).
+- API: tạo gia đình, tạo lời mời (liên kết có mã), chấp nhận, rời nhóm, chủ xoá thành viên, chủ xoá gia đình.
+- Màn Gia đình trong Hồ sơ: danh sách thành viên, nút Mời, hiện liên kết để sao chép.
+- Một người thuộc tối đa một gia đình ở bản đầu để đơn giản.
 
 **Tiêu chí nghiệm thu**
-- [ ] Bấm liên kết thì tài khoản được đánh dấu đã xác minh
-- [ ] Banner biến mất sau khi xác minh
-- [ ] Có test máy chủ và cập nhật README
+- [ ] Hai tài khoản kết nối qua liên kết mời và thấy nhau trong màn Gia đình
+- [ ] Mã mời dùng lần hai hoặc quá hạn bị từ chối
+- [ ] Rời nhóm hay bị xoá thì không còn truy cập gì của gia đình (có test)
+- [ ] Có test máy chủ cho toàn bộ luồng và quyền của từng vai trò
 
-**Tệp liên quan:** `server/routes.js`, `server/db.js`, `web/js/app.js`
+**Tệp hiện có liên quan:** `server/db.js`, `server/routes.js`, `web/js/app.js`
 
-### A3. Danh sách thiết bị đăng nhập và đăng xuất từ xa (3 điểm)
+### A2. Danh sách đi chợ dùng chung (5 điểm)
 
-Phụ thuộc: không. Nhãn: backend, frontend.
+Phụ thuộc: A1. Nhãn: feature, backend, frontend.
 
-**Bối cảnh.** Bảng sessions đã lưu user agent nhưng người dùng không xem hay huỷ được phiên nào.
+**Bối cảnh.** Việc đi chợ thường là của cả nhà: một người lên danh sách, người đi chợ tick từng món.
 
 **Việc cần làm**
-- GET /api/sessions và DELETE /api/sessions/:id (chỉ phiên của chính mình).
-- Mục Thiết bị đăng nhập trong Hồ sơ: đánh dấu thiết bị hiện tại, nút Đăng xuất thiết bị khác.
+- Cho phép chia sẻ một việc đi chợ (kèm danh sách và số lượng) với gia đình.
+- Lưu danh sách chung ở bảng riêng; mọi thành viên xem, tick, thêm món, sửa số lượng.
+- Cập nhật gần thời gian thực bằng hỏi lại mỗi 15 giây khi đang mở việc đó.
+- Hiện ai vừa tick món nào. Xung đột (hai người cùng sửa một món) thì bản mới nhất thắng và báo nhẹ.
 
 **Tiêu chí nghiệm thu**
-- [ ] Không huỷ được phiên của người khác (có test)
-- [ ] Huỷ phiên khác thì thiết bị đó nhận 401 ở lần gọi kế tiếp
-- [ ] Có test máy chủ
+- [ ] Hai tài khoản trong cùng gia đình cùng tick một danh sách và thấy thay đổi của nhau trong vòng 20 giây
+- [ ] Người ngoài gia đình không đọc được (có test truy cập)
+- [ ] Bản chia sẻ không làm hỏng đồng bộ dữ liệu cá nhân hiện có
+- [ ] Thêm bước vào e2e/run.js hoặc một bộ e2e mới cho hai thiết bị cùng gia đình
 
-**Tệp liên quan:** `server/routes.js`, `server/auth.js`, `web/js/app.js`
+**Tệp hiện có liên quan:** `server/routes.js`, `server/db.js`, `web/js/app.js`, `e2e/run.js`
 
-### A4. Lưu bộ đếm giới hạn vào SQLite (2 điểm)
+### A3. Giao việc cho người trong nhà (3 điểm)
 
-Phụ thuộc: không. Nhãn: backend, security.
+Phụ thuộc: A1. Nhãn: feature, backend, frontend.
 
-**Bối cảnh.** Giới hạn thử đăng nhập và đăng ký đang nằm trong bộ nhớ, khởi động lại là mất.
+**Bối cảnh.** Ví dụ: nhờ vợ đón con lúc 5h. Hiện chỉ tự nhắc cho mình.
 
 **Việc cần làm**
-- Bảng rate_limits (khoá, số lần, hết hạn) dùng chung cho đăng nhập, đăng ký và quên mật khẩu.
-- Dọn các dòng hết hạn định kỳ.
+- Khi tạo việc, chọn Giao cho một thành viên gia đình.
+- Người nhận thấy việc trong mục Việc được giao, chọn Nhận, Từ chối hoặc Đã xong.
+- Người giao thấy trạng thái. Có huy hiệu số việc chưa xem trên avatar.
 
 **Tiêu chí nghiệm thu**
-- [ ] Khởi động lại máy chủ không xoá bộ đếm (có test)
-- [ ] Có test dọn dẹp dòng hết hạn
+- [ ] Giao, nhận, từ chối và hoàn thành đều có trạng thái đúng ở cả hai phía (có test)
+- [ ] Chỉ thành viên cùng gia đình mới giao được cho nhau
+- [ ] Việc từ chối quay về người giao kèm thông báo trong app
 
-**Tệp liên quan:** `server/auth.js`, `server/routes.js`, `server/db.js`
+**Tệp hiện có liên quan:** `server/routes.js`, `server/db.js`, `web/js/app.js`
 
-### A5. Sao lưu SQLite tự động và khôi phục (3 điểm)
+### A4. Thói quen chung và nhắc nhau (3 điểm)
 
-Phụ thuộc: không. Nhãn: backend, ops.
+Phụ thuộc: A1. Nhãn: feature, backend, frontend.
 
-**Bối cảnh.** Toàn bộ dữ liệu người dùng nằm trong một file; mất file là mất tất cả.
+**Bối cảnh.** Uống nước hay đi bộ dễ giữ hơn khi cả nhà cùng làm.
 
 **Việc cần làm**
-- Lệnh npm run backup dùng VACUUM INTO ra file có dấu thời gian.
-- Tuỳ chọn chạy sao lưu định kỳ trong máy chủ (BACKUP_EVERY_HOURS), giữ N bản gần nhất.
-- Hướng dẫn khôi phục và một lệnh kiểm tra bản sao lưu mở được.
+- Một thói quen có thể mở chia sẻ cho gia đình, mỗi người có tiến độ riêng.
+- Màn tóm tắt: hôm nay ai đã làm xong, ai chưa.
+- Nút Nhắc nhẹ gửi một lời nhắc dễ thương cho người chưa làm (giới hạn tần suất để không phiền).
 
 **Tiêu chí nghiệm thu**
-- [ ] Sao lưu khi máy chủ đang chạy không làm hỏng dữ liệu
-- [ ] Có test: sao lưu rồi khôi phục ra cùng số người dùng và việc
-- [ ] Có mục Sao lưu trong README
+- [ ] Tiến độ của mỗi người chỉ hiện cho người cùng gia đình
+- [ ] Nút Nhắc nhẹ có giới hạn số lần mỗi ngày (có test)
+- [ ] Tắt chia sẻ thì người khác không còn thấy tiến độ
 
-**Tệp liên quan:** `server/db.js`, `server/index.js`, `Dockerfile`
+**Tệp hiện có liên quan:** `server/routes.js`, `web/js/app.js`
 
-### A6. Xuất và nhập dữ liệu cá nhân (3 điểm)
+### A5. Chia từng mục và thu hồi quyền (3 điểm)
 
-Phụ thuộc: không. Nhãn: backend, frontend.
+Phụ thuộc: A1, A2. Nhãn: feature, privacy, backend, frontend.
 
-**Bối cảnh.** Người dùng chưa có cách lấy dữ liệu của mình ra khỏi Remi.
+**Bối cảnh.** Người dùng cần kiểm soát rõ cái gì đang được chia sẻ với ai.
 
 **Việc cần làm**
-- GET /api/export trả toàn bộ dữ liệu của người dùng dạng JSON có phiên bản định dạng.
-- POST /api/import kiểm tra chặt rồi gộp vào dữ liệu hiện có.
-- Nút Xuất và Nhập trong Hồ sơ.
+- Màn Đang chia sẻ: liệt kê từng việc, danh sách, thói quen đã chia sẻ và với ai.
+- Thu hồi từng mục hoặc tất cả bằng một nút.
+- Ghi nhật ký ngắn ai đã xem hay sửa mục chung gần đây.
 
 **Tiêu chí nghiệm thu**
-- [ ] Xuất rồi nhập sang tài khoản mới ra dữ liệu giống hệt (có test)
-- [ ] Tệp sai định dạng bị từ chối với thông báo rõ
-- [ ] Có test máy chủ
+- [ ] Thu hồi có hiệu lực ngay ở lần gọi API kế tiếp (có test)
+- [ ] Không có đường nào để đọc mục chưa được chia sẻ, kể cả đoán mã (có test)
+- [ ] Cập nhật README mục Chia sẻ và quyền riêng tư
 
-**Tệp liên quan:** `server/routes.js`, `web/js/app.js`
+**Tệp hiện có liên quan:** `server/routes.js`, `web/js/app.js`
 
-## Nhóm B: Di động và thông báo
+## Chức năng B: Thực đơn tuần và tủ đồ nhà
 
-App trên điện thoại, thông báo, gọi dậy. Tổng 19 điểm.
+Lên thực đơn cả tuần, gộp danh sách đi chợ, quản lý đồ có sẵn và hạn dùng. Tổng 19 điểm.
 
-### B1. Bọc ứng dụng bằng Capacitor (iOS và Android) (5 điểm)
+### B1. Thực đơn tuần (5 điểm)
 
-Phụ thuộc: không. Nhãn: mobile.
+Phụ thuộc: không. Nhãn: feature, frontend.
 
-**Bối cảnh.** Mới có bản web cài được (PWA). Muốn lên cửa hàng ứng dụng cần bản native bọc bên ngoài.
+**Bối cảnh.** Hiện Remi chỉ giúp đi chợ cho từng bữa. Nhiều nhà muốn lên thực đơn cả tuần một lần.
 
 **Việc cần làm**
-- Thêm Capacitor, tạo dự án android và ios dùng thư mục web/.
-- Cấu hình địa chỉ máy chủ (SERVER_URL) vì app native không cùng nguồn với máy chủ.
-- Phiên đăng nhập trên WebView: dùng Bearer token (máy chủ đã hỗ trợ) thay cho cookie nếu cần.
-- Biểu tượng và màn hình khởi động từ web/icons.
-- Tài liệu build và chạy thử trên máy ảo và máy thật.
+- Tab Thực đơn: lưới 7 ngày nhân 3 bữa (sáng, trưa, tối).
+- Chọn món từ kho món ăn (tìm không dấu) hoặc gõ tên món tự do; mỗi bữa có số người ăn.
+- Lưu theo tuần, sao chép tuần trước sang tuần này.
+- Lưu trong dữ liệu người dùng và đồng bộ như các dữ liệu khác.
 
 **Tiêu chí nghiệm thu**
-- [ ] Đăng nhập, tạo việc và đồng bộ chạy được trong app Android và iOS
-- [ ] Có hướng dẫn từng bước trong docs/MOBILE.md
-- [ ] Không làm hỏng bản web hiện tại (npm test và test:e2e vẫn qua)
+- [ ] Tạo, sửa, xoá món trong từng bữa và đồng bộ sang thiết bị khác (có test e2e)
+- [ ] Không tràn ngang ở 320px; ở màn hình rộng hiện cả tuần cùng lúc
+- [ ] Có test cho phần sao chép tuần
 
-**Tệp liên quan:** `web/index.html`, `web/manifest.webmanifest`, `package.json`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`, `web/data/dishes.json`
 
-### B2. Thông báo cục bộ hẹn ngay trên máy (5 điểm)
+### B2. Gộp danh sách đi chợ từ thực đơn (5 điểm)
 
-Phụ thuộc: B1. Nhãn: mobile.
+Phụ thuộc: B1. Nhãn: feature, frontend.
 
-**Bối cảnh.** Thông báo hiện nay đi qua máy chủ. Thông báo hẹn ngay trên máy hoạt động tin cậy hơn và không cần máy chủ biết nội dung.
+**Bối cảnh.** Cả tuần dùng nhiều lần hành, gừng, nước mắm. Phải cộng dồn chứ không liệt kê lặp lại.
 
 **Việc cần làm**
-- Dùng plugin Local Notifications của Capacitor.
-- Dựng lại các thông báo từ buildSchedule() mỗi khi dữ liệu đổi (huỷ cái cũ, đặt cái mới).
-- Hỗ trợ cuộc gọi dậy chỉ khi vẫn ở trạng thái ngủ.
-- Không đặt trùng với thông báo đẩy từ máy chủ.
+- Nút Tạo danh sách đi chợ từ tuần: lấy nguyên liệu của mọi món trong tuần, co giãn theo số người từng bữa.
+- Cộng dồn nguyên liệu trùng nếu cùng loại đơn vị (g với kg, ml với lít); khác loại thì giữ hai dòng.
+- Nhóm theo loại (thịt cá, rau củ, gia vị, khác).
+- Tạo ra một việc đi chợ thường, dùng lại bộ tick và chỉnh số lượng đã có.
 
 **Tiêu chí nghiệm thu**
-- [ ] Tắt mạng và đóng app vẫn nhận nhắc đúng giờ trên máy thật
-- [ ] Sửa hay xoá việc thì thông báo cũ biến mất
-- [ ] Có ghi chú kết quả thử trên ít nhất hai máy
+- [ ] Hai món cùng dùng 200 g và 300 g thịt ba chỉ ra 500 g (có test trên qty.js hoặc hàm mới)
+- [ ] Đơn vị không cộng được thì không làm mất dòng nào
+- [ ] Có test với ít nhất 5 món chồng lên nhau
 
-**Tệp liên quan:** `web/js/app.js`, `web/sw.js`
+**Tệp hiện có liên quan:** `web/js/qty.js`, `web/js/app.js`, `server/test/qty.test.js`
 
-### B3. Kiểm thử thông báo đẩy thật trên Chrome, Safari iOS, Android (3 điểm)
+### B3. Tủ đồ nhà (5 điểm)
 
-Phụ thuộc: không. Nhãn: mobile, backend.
+Phụ thuộc: không. Nhãn: feature, frontend.
 
-**Bối cảnh.** Thư viện web-push chưa từng được thử gửi thật tới thiết bị trong quá trình phát triển.
+**Bối cảnh.** Biết nhà còn gì để khỏi mua trùng và khỏi để đồ hỏng. Lưu ý: state.pantry hiện chỉ là bộ nhớ gợi ý khi đi chợ, không phải kho đồ có sẵn; cần kho mới.
 
 **Việc cần làm**
-- Cài web-push, cấu hình VAPID, chạy máy chủ có HTTPS (có thể dùng tunnel).
-- Thử Chrome máy tính, Chrome Android, Safari iOS 16.4 trở lên (đã thêm vào Màn hình chính).
-- Ghi bảng kết quả vào docs/PUSH-TEST.md; sửa lỗi gặp phải; xử lý đăng ký hết hạn.
+- Dữ liệu mới state.fridge: tên, số lượng, đơn vị, hạn dùng.
+- Màn Tủ đồ: thêm, sửa, trừ khi dùng, sắp theo hạn dùng.
+- Đi chợ xong, tick món thì có nút Cho vào tủ.
+- Nhắc đồ sắp hết hạn trong 2 ngày (dùng cơ chế nhắc hiện có).
 
 **Tiêu chí nghiệm thu**
-- [ ] Nút gửi thử /api/push/test nhận được ở cả ba nền tảng
-- [ ] Đăng ký hết hạn (410) tự bị xoá
-- [ ] Có docs/PUSH-TEST.md với bảng kết quả và phiên bản thiết bị
+- [ ] Thêm và trừ số lượng dùng đơn vị qty.js, không cho số âm (có test)
+- [ ] Đồ sắp hết hạn hiện nổi bật và có lời nhắc
+- [ ] Dữ liệu đồng bộ cùng các dữ liệu khác
 
-**Tệp liên quan:** `server/push.js`, `server/scheduler.js`, `web/sw.js`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`, `server/test/qty.test.js`
 
-### B4. Nút hành động trên thông báo (3 điểm)
+### B4. Hôm nay nấu gì (2 điểm)
 
-Phụ thuộc: B3. Nhãn: mobile, frontend.
+Phụ thuộc: B3. Nhãn: feature, frontend.
 
-**Bối cảnh.** Người dùng phải mở app để bấm Xong. Cần bấm ngay trên thông báo.
+**Bối cảnh.** Câu hỏi mỗi ngày của người nội trợ.
 
 **Việc cần làm**
-- Thêm nút Xong, Nhắc lại sau 10 phút, và Đã uống X ml cho thói quen nước.
-- Xử lý ở service worker và gửi về app hoặc API nhỏ để ghi nhận.
-- Nhắc lại sau 10 phút tạo một lời nhắc mới.
+- Gợi ý món nấu được từ đồ trong tủ, xếp theo tỉ lệ nguyên liệu đã có.
+- Hiện nguyên liệu còn thiếu và nút tạo việc đi chợ cho phần thiếu.
 
 **Tiêu chí nghiệm thu**
-- [ ] Bấm Xong trên thông báo thì việc hoặc mốc thói quen được đánh dấu
-- [ ] Nhắc lại sau 10 phút hoạt động đúng một lần
-- [ ] Có test cho phần xử lý ở máy chủ nếu có API mới
+- [ ] Món đủ nguyên liệu xếp trên món thiếu (có test thuật toán xếp hạng)
+- [ ] Bấm tạo việc đi chợ ra danh sách chỉ gồm phần thiếu
 
-**Tệp liên quan:** `web/sw.js`, `server/routes.js`, `web/js/app.js`
+**Tệp hiện có liên quan:** `web/data/dishes.json`, `web/js/app.js`
 
-### B5. Độ tin cậy cuộc gọi dậy trên điện thoại thật (3 điểm)
+### B5. Món của tôi (2 điểm)
 
-Phụ thuộc: B2. Nhãn: mobile, research.
+Phụ thuộc: không. Nhãn: feature, frontend.
 
-**Bối cảnh.** Gọi dậy là tính năng dễ gây thất vọng nhất nếu thông báo bị hệ thống chặn.
+**Bối cảnh.** Mỗi nhà có những món riêng, kho mẫu không bao giờ đủ.
 
 **Việc cần làm**
-- Thử với Tiết kiệm pin, Tập trung, Không làm phiền, khoá màn hình lâu trên iOS và Android.
-- Ghi lại tỉ lệ nhận đúng giờ.
-- Thêm màn hướng dẫn trong app và đề xuất đặt thêm báo thức hệ thống.
-- Báo cáo xem có cần xin quyền đặc biệt của Apple (Critical Alerts) hay không.
+- Tạo món riêng: tên, nguyên liệu và định lượng cho 4 người, ghi chú.
+- Nhân bản một món có sẵn rồi sửa.
+- Món của tôi xuất hiện cùng kho món khi chọn món cho thực đơn và đi chợ.
 
 **Tiêu chí nghiệm thu**
-- [ ] Có báo cáo kết quả thử trên ít nhất 3 máy
-- [ ] Có màn hướng dẫn trong app
-- [ ] Quyết định rõ có làm tiếp Critical Alerts hay không
+- [ ] Món tạo ra dùng được trong tạo việc đi chợ và (khi có B1) trong thực đơn
+- [ ] Dữ liệu đồng bộ giữa các thiết bị
+- [ ] Có test
 
-**Tệp liên quan:** `web/js/app.js`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/data/dishes.json`
 
-## Nhóm C: AI và dữ liệu
+## Chức năng C: Thống kê, chuỗi ngày và phần thưởng
 
-Hiểu câu nói trên máy, kho món ăn, huấn luyện model. Tổng 19 điểm.
+Chuỗi ngày liên tiếp, biểu đồ tuần tháng, huy hiệu, Remi đổi biểu cảm. Tổng 19 điểm.
 
-### C1. Nối bộ hiểu câu trên máy vào bản web chính (3 điểm)
+### C1. Chuỗi ngày và tỉ lệ hoàn thành (5 điểm)
 
-Phụ thuộc: không. Nhãn: ai, frontend.
+Phụ thuộc: không. Nhãn: feature, frontend.
 
-**Bối cảnh.** Bộ hiểu câu theo luật đã có và đã đo, nhưng chưa được dùng trong bản web chính. Bản HTML đơn trong standalone/ đã có cách nối làm mẫu.
+**Bối cảnh.** Chỉ thói quen có nhật ký (h.log theo ngày). Việc thường hoàn thành chỉ đổi cờ done, không lưu khi nào, và việc lặp lại chỉ nhảy sang lần sau, nên chưa tính được lịch sử.
 
 **Việc cần làm**
-- Nhúng local-parse.js và dữ liệu món ăn vào web/index.html.
-- Thêm lựa chọn Tự động hoặc Chỉ trên máy trong Hồ sơ.
-- Khi AI lỗi hoặc mất mạng thì đọc trên máy và nói rõ trong form.
-- Chế độ Chỉ trên máy không được gọi /api/ai/parse.
+- Ghi lịch sử hoàn thành việc theo ngày (ví dụ state.doneLog) mỗi khi tick, kể cả việc lặp lại.
+- Hàm tính chuỗi ngày liên tiếp cho thói quen, tính theo đúng các thứ trong tuần được chọn (ngày nghỉ không làm đứt chuỗi).
+- Tỉ lệ hoàn thành 7 và 30 ngày gần nhất.
+- Hiện chuỗi và tỉ lệ ngay trên thẻ thói quen.
 
 **Tiêu chí nghiệm thu**
-- [ ] Có test đầu-cuối: chế độ Chỉ trên máy không gửi yêu cầu AI nào
-- [ ] Mất mạng vẫn tạo được việc bằng câu nói
-- [ ] Giữ nguyên hành vi hiện tại khi chọn Tự động và AI hoạt động
+- [ ] Hàm tính chuỗi có test với đồng hồ cố định: thói quen thứ 2, 4, 6 bỏ qua thứ 3 và thứ 5 mà không đứt chuỗi
+- [ ] Dữ liệu cũ chưa có nhật ký vẫn chạy bình thường
+- [ ] Nhật ký đồng bộ cùng dữ liệu khác
 
-**Tệp liên quan:** `web/js/local-parse.js`, `web/js/app.js`, `web/data/dishes.json`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`, `server/test/ml.test.js`
 
-### C2. Báo "không chắc" và chiến lược lai luật rồi AI (3 điểm)
+### C2. Trang Thống kê tuần và tháng (5 điểm)
 
-Phụ thuộc: không. Nhãn: ai.
+Phụ thuộc: C1. Nhãn: feature, frontend.
 
-**Bối cảnh.** Bộ luật hiện luôn trả lời, kể cả khi không hiểu. Cần biết khi nào nên hỏi AI hoặc hỏi lại người dùng.
+**Bối cảnh.** Người dùng muốn thấy mình tiến bộ ra sao.
 
 **Việc cần làm**
-- Bộ luật trả thêm độ tin cậy và lý do (không thấy giờ, giờ mơ hồ, nhiều ngày...).
-- Quy tắc lai: chắc thì dùng luôn, không chắc thì gọi AI hoặc hiện cảnh báo.
-- Thêm số đo "không chắc nhưng sai" vào bộ đo.
+- Tab Thống kê: chọn tuần hoặc tháng.
+- Biểu đồ cột vẽ bằng SVG tự viết (không thêm thư viện): nước uống ml mỗi ngày, số việc hoàn thành, tỉ lệ thói quen.
+- Ghi nhật ký giờ dậy và giờ đi ngủ mỗi ngày (hiện chỉ lưu trạng thái hiện tại) để vẽ biểu đồ giấc ngủ.
+- Màn hình rộng xếp biểu đồ thành lưới.
 
 **Tiêu chí nghiệm thu**
-- [ ] Trên gold và holdout, các mẫu sai phải có độ tin cậy thấp hơn các mẫu đúng (báo cáo số liệu)
-- [ ] Có test cho từng lý do không chắc
-- [ ] Cập nhật ml/README.md
+- [ ] Biểu đồ khớp số liệu nhật ký (test với dữ liệu mẫu)
+- [ ] Không tràn ngang ở 320px
+- [ ] Có trạng thái trống dễ thương khi chưa có dữ liệu
 
-**Tệp liên quan:** `web/js/local-parse.js`, `ml/eval/run.js`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`, `web/index.html`
 
-### C3. Mở rộng kho món ăn lên ít nhất 100 món (3 điểm)
+### C3. Huy hiệu và bộ sưu tập (3 điểm)
 
-Phụ thuộc: không. Nhãn: ai, data.
+Phụ thuộc: C1. Nhãn: feature, frontend.
 
-**Bối cảnh.** Kho hiện có 15 món, là mẫu. Món ngoài kho thì phải nhờ AI hoặc người dùng tự thêm.
+**Bối cảnh.** Phần thưởng nhỏ giúp giữ thói quen, nhất là khi app dành cho người thích sự đáng yêu.
 
 **Việc cần làm**
-- Thêm món, tên gọi khác và nguyên liệu cho 4 người, tự viết hoặc từ nguồn có giấy phép phù hợp.
-- Ghi nguồn và giấy phép vào docs/DATA-SOURCES.md.
-- Bổ sung bộ kiểm tra: định lượng đọc được, không trùng tên.
+- Khoảng 12 huy hiệu (7 ngày liên tiếp, uống đủ nước 5 ngày, hoàn thành 10 việc đầu tiên...), mô tả điều kiện rõ ràng.
+- Mở khoá thì hiện thông báo trong app, mỗi huy hiệu chỉ báo một lần.
+- Trang Bộ sưu tập: huy hiệu đã có sáng, chưa có mờ kèm điều kiện.
 
 **Tiêu chí nghiệm thu**
-- [ ] Ít nhất 100 món, test kho món vẫn qua
-- [ ] Có docs/DATA-SOURCES.md nêu rõ nguồn từng nhóm dữ liệu
-- [ ] Bộ đo ml/eval chạy lại và không giảm điểm
+- [ ] Điều kiện từng huy hiệu có test với dữ liệu mẫu
+- [ ] Không báo lại huy hiệu đã mở khoá, kể cả sau khi đồng bộ từ thiết bị khác
+- [ ] Huy hiệu lưu trong dữ liệu người dùng
 
-**Tệp liên quan:** `web/data/dishes.json`, `server/test/ml.test.js`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
 
-### C4. Thu dữ liệu thật có đồng ý để làm tập đo và huấn luyện (5 điểm)
+### C4. Remi đổi biểu cảm (3 điểm)
 
-Phụ thuộc: không. Nhãn: ai, privacy, backend.
+Phụ thuộc: C3. Nhãn: feature, frontend, design.
 
-**Bối cảnh.** Số đo hiện tại chỉ trên câu do nhóm tự viết. Cần dữ liệu thật, nhưng chỉ khi người dùng đồng ý rõ ràng.
+**Bối cảnh.** Linh vật Remi hiện chỉ là biểu tượng. Cho nó sống động theo thành tích.
 
 **Việc cần làm**
-- Màn đồng ý rõ ràng, tắt mặc định, có thể rút lại bất kỳ lúc nào.
-- Lưu cặp (câu gõ, bản người dùng đã sửa) sau khi bỏ tên, số điện thoại, địa chỉ.
-- Cho người dùng xem và xoá dữ liệu đã đóng góp.
-- Công cụ xuất tập đo mù (giữ riêng, không đưa vào huấn luyện).
+- Vẽ vài biến thể SVG của Remi (vui, hào hứng, buồn ngủ, ăn mừng) dựa trên web/icons/icon.svg.
+- Remi xuất hiện ở đầu Hôm nay và đổi biểu cảm theo tình hình (đã đủ nước, đang có chuỗi, mới dậy...).
+- Mỗi huy hiệu mở khoá một món phụ kiện (nơ, mũ) bật được trong Hồ sơ.
 
 **Tiêu chí nghiệm thu**
-- [ ] Không lưu gì nếu chưa đồng ý (có test)
-- [ ] Rút lại đồng ý thì dữ liệu cũ bị xoá
-- [ ] Có bộ lọc thông tin cá nhân với test các mẫu thường gặp
-- [ ] Duyệt lại với người phụ trách quyết định D-5 trước khi bật cho người dùng
+- [ ] Tối thiểu 4 biểu cảm, mỗi cái có điều kiện hiện rõ ràng (có test hàm chọn biểu cảm)
+- [ ] Không làm chậm tải trang đáng kể (SVG nhúng, không ảnh rời)
+- [ ] Hoạt ảnh tôn trọng chế độ giảm chuyển động của hệ thống
 
-**Tệp liên quan:** `server/routes.js`, `server/db.js`, `web/js/app.js`, `ml/README.md`
+**Tệp hiện có liên quan:** `web/icons/icon.svg`, `web/js/app.js`, `web/css/app.css`
 
-### C5. Tinh chỉnh model nhỏ và so với bộ luật (5 điểm)
+### C5. Bản tin cuối tuần (3 điểm)
 
-Phụ thuộc: C2, C4. Nhãn: ai, research.
+Phụ thuộc: C2. Nhãn: feature, frontend.
 
-**Bối cảnh.** Kịch bản huấn luyện đã viết nhưng chưa từng chạy vì chưa có GPU.
+**Bối cảnh.** Một lời tổng kết tuần theo giọng của Remi, gọi đúng tên người dùng.
 
 **Việc cần làm**
-- Chọn model nền nhỏ có giấy phép dùng thương mại phù hợp và hỗ trợ tiếng Việt tốt.
-- Chạy ml/train, chuyển GGUF, ép JSON bằng ngữ pháp GBNF.
-- Đo trên gold, holdout và tập đo mù của C4; so với bộ luật.
-- Đo thời gian trả lời và bộ nhớ trên điện thoại thấp nhất cần hỗ trợ.
+- Sáng chủ nhật hiện thẻ Tuần của bạn: số việc xong, nước uống, chuỗi dài nhất, lời Remi.
+- Lời Remi theo giọng nhắc đã chọn (thân mật, lịch sự, vui vẻ).
+- Nút Lưu ảnh: vẽ thẻ ra canvas thành PNG để chia sẻ.
 
 **Tiêu chí nghiệm thu**
-- [ ] Có báo cáo số đo cạnh bộ luật, nêu cả những chỗ model kém hơn
-- [ ] JSON hợp lệ 100% nhờ ngữ pháp
-- [ ] Chỉ đề xuất đưa vào app nếu đạt các tiêu chí trong ml/README.md
+- [ ] Thẻ chỉ hiện một lần mỗi tuần và xem lại được từ Thống kê
+- [ ] Ảnh PNG hiển thị đúng chữ tiếng Việt có dấu
+- [ ] Có test cho hàm tạo lời tổng kết
 
-**Tệp liên quan:** `ml/train/lora_finetune.py`, `ml/engines/llamacpp.js`, `ml/README.md`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
 
-## Nhóm D: Giao diện và trải nghiệm
+## Chức năng D: Lịch nâng cao
 
-Màn hình, trợ năng, chia sẻ, đa ngôn ngữ. Tổng 19 điểm.
+Xem tuần và ngày dạng dòng thời gian, kéo thả, báo trùng giờ, xuất nhập lịch .ics. Tổng 19 điểm.
 
-### D1. Chia sẻ danh sách đi chợ và việc với người thân (5 điểm)
+### D1. Xem tuần và xem ngày dạng dòng thời gian (5 điểm)
 
-Phụ thuộc: không. Nhãn: frontend, backend.
+Phụ thuộc: không. Nhãn: feature, frontend.
 
-**Bối cảnh.** Việc đi chợ thường là của cả nhà. Hiện mỗi tài khoản là một ngăn riêng.
+**Bối cảnh.** Lịch hiện chỉ có lưới tháng và danh sách của một ngày. Việc cũng chưa có thời lượng nên không vẽ thành khối được.
 
 **Việc cần làm**
-- Mô hình chia sẻ: người mời, người nhận, quyền xem hoặc sửa, thu hồi.
-- Mời bằng liên kết hoặc email; chỉ chia sẻ từng việc hoặc danh sách, không chia sẻ cả tài khoản.
-- Đồng bộ thay đổi hai chiều, xử lý xung đột theo mục.
-- Quyết định D-1 (kiến trúc riêng tư) phải được chốt trước khi bắt đầu.
+- Thêm trường thời lượng (durMin, mặc định 30 phút) vào việc và ô chỉnh trong khung chi tiết.
+- Chế độ Tuần và Ngày: trục giờ dọc, việc là khối theo thời lượng, đường kẻ giờ hiện tại.
+- Màn hình rộng hiện 7 cột; điện thoại hiện 1 hoặc 3 ngày.
+- Thói quen có giờ cố định hiện thành vạch nhỏ.
 
 **Tiêu chí nghiệm thu**
-- [ ] Hai tài khoản cùng tick một danh sách đi chợ và thấy thay đổi của nhau
-- [ ] Thu hồi quyền thì người kia không còn thấy dữ liệu
-- [ ] Có test máy chủ về quyền truy cập, không ai đọc được dữ liệu chưa được chia sẻ
-
-**Tệp liên quan:** `server/routes.js`, `server/db.js`, `web/js/app.js`
-
-### D2. Trợ năng: bàn phím và đọc màn hình (3 điểm)
-
-Phụ thuộc: không. Nhãn: frontend, a11y.
-
-**Bối cảnh.** Các hộp thoại và bộ chọn mới chưa được kiểm tra bằng bàn phím hay trình đọc màn hình.
-
-**Việc cần làm**
-- Bẫy tiêu điểm trong hộp thoại, trả tiêu điểm về nút đã mở, aria-modal chuẩn.
-- Thứ tự Tab hợp lý cho bộ chọn giờ, nút chọn nhanh và danh sách đi chợ.
-- Kiểm tra bằng VoiceOver hoặc NVDA, tương phản màu đạt mức AA.
-- Thêm một số kiểm tra tự động vào e2e.
-
-**Tiêu chí nghiệm thu**
-- [ ] Dùng được toàn bộ luồng tạo việc và chia nước chỉ bằng bàn phím
-- [ ] Trình đọc màn hình đọc được nhãn các nút + và −
-- [ ] Có báo cáo kiểm tra và test tự động cho focus trap
-
-**Tệp liên quan:** `web/js/app.js`, `web/css/app.css`, `web/index.html`
-
-### D3. Tìm kiếm việc, thói quen và ghi chú (3 điểm)
-
-Phụ thuộc: không. Nhãn: frontend.
-
-**Bối cảnh.** Dữ liệu càng nhiều càng khó tìm lại một ghi chú hay một món đã nhớ.
-
-**Việc cần làm**
-- Ô tìm (phím Ctrl hoặc Cmd cộng K) tìm trong việc, thói quen, ghi chú ngày và nguyên liệu.
-- Tìm không dấu vẫn ra kết quả có dấu.
-- Kết quả mở thẳng khung chi tiết hoặc ngày trong Lịch.
-
-**Tiêu chí nghiệm thu**
-- [ ] Gõ "hop" tìm ra "Họp"
-- [ ] Chọn kết quả mở đúng nơi
-- [ ] Có test đầu-cuối
-
-**Tệp liên quan:** `web/js/app.js`, `web/css/app.css`
-
-### D4. Sửa kế hoạch uống nước và xem tiến độ 7 ngày (3 điểm)
-
-Phụ thuộc: không. Nhãn: frontend.
-
-**Bối cảnh.** Khung chi tiết thói quen mới chỉ đổi được lượng mỗi lần, chưa đổi được tổng lượng, số lần, khung giờ như lúc tạo.
-
-**Việc cần làm**
-- Dùng lại khối Chia lượng nước trong khung chi tiết thói quen.
-- Biểu đồ cột 7 ngày gần nhất (ml đã uống) dựa trên nhật ký đã có.
-
-**Tiêu chí nghiệm thu**
-- [ ] Đổi kế hoạch thì lịch nhắc ngày hôm nay và các ngày sau cập nhật
-- [ ] Biểu đồ đúng với dữ liệu nhật ký (có test)
+- [ ] Việc cũ chưa có durMin vẫn hiển thị với mặc định
+- [ ] Khối việc đúng vị trí và độ dài theo giờ và thời lượng (có test)
 - [ ] Không tràn ngang ở 320px
 
-**Tệp liên quan:** `web/js/app.js`, `web/css/app.css`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
 
-### D5. Đa ngôn ngữ: tiếng Việt và tiếng Anh (5 điểm)
+### D2. Kéo thả đổi giờ và thời lượng (5 điểm)
 
-Phụ thuộc: không. Nhãn: frontend, i18n.
+Phụ thuộc: D1. Nhãn: feature, frontend.
 
-**Bối cảnh.** Mọi chữ hiện nằm cứng trong mã. Muốn có bản tiếng Anh phải tách ra.
+**Bối cảnh.** Dời việc bằng kéo thả nhanh hơn mở form rất nhiều.
 
 **Việc cần làm**
-- Tách chuỗi sang web/js/i18n.js (tiếng Việt, tiếng Anh).
-- Lời nhắc, giọng nhắc và các câu gọi tên cũng theo ngôn ngữ.
-- Prompt AI và bộ hiểu câu theo ngôn ngữ đã chọn (tiếng Anh dùng AI trước, bộ luật sau).
-- Chọn ngôn ngữ trong Hồ sơ, mặc định theo trình duyệt.
+- Kéo khối việc sang giờ hoặc ngày khác (chuột và cảm ứng, bước 5 phút).
+- Kéo mép dưới để đổi thời lượng.
+- Lưu và đồng bộ; việc lặp lại hỏi dời một lần hay mọi lần.
+- Phím tắt bàn phím để dời cho người không dùng chuột.
 
 **Tiêu chí nghiệm thu**
-- [ ] Test tự động báo lỗi nếu còn chuỗi tiếng Việt cứng ngoài tệp ngôn ngữ
-- [ ] Đổi ngôn ngữ không cần tải lại trang
-- [ ] Ngày giờ định dạng theo ngôn ngữ
+- [ ] Kéo xong thì giờ lưu đúng và lịch nhắc cập nhật (có test e2e)
+- [ ] Hoạt động trên cảm ứng (kiểm tra bằng thiết bị thật hoặc giả lập cảm ứng)
+- [ ] Có phương án thay thế bằng bàn phím
 
-**Tệp liên quan:** `web/js/app.js`, `web/index.html`, `server/ai.js`
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
 
-## Nhóm E: Nền tảng và chất lượng
+### D3. Báo trùng giờ và tìm giờ trống (3 điểm)
 
-Triển khai, CI, công cụ, bảo mật, giám sát. Tổng 19 điểm.
+Phụ thuộc: D1. Nhãn: feature, frontend.
 
-### E1. Triển khai thử lên máy chủ thật (5 điểm)
+**Bối cảnh.** Hai việc đè nhau là lỗi dễ gặp khi tự đặt nhiều thứ.
+
+**Việc cần làm**
+- Phát hiện hai việc có khoảng thời gian chồng nhau, hiện cảnh báo ngay trong khung tạo và sửa.
+- Nút Tìm giờ trống: gợi ý 3 khoảng trống gần nhất đủ thời lượng, trong khung giờ thức của người dùng.
+- Bấm vào gợi ý thì điền giờ vào bộ chọn.
+
+**Tiêu chí nghiệm thu**
+- [ ] Hàm tìm khoảng trống có test với nhiều trường hợp biên (nửa đêm, trùng đúng đầu mút)
+- [ ] Không báo trùng với việc đã xong
+- [ ] Gợi ý không rơi vào giờ ngủ
+
+**Tệp hiện có liên quan:** `web/js/app.js`
+
+### D4. Xuất và nhập lịch .ics (3 điểm)
+
+Phụ thuộc: không. Nhãn: feature, frontend, backend.
+
+**Bối cảnh.** Cầu nối với Google Calendar và Apple Calendar.
+
+**Việc cần làm**
+- Nút Xuất .ics: việc và (tuỳ chọn) thói quen có giờ thành sự kiện, có lặp lại hằng ngày hoặc hằng tuần.
+- Nhập .ics: đọc VEVENT cơ bản (tiêu đề, giờ, thời lượng, lặp lại đơn giản), cho xem trước rồi mới nhập.
+- Bỏ qua phần không hỗ trợ và nói rõ đã bỏ gì.
+
+**Tiêu chí nghiệm thu**
+- [ ] Xuất rồi nhập lại ra các việc giống nhau về giờ và lặp lại (có test)
+- [ ] Mở được tệp .ics xuất ra bằng ít nhất một ứng dụng lịch thật (ghi vào pull request)
+- [ ] Tệp .ics hỏng không làm app lỗi
+
+**Tệp hiện có liên quan:** `web/js/app.js`, `server/routes.js`
+
+### D5. Liên kết lịch để thuê bao (3 điểm)
+
+Phụ thuộc: D4. Nhãn: feature, backend, privacy.
+
+**Bối cảnh.** Thuê bao một địa chỉ .ics trong Google hay Apple Calendar thì lịch của Remi tự hiện bên đó, không cần xuất tay.
+
+**Việc cần làm**
+- Bảng calendar_tokens: mỗi người có một mã bí mật, tạo lại hoặc thu hồi được.
+- GET /api/cal/<mã>.ics trả lịch tương lai của người đó (không dùng cookie).
+- Nút Lấy liên kết lịch trong Hồ sơ, cảnh báo rằng ai có liên kết là xem được lịch.
+
+**Tiêu chí nghiệm thu**
+- [ ] Mã sai trả 404, mã bị thu hồi trả 404 (có test)
+- [ ] Chỉ trả việc của chính chủ, không trả ghi chú riêng
+- [ ] Có giới hạn tần suất truy cập
+
+**Tệp hiện có liên quan:** `server/routes.js`, `server/db.js`, `web/js/app.js`
+
+## Chức năng E: Nhập nhanh thông minh
+
+Nhiều việc trong một câu, chụp ảnh thành danh sách, việc hay dùng, nói liên tục, hoàn tác. Tổng 19 điểm.
+
+### E1. Nhiều việc trong một câu (5 điểm)
+
+Phụ thuộc: không. Nhãn: feature, ai, frontend.
+
+**Bối cảnh.** Người dùng hay nói liền một mạch: mai họp 9h, 2h đón con, tối đi chợ. Hiện mỗi lần chỉ ra một việc.
+
+**Việc cần làm**
+- Tách câu thành nhiều việc: cập nhật prompt AI (trả mảng) và bộ luật tách theo dấu phẩy, chấm phẩy, từ nối (rồi, sau đó, và).
+- Màn xem lại: danh sách các việc đã hiểu, bỏ tick việc không muốn, sửa nhanh từng việc rồi Thêm tất cả.
+- Thêm ít nhất 15 câu nhiều việc vào ml/data/gold.jsonl (kèm nhãn) để đo bộ luật.
+
+**Tiêu chí nghiệm thu**
+- [ ] Câu 3 việc ra đúng 3 việc với giờ đúng trong ít nhất 90% mẫu trên bộ đo mới (báo cáo số liệu)
+- [ ] Câu một việc vẫn chạy y như cũ (các bài đo cũ không giảm điểm)
+- [ ] Có test đầu-cuối từ câu tới ba việc được lưu
+
+**Tệp hiện có liên quan:** `server/ai.js`, `web/js/local-parse.js`, `web/js/app.js`, `ml/data/gold.jsonl`
+
+### E2. Chụp ảnh thành danh sách (5 điểm)
+
+Phụ thuộc: không. Nhãn: feature, ai, backend, frontend.
+
+**Bối cảnh.** Ghi chú viết tay, tin nhắn chụp màn hình, trang công thức: chụp một cái là ra danh sách đi chợ.
+
+**Việc cần làm**
+- Nút Chụp hoặc chọn ảnh; thu nhỏ ảnh ở máy trước khi gửi.
+- Endpoint POST /api/ai/vision gửi ảnh cho Claude (khối ảnh của Messages API) để đọc ra việc hoặc danh sách món kèm định lượng.
+- Giới hạn kích thước, định dạng và dùng chung bộ đếm lượt AI mỗi ngày; không lưu ảnh ở máy chủ.
+- Có dòng giải thích ảnh sẽ được gửi tới Claude; tắt hẳn khi người dùng chọn chế độ Chỉ trên máy.
+
+**Tiêu chí nghiệm thu**
+- [ ] Ảnh sai định dạng hoặc quá lớn bị từ chối rõ ràng (có test)
+- [ ] Không có ảnh nào được ghi vào đĩa hay cơ sở dữ liệu (có test)
+- [ ] Kết quả đi qua màn xem lại trước khi tạo gì, không tự tạo việc
+- [ ] Kiểm thử với ít nhất 5 ảnh thật, ghi kết quả vào pull request (máy chủ giả trong test tự động)
+
+**Tệp hiện có liên quan:** `server/ai.js`, `server/routes.js`, `web/js/app.js`
+
+### E3. Việc hay dùng và mẫu (3 điểm)
+
+Phụ thuộc: không. Nhãn: feature, frontend.
+
+**Bối cảnh.** Nhiều việc lặp đi lặp lại nhưng không đều đủ để đặt lặp (đón con 4h30 các ngày đi học).
+
+**Việc cần làm**
+- Lưu một việc làm mẫu: tên, giờ trong ngày, nhắc trước, danh sách.
+- Dải Việc hay dùng ở trang chủ: một chạm tạo lại cho hôm nay hoặc ngày mai.
+- Gợi ý lưu thành mẫu khi một việc có tên gần giống xuất hiện từ 3 lần trở lên.
+
+**Tiêu chí nghiệm thu**
+- [ ] Một chạm tạo đúng việc với giờ của hôm nay hoặc ngày mai (có test)
+- [ ] Gợi ý chỉ hiện sau lần thứ 3 và không hiện lại khi đã từ chối
+- [ ] Mẫu đồng bộ giữa các thiết bị
+
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
+
+### E4. Nói liên tục (3 điểm)
+
+Phụ thuộc: E1. Nhãn: feature, frontend.
+
+**Bối cảnh.** Nút micro hiện chỉ nghe một câu rồi tự gửi.
+
+**Việc cần làm**
+- Chế độ nói liên tục: hiện chữ trực tiếp, tự ngắt câu khi dừng.
+- Đưa toàn bộ lời nói qua cơ chế nhiều việc của E1, hiện màn xem lại.
+- Xử lý khéo trường hợp bị từ chối quyền micro hoặc trình duyệt không hỗ trợ.
+
+**Tiêu chí nghiệm thu**
+- [ ] Nói ba việc liền nhau ra ba việc (kiểm tra bằng giả lập SpeechRecognition trong test)
+- [ ] Từ chối micro thì báo hướng dẫn bật quyền, không báo lỗi mơ hồ
+- [ ] Dừng thì giải phóng micro
+
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
+
+### E5. Hoàn tác và lịch sử nhập (3 điểm)
+
+Phụ thuộc: không. Nhãn: feature, frontend.
+
+**Bối cảnh.** Lỡ tay tick nhầm hoặc xoá nhầm là mất công nhập lại.
+
+**Việc cần làm**
+- Thông báo Hoàn tác trong khoảng 8 giây sau khi tạo, xoá, tick hoặc dời việc.
+- Phím Ctrl hoặc Cmd cộng Z hoàn tác thao tác gần nhất.
+- Lịch sử 20 câu đã nhập gần đây, bấm để dùng lại.
+
+**Tiêu chí nghiệm thu**
+- [ ] Hoàn tác khôi phục đúng trạng thái trước đó kể cả danh sách và ghi chú (có test)
+- [ ] Hoàn tác không làm hỏng đồng bộ (mục khôi phục không bị coi là đã xoá)
+- [ ] Lịch sử không lưu câu khi người dùng bật chế độ riêng tư
+
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/css/app.css`
+
+## Việc chung, chưa phân công
+
+Đây là các việc nền tảng (hạ tầng, bảo mật, di động, công cụ) không thuộc chức năng nào. **Không tính vào 95 điểm ở trên.** Ai xong phần của mình sớm thì nhận thêm. Riêng **N0** nên làm trước vì nó giảm xung đột khi 5 người cùng sửa một tệp.
+
+### N0. Tách app.js thành các tệp theo tính năng (nên làm trước) (5 điểm)
+
+Phụ thuộc: không. Nhãn: tooling, refactor.
+
+**Bối cảnh.** app.js là một khối hơn 1500 dòng bọc trong một hàm. Năm người cùng sửa một tệp sẽ xung đột liên tục khi gộp.
+
+**Việc cần làm**
+- Tách thành các tệp theo vùng (dữ liệu và đồng bộ, hộp thoại, Hôm nay, Lịch, Thói quen, Đi chợ...) nạp theo thứ tự, dùng chung một đối tượng Remi để chia sẻ trạng thái và hàm.
+- Không đổi hành vi: toàn bộ bộ test hiện có vẫn qua.
+- Ghi sơ đồ tệp vào CONTRIBUTING.md để mỗi người biết đặt mã tính năng mới ở đâu.
+
+**Tiêu chí nghiệm thu**
+- [ ] npm test, test:e2e, test:responsive, test:features đều xanh trước và sau
+- [ ] Mỗi tính năng mới có chỗ gắn rõ ràng, không cần sửa các tệp của tính năng khác
+- [ ] Cả nhóm xem lại trước khi gộp
+
+**Tệp hiện có liên quan:** `web/js/app.js`, `web/index.html`, `e2e/run.js`
+
+### N1. Quên mật khẩu và xác minh email (5 điểm)
+
+Phụ thuộc: không. Nhãn: backend, security.
+
+**Bối cảnh.** Quên mật khẩu hiện là mất tài khoản; email đăng ký chưa được xác minh.
+
+**Việc cần làm**
+- POST /api/auth/forgot và /api/auth/reset với token băm, hết hạn 60 phút, dùng một lần.
+- Bộ gửi email tách riêng cấu hình bằng biến môi trường để test thay bằng bộ giả.
+- Xác minh email khi đăng ký, banner nhắc nếu chưa xác minh.
+
+**Tiêu chí nghiệm thu**
+- [ ] Trả lời giống hệt dù email có tài khoản hay không
+- [ ] Token dùng lần hai hoặc quá hạn bị từ chối (có test)
+- [ ] Đổi mật khẩu xong thì huỷ mọi phiên đang đăng nhập
+
+**Tệp hiện có liên quan:** `server/routes.js`, `server/auth.js`, `server/db.js`, `web/js/app.js`
+
+### N2. Triển khai thử lên máy chủ thật (5 điểm)
 
 Phụ thuộc: không. Nhãn: ops.
 
-**Bối cảnh.** Docker và compose đã viết nhưng chưa từng được build hoặc chạy trên máy chủ thật có HTTPS.
+**Bối cảnh.** Docker và compose chưa từng được build hay chạy trên máy chủ thật có HTTPS.
 
 **Việc cần làm**
-- Chạy docker build và compose, sửa lỗi nếu có (kèm package-lock.json).
-- Chọn nhà cung cấp, bật HTTPS và tên miền, gắn ổ đĩa cho /data.
-- Điền biến môi trường thật (ANTHROPIC_API_KEY, TRUST_PROXY=1, VAPID).
-- Viết docs/DEPLOY.md từng bước và kiểm tra /api/health từ ngoài.
+- Chạy docker build, sửa lỗi nếu có, thêm package-lock.json.
+- Chọn nhà cung cấp, bật HTTPS, gắn ổ đĩa cho /data, điền biến môi trường thật.
+- Viết docs/DEPLOY.md từng bước.
 
 **Tiêu chí nghiệm thu**
 - [ ] Có địa chỉ chạy được, đăng ký và tạo việc thành công
 - [ ] Khởi động lại container không mất dữ liệu
 - [ ] docs/DEPLOY.md đủ để người khác làm lại từ đầu
 
-**Tệp liên quan:** `Dockerfile`, `docker-compose.yml`, `.env.example`, `README.md`
+**Tệp hiện có liên quan:** `Dockerfile`, `docker-compose.yml`, `.env.example`, `README.md`
 
-### E2. Làm CI chạy ổn định cả bài kiểm thử trình duyệt (3 điểm)
+### N3. Làm CI chạy ổn định cả bài kiểm thử trình duyệt (3 điểm)
 
 Phụ thuộc: không. Nhãn: ops, testing.
 
-**Bối cảnh.** Công việc CI hiện chỉ chạy test máy chủ; job e2e đang để continue-on-error vì chưa được kiểm chứng trên GitHub.
+**Bối cảnh.** Job trình duyệt đang để cho phép lỗi vì chưa từng chạy trên GitHub.
 
 **Việc cần làm**
-- Làm cho npm run test:e2e, test:responsive và test:features chạy xanh trên GitHub Actions.
-- Lưu cache trình duyệt, đính kèm ảnh chụp màn hình khi lỗi.
+- Làm test:e2e, test:responsive, test:features xanh trên GitHub Actions.
 - Bỏ continue-on-error và đặt các job thành bắt buộc trong bảo vệ nhánh main.
 
 **Tiêu chí nghiệm thu**
-- [ ] Ba bộ test trình duyệt xanh trên 5 lần chạy liên tiếp
+- [ ] Ba bộ test xanh trên 5 lần chạy liên tiếp
 - [ ] Pull request không gộp được khi CI đỏ
-- [ ] Thời gian CI hợp lý, ghi vào CONTRIBUTING.md
 
-**Tệp liên quan:** `.github/workflows/ci.yml`, `package.json`
+**Tệp hiện có liên quan:** `.github/workflows/ci.yml`, `package.json`
 
-### E3. ESLint, Prettier và kiểm tra trước khi commit (2 điểm)
-
-Phụ thuộc: không. Nhãn: tooling.
-
-**Bối cảnh.** Chưa có công cụ thống nhất cách viết mã giữa 5 người.
-
-**Việc cần làm**
-- Thêm ESLint và Prettier với cấu hình tối thiểu hợp với mã hiện tại.
-- npm run lint và npm run format, chạy trong CI.
-- Hook commit chạy lint cho tệp đã đổi.
-
-**Tiêu chí nghiệm thu**
-- [ ] npm run lint xanh trên toàn bộ mã hiện có
-- [ ] CI báo đỏ khi sai quy tắc
-- [ ] Có hướng dẫn cài hook trong CONTRIBUTING.md
-
-**Tệp liên quan:** `package.json`, `.editorconfig`
-
-### E4. Tự lưu font và rà soát bảo mật (3 điểm)
+### N4. Tự lưu font và rà soát bảo mật (3 điểm)
 
 Phụ thuộc: không. Nhãn: security, frontend.
 
-**Bối cảnh.** Trang đang tải font từ Google Fonts (lộ địa chỉ IP người dùng cho bên thứ ba) và CSP phải mở cho bên đó.
+**Bối cảnh.** Trang đang tải font từ Google Fonts nên lộ địa chỉ IP người dùng cho bên thứ ba.
 
 **Việc cần làm**
-- Tự lưu font Be Vietnam Pro trong web/fonts (kiểm tra giấy phép), bỏ liên kết Google Fonts.
-- Thu hẹp CSP bỏ googleapis và gstatic, cập nhật service worker.
-- Rà soát theo danh sách OWASP ASVS mức cơ bản và ghi báo cáo vào docs/SECURITY-REVIEW.md.
+- Tự lưu font Be Vietnam Pro trong web/fonts (kiểm tra giấy phép), siết CSP.
+- Rà soát theo OWASP ASVS mức cơ bản, ghi docs/SECURITY-REVIEW.md.
 
 **Tiêu chí nghiệm thu**
-- [ ] Không còn yêu cầu mạng nào tới bên thứ ba khi mở trang (kiểm bằng test)
-- [ ] Giao diện hiển thị đúng tiếng Việt có dấu với font mới
-- [ ] Báo cáo liệt kê phát hiện và mức độ ưu tiên
+- [ ] Không còn yêu cầu mạng tới bên thứ ba khi mở trang (có test)
+- [ ] Báo cáo liệt kê phát hiện và mức ưu tiên
 
-**Tệp liên quan:** `server/http.js`, `web/index.html`, `web/css/app.css`
+**Tệp hiện có liên quan:** `server/http.js`, `web/index.html`, `web/css/app.css`
 
-### E5. Hợp nhất bản HTML đơn với bản web chính (3 điểm)
+### N5. Bọc Capacitor và thử thông báo đẩy thật (5 điểm)
 
-Phụ thuộc: không. Nhãn: tooling, frontend.
+Phụ thuộc: không. Nhãn: mobile.
 
-**Bối cảnh.** standalone/remi.html là ảnh chụp từ một nhánh mã riêng. Hai bản sẽ lệch dần nếu để vậy.
+**Bối cảnh.** Mới có bản web cài được; web-push chưa từng thử gửi thật tới thiết bị.
 
 **Việc cần làm**
-- Viết script tạo file HTML đơn từ web/ (nhúng CSS, JS, dữ liệu) thay cho chỉnh tay.
-- Kiểm thử file sinh ra trong CI bằng bộ test trình duyệt.
-- Xoá bản lệch và ghi cách tạo lại vào standalone/README.md.
+- Thêm Capacitor cho iOS và Android, chạy được trên máy ảo.
+- Thử gửi thông báo đẩy thật trên Chrome, Android và Safari iOS (Màn hình chính), ghi bảng kết quả vào docs/PUSH-TEST.md.
 
 **Tiêu chí nghiệm thu**
-- [ ] npm run build:standalone tạo ra file chạy được khi mở trực tiếp
-- [ ] CI kiểm tra file sinh ra
+- [ ] Đăng nhập và đồng bộ chạy được trong app trên máy ảo
+- [ ] Bảng kết quả thông báo đẩy ghi rõ thiết bị và phiên bản
+
+**Tệp hiện có liên quan:** `web/index.html`, `web/sw.js`, `server/push.js`, `package.json`
+
+### N6. Hợp nhất bản HTML đơn với bản web chính (3 điểm)
+
+Phụ thuộc: không. Nhãn: tooling.
+
+**Bối cảnh.** standalone/remi.html là ảnh chụp từ một nhánh mã riêng, sẽ lệch dần.
+
+**Việc cần làm**
+- Viết script tạo file HTML đơn từ web/ thay cho chỉnh tay.
+- Kiểm thử file sinh ra trong CI.
+
+**Tiêu chí nghiệm thu**
 - [ ] Chỉ còn một nguồn mã duy nhất
+- [ ] CI kiểm tra file sinh ra
 
-**Tệp liên quan:** `standalone/remi.html`, `web/index.html`, `web/js/app.js`
+**Tệp hiện có liên quan:** `standalone/remi.html`, `web/index.html`, `web/js/app.js`
 
-### E6. Giám sát: nhật ký, sức khoẻ và cảnh báo lỗi (3 điểm)
+### N7. Huấn luyện model nhỏ hiểu câu trên máy (5 điểm)
 
-Phụ thuộc: không. Nhãn: ops, backend.
+Phụ thuộc: không. Nhãn: ai, research.
 
-**Bối cảnh.** Khi chạy thật cần biết thông báo có đang được gửi hay không.
+**Bối cảnh.** Kịch bản huấn luyện đã viết nhưng chưa từng chạy vì chưa có GPU. Nên làm sau khi đã có dữ liệu thật và bộ đo mù.
 
 **Việc cần làm**
-- Nhật ký JSON có cấp độ và mã yêu cầu.
-- /api/health trả thêm trạng thái cơ sở dữ liệu và độ trễ của bộ gửi lời nhắc.
-- Đếm lời nhắc đã gửi, bỏ qua, lỗi; cảnh báo lỗi qua webhook hoặc Sentry.
+- Chọn model nền nhỏ có giấy phép dùng thương mại phù hợp.
+- Huấn luyện, đo trên gold, holdout và dữ liệu thật, so với bộ luật, đo tốc độ trên điện thoại.
 
 **Tiêu chí nghiệm thu**
-- [ ] Có test cho /api/health khi cơ sở dữ liệu lỗi
-- [ ] Nhật ký không chứa mật khẩu, token hay nội dung câu nói
-- [ ] Có tài liệu cách đọc số liệu
+- [ ] Có báo cáo số đo cạnh bộ luật, nêu cả những chỗ model kém hơn
+- [ ] Chỉ đề xuất đưa vào app nếu đạt các tiêu chí trong ml/README.md
 
-**Tệp liên quan:** `server/index.js`, `server/scheduler.js`, `server/routes.js`
+**Tệp hiện có liên quan:** `ml/train/lora_finetune.py`, `ml/engines/llamacpp.js`, `ml/README.md`
 

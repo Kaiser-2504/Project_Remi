@@ -4,7 +4,7 @@ about: Một việc trong bảng việc của nhóm
 labels: ''
 ---
 
-**Nhóm / mã việc:** (ví dụ B3)
+**Chức năng / mã việc:** (ví dụ B3, hoặc N2 nếu là việc chung)
 
 ### Bối cảnh
 

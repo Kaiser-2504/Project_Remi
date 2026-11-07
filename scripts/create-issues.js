@@ -9,7 +9,7 @@
  * Cần cài gh và đã chạy `gh auth login`. Chạy hai lần sẽ tạo issue trùng, nên chỉ chạy thật một lần.
  */
 const { execFileSync } = require('node:child_process');
-const { load, issueBody } = require('./tasks');
+const { load, issueBody, everything } = require('./tasks');
 
 const av = process.argv.slice(2);
 const flag = (k) => av.includes('--' + k);
@@ -18,15 +18,18 @@ const val = (k) => { const i = av.indexOf('--' + k); return i >= 0 ? av[i + 1] :
 function plan(data, { repo, assign } = {}) {
   const owner = Object.fromEntries(String(assign || '').split(',').filter(Boolean).map((p) => p.split('=')));
   const base = repo ? ['--repo', repo] : [];
+  const all = everything(data);
   const cmds = [];
-  const colors = { A: '1D76DB', B: '0E8A16', C: '5319E7', D: 'FBCA04', E: 'D93F0B' };
-  for (const m of data.team) cmds.push(['label', 'create', `track:${m.id}`, '--description', `${m.name}`, '--color', colors[m.id], '--force', ...base]);
-  for (const p of [...new Set(data.tasks.map((t) => t.points))]) cmds.push(['label', 'create', `points:${p}`, '--color', 'C5DEF5', '--force', ...base]);
-  for (const l of [...new Set(data.tasks.flatMap((t) => t.labels))]) cmds.push(['label', 'create', l, '--color', 'EDEDED', '--force', ...base]);
-  for (const t of data.tasks) {
+  const colors = { A: '1D76DB', B: '0E8A16', C: '5319E7', D: 'FBCA04', E: 'D93F0B', N: '999999' };
+  for (const m of data.team) cmds.push(['label', 'create', `track:${m.id}`, '--description', m.feature, '--color', colors[m.id], '--force', ...base]);
+  cmds.push(['label', 'create', 'track:chung', '--description', 'Việc chung, chưa phân công', '--color', colors.N, '--force', ...base]);
+  for (const p of [...new Set(all.map((t) => t.points))]) cmds.push(['label', 'create', `points:${p}`, '--color', 'C5DEF5', '--force', ...base]);
+  for (const l of [...new Set(all.flatMap((t) => t.labels))]) cmds.push(['label', 'create', l, '--color', 'EDEDED', '--force', ...base]);
+  for (const t of all) {
+    const track = t.track === 'N' ? 'track:chung' : `track:${t.track}`;
     const c = ['issue', 'create', '--title', `[${t.id}] ${t.title}`, '--body', issueBody(t, data),
-      '--label', [`track:${t.track}`, `points:${t.points}`, ...t.labels].join(','), ...base];
-    if (owner[t.track]) c.push('--assignee', owner[t.track]);
+      '--label', [track, `points:${t.points}`, ...t.labels].join(','), ...base];
+    if (t.track !== 'N' && owner[t.track]) c.push('--assignee', owner[t.track]);
     cmds.push(c);
   }
   return cmds;

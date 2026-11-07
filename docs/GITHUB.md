@@ -25,7 +25,7 @@ git status
 
 1. Settings, Collaborators: mời 4 người còn lại.
 2. Settings, Branches, Add branch ruleset (hoặc Add rule) cho `main`: bắt buộc pull request, ít nhất 1 người duyệt, bắt buộc các kiểm tra `test` và `docker` phải xanh.
-3. Job `browser` đang để cho phép lỗi vì chưa từng chạy trên GitHub. Làm xong việc E2 rồi mới đưa nó vào danh sách bắt buộc.
+3. Job `browser` đang để cho phép lỗi vì chưa từng chạy trên GitHub. Làm xong việc chung N3 rồi mới đưa nó vào danh sách bắt buộc.
 
 ## 3. Chốt người phụ trách và tạo issue
 
@@ -43,7 +43,7 @@ gh auth login
 node scripts/create-issues.js --run --repo TAI-KHOAN/TEN-REPO --assign A=ten-a,B=ten-b,C=ten-c,D=ten-d,E=ten-e
 ```
 
-Script tạo nhãn theo nhóm và điểm, mỗi việc thành một issue có bối cảnh, việc cần làm và tiêu chí nghiệm thu dạng hộp tick, gán cho người của nhóm đó. Script này mới chạy thử ở chế độ in lệnh, **chưa chạy thật với GitHub**.
+Script tạo nhãn theo chức năng và điểm, mỗi việc thành một issue có bối cảnh, việc cần làm và tiêu chí nghiệm thu dạng hộp tick. Việc của chức năng A đến E gán cho người phụ trách chức năng đó (`--assign A=...,E=...`). Các việc chung N0 đến N7 **không gán ai**, mang nhãn `track:chung`, ai xong phần mình thì nhận. Script này mới chạy thử ở chế độ in lệnh, **chưa chạy thật với GitHub**.
 
 ## 4. Theo dõi
 
@@ -51,4 +51,4 @@ Tạo một Project (bảng Kanban) trên GitHub, thêm các issue vào, chia c�
 
 ## 5. Khi bảng việc đổi
 
-Sửa `docs/tasks.json`, chạy `npm run tasks:doc`, commit cả hai tệp. Test sẽ kiểm tra bảng vẫn cân bằng giữa 5 nhóm và mọi tệp được nhắc tới đều có thật.
+Sửa `docs/tasks.json`, chạy `npm run tasks:doc`, commit cả hai tệp. Test sẽ kiểm tra bảng vẫn cân bằng giữa 5 chức năng và mọi tệp được nhắc tới đều có thật.

@@ -160,7 +160,7 @@ Biểu tượng nằm ở `web/icons/`; xuất lại PNG từ SVG bằng `npm ru
 
 ## Làm việc nhóm
 
-Bảng việc cho 5 người nằm ở `docs/TASKS.md` (sinh từ `docs/tasks.json`), hướng dẫn đẩy lên GitHub và tạo issue ở `docs/GITHUB.md`, quy ước ở `CONTRIBUTING.md`. Bản HTML đơn chạy không cần máy chủ nằm ở `standalone/`.
+Mỗi thành viên phụ trách trọn một chức năng mới (chia sẻ với gia đình, thực đơn tuần và tủ đồ nhà, thống kê và phần thưởng, lịch nâng cao, nhập nhanh thông minh). Bảng việc nằm ở `docs/TASKS.md` (sinh từ `docs/tasks.json`), hướng dẫn đẩy lên GitHub và tạo issue ở `docs/GITHUB.md`, quy ước ở `CONTRIBUTING.md`. Bản HTML đơn chạy không cần máy chủ nằm ở `standalone/`.
 
 ## Đã kiểm tra và chưa kiểm tra
 

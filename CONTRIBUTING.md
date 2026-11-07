@@ -26,7 +26,7 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 
 ## Quy trình mỗi việc
 
-1. Nhận một issue (xem `docs/TASKS.md` và `docs/GITHUB.md`).
+1. Nhận một issue. Mỗi người phụ trách trọn một chức năng (xem `docs/TASKS.md`), việc nào trong chức năng của mình thì tự nhận, việc chung (N0 đến N7) thì ai xong phần mình thì nhận thêm.
 2. Tách nhánh từ `main`, đặt tên `<mã việc>-<mô tả ngắn>`, ví dụ `A1-quen-mat-khau`.
 3. Commit nhỏ, thông điệp nói rõ làm gì và vì sao.
 4. Mở pull request theo mẫu. **Đề xuất mặc định:** ít nhất một người khác duyệt, CI xanh mới gộp, gộp kiểu squash. Cả nhóm chốt lại ở quyết định D-6.
@@ -51,7 +51,7 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 | `ml/` | Dữ liệu huấn luyện, bộ đo chất lượng, kịch bản tinh chỉnh model |
 | `e2e/` | Các bộ test trình duyệt |
 | `standalone/` | Bản HTML đơn chạy không cần máy chủ (ảnh chụp, xem README trong đó) |
-| `docs/` | Bảng việc của nhóm |
+| `docs/` | Bảng việc: 5 chức năng cho 5 người cộng việc chung |
 | `scripts/` | Công cụ nhỏ: dựng bảng việc, tạo issue, xuất biểu tượng |
 
 ## Mẹo khi dùng terminal

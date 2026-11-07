@@ -1,0 +1,48 @@
+{"id":"g01","family":"task","input":"nhắc tôi họp với khách lúc 9h30 sáng mai","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T09:30","repeat":"none","leadMinutes":0,"shopping":false,"title":"họp với khách"}}
+{"id":"g02","family":"task","input":"mai 9h30 họp, nhắc trước 30 phút","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T09:30","leadMinutes":30,"title":"họp"}}
+{"id":"g03","family":"task","input":"gọi cho bố mẹ 8 giờ tối nay","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T20:00","title":"gọi cho bố mẹ"}}
+{"id":"g04","family":"task","input":"tối nay 7h đón con","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T19:00","title":"đón con"}}
+{"id":"g05","family":"task","input":"chiều mai 3h đi khám răng","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T15:00","title":"đi khám răng"}}
+{"id":"g06","family":"task","input":"14h thứ sáu nộp báo cáo","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-06T14:00","title":"nộp báo cáo"}}
+{"id":"g07","family":"shopping","input":"chủ nhật 10h sáng đi siêu thị","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-08T10:00","shopping":true,"leadMinutes":60,"servings":4}}
+{"id":"g08","family":"task","input":"thứ 6 tuần sau 9h họp","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-13T09:00","title":"họp"}}
+{"id":"g09","family":"task","input":"ngày 15/11 lúc 7h tối ăn tối với gia đình","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-15T19:00","title":"ăn tối với gia đình"}}
+{"id":"g10","family":"task","input":"nhắc tôi trả tiền điện vào ngày 20","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-20T09:00","title":"trả tiền điện"}}
+{"id":"g11","family":"task","input":"7h30 sáng mai đưa con đi học","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T07:30","title":"đưa con đi học"}}
+{"id":"g12","family":"repeat","input":"mỗi sáng 7h gọi cho mẹ","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T07:00","repeat":"daily","title":"gọi cho mẹ"}}
+{"id":"g13","family":"repeat","input":"hằng tuần thứ hai 9h họp nhóm","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-09T09:00","repeat":"weekly","title":"họp nhóm"}}
+{"id":"g14","family":"repeat","input":"mỗi thứ 6 5h chiều đổ rác","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-06T17:00","repeat":"weekly","title":"đổ rác"}}
+{"id":"g15","family":"shopping","input":"nhớ đi chợ nấu cà ri lúc 7h tối nay","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T19:00","shopping":true,"leadMinutes":60,"servings":4,"items":["Thịt gà","Bột cà ri","Khoai tây","Cà rốt","Hành tây","Nước cốt dừa","Sả"]}}
+{"id":"g16","family":"shopping","input":"vợ nhờ tôi đi chợ nấu canh chua cá cho 6 người lúc 6h chiều mai","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T18:00","shopping":true,"servings":6,"items":["Cá lóc","Cà chua","Dứa","Đậu bắp","Giá đỗ","Me","Rau om"],"qty":{"Cá lóc":"750 g"}}}
+{"id":"g17","family":"shopping","input":"đi chợ 7h","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T19:00","shopping":true,"title":"đi chợ"}}
+{"id":"g18","family":"habit","input":"uống nước 2 lít mỗi ngày","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":true,"days":[0,1,2,3,4,5,6],"spread":{"count":8,"from":"wake","to":"bed"}}}}
+{"id":"g19","family":"habit","input":"nhắc tôi uống nước từ bây giờ đến 9h tối đủ 1,5 lít","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":false,"spread":{"count":6,"from":"now","to":"21:00"}}}}
+{"id":"g20","family":"habit","input":"uống đủ 2,5 lít nước mỗi ngày","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":true,"spread":{"count":10,"from":"wake","to":"bed"}}}}
+{"id":"g21","family":"habit","input":"giãn cơ 5 phút mỗi ngày lúc 7h sáng","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"giãn cơ 5 phút","habit":{"recurring":true,"times":["07:00"],"days":[0,1,2,3,4,5,6]}}}
+{"id":"g22","family":"habit","input":"đi bộ 30 phút mỗi sáng","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"đi bộ 30 phút","habit":{"recurring":true,"times":["07:00"]}}}
+{"id":"g23","family":"habit","input":"thiền 10 phút mỗi tối","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":true,"times":["21:00"]}}}
+{"id":"g24","family":"habit","input":"tập yoga thứ 2, 4, 6 lúc 6h chiều","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":true,"days":[1,3,5],"times":["18:00"]}}}
+{"id":"g25","family":"habit","input":"đọc sách 20 trang cuối tuần","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"đọc sách 20 trang","habit":{"recurring":true,"days":[6,0]}}}
+{"id":"g26","family":"habit","input":"uống vitamin mỗi ngày 8h sáng","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":true,"times":["08:00"]}}}
+{"id":"g27","family":"nodiacritics","input":"nhac toi hop voi khach luc 9h30 sang mai","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T09:30","title":"hop voi khach"}}
+{"id":"g28","family":"nodiacritics","input":"mai 7h toi di cho nau ca kho","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T19:00","shopping":true,"items":["Cá basa","Hành tím","Nước mắm","Đường","Tiêu xay","Ớt"]}}
+{"id":"g29","family":"task","input":"thứ 7 này 10h sáng dọn nhà","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-07T10:00","title":"dọn nhà"}}
+{"id":"g30","family":"task","input":"sáng mai 6h30 bay","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T06:30","title":"bay"}}
+{"id":"g31","family":"task","input":"8h tối nay họp phụ huynh, báo trước tui 1 tiếng","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T20:00","leadMinutes":60,"title":"họp phụ huynh"}}
+{"id":"g32","family":"task","input":"mai 2h chiều đặt lịch cắt tóc, nhắc trước 1 tiếng rưỡi","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T14:00","leadMinutes":90,"title":"đặt lịch cắt tóc"}}
+{"id":"g33","family":"repeat","input":"nhắc tôi tưới cây lúc 6h chiều hằng ngày","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T18:00","repeat":"daily","title":"tưới cây"}}
+{"id":"g34","family":"task","input":"ngày kia 9h sáng đi làm giấy tờ","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-06T09:00","title":"đi làm giấy tờ"}}
+{"id":"g35","family":"task","input":"thứ 2 8h họp","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-09T08:00","title":"họp"}}
+{"id":"g36","family":"task","input":"tối mai 7h gặp bạn","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T19:00","title":"gặp bạn"}}
+{"id":"g37","family":"shopping","input":"đi chợ nấu thịt kho trứng cho 3 người 5h chiều","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T17:00","shopping":true,"servings":3,"items":["Thịt ba chỉ","Trứng gà","Nước dừa","Nước mắm","Đường","Hành tím"],"qty":{"Thịt ba chỉ":"450 g"}}}
+{"id":"g38","family":"task","input":"hôm nay 3h chiều gọi điện cho khách","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T15:00","title":"gọi điện cho khách"}}
+{"id":"g39","family":"task","input":"12h trưa mai ăn cơm với sếp","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T12:00","title":"ăn cơm với sếp"}}
+{"id":"g40","family":"task","input":"23h tối nay tắt máy chủ","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T23:00","title":"tắt máy chủ"}}
+{"id":"g41","family":"habit","input":"chạy bộ 5 km mỗi ngày","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"chạy bộ 5 km","habit":{"recurring":true,"days":[0,1,2,3,4,5,6]}}}
+{"id":"g42","family":"task","input":"đi khám tổng quát ngày 3/12 lúc 8h sáng","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-12-03T08:00","title":"đi khám tổng quát"}}
+{"id":"g43","family":"shopping","input":"mua quà sinh nhật cho mẹ chủ nhật","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-08T09:00","shopping":true}}
+{"id":"g44","family":"task","input":"chiều nay 5h30 họp online","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T17:30","title":"họp online"}}
+{"id":"g45","family":"habit","input":"hít đất 20 cái mỗi sáng","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"hít đất 20 cái","habit":{"recurring":true,"times":["07:00"]}}}
+{"id":"g46","family":"habit","input":"lên lịch hẹn uống 1 lít nước chia làm 4 lần từ 1h-5h","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"uống nước 1 lít","habit":{"recurring":false,"ml":1000,"spread":{"count":4,"from":"13:00","to":"17:00"}}}}
+{"id":"g47","family":"habit","input":"uống 2 lít nước chia 8 lần từ 8h đến 9h tối mỗi ngày","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":true,"ml":2000,"spread":{"count":8,"from":"08:00","to":"21:00"}}}}
+{"id":"g48","family":"habit","input":"uống nước 500 ml chia thành 2 lần từ 9h-11h sáng","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":false,"ml":500,"spread":{"count":2,"from":"09:00","to":"11:00"}}}}

@@ -1,9 +1,7 @@
-# Điền tài khoản GitHub của từng thành viên vào đây rồi bỏ dấu # để GitHub tự gán người duyệt.
-# Dòng sau cùng thắng, nên đặt các quy tắc cụ thể ở cuối.
+# Điền tài khoản GitHub vào đây rồi bỏ dấu # để GitHub tự gán người duyệt.
+# Vì mỗi người làm một chức năng trên cùng vài tệp chung, cách đơn giản là mọi người cùng duyệt chéo nhau:
 #
-# * @thanh-vien-1
-# /server/                @thanh-vien-A
-# /web/sw.js              @thanh-vien-B
-# /ml/                    @thanh-vien-C
-# /web/css/ /web/js/      @thanh-vien-D
-# /.github/ /Dockerfile   @thanh-vien-E
+# * @thanh-vien-1 @thanh-vien-2 @thanh-vien-3 @thanh-vien-4 @thanh-vien-5
+#
+# Có thể siết riêng phần nhạy cảm (đăng nhập, chia sẻ) cho người phụ trách chức năng A:
+# /server/auth.js         @thanh-vien-A
