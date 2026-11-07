@@ -1,7 +1,7 @@
 /* Service worker của Remi: mở app khi mất mạng và nhận thông báo đẩy từ máy chủ. */
 'use strict';
-const CACHE = 'remi-v3';
-const SHELL = ['/', '/css/app.css', '/js/api.js', '/js/qty.js', '/js/app.js', '/manifest.webmanifest', '/icons/icon.svg'];
+const CACHE = 'remi-v4';
+const SHELL = ['/', '/css/app.css', '/js/api.js', '/js/qty.js', '/js/stats.js', '/js/app.js', '/manifest.webmanifest', '/icons/icon.svg'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
