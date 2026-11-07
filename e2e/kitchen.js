@@ -33,6 +33,14 @@ const SHOTS = process.env.KITCHEN_SHOTS;
     pg.on('pageerror', (e) => errors.push(name + ': ' + e.message));
     pg.on('console', (m) => { if (/Content Security Policy|Refused to/i.test(m.text())) errors.push(name + ' CSP: ' + m.text()); });
     await pg.setViewport({ width: 390, height: 844 });
+    // Puppeteer bấm chuột vào toạ độ: phần tử sát đáy màn hình sẽ bị thanh điều hướng cố định che (lỗi chỉ thấy trên CI).
+    // Nên luôn cuộn phần tử ra giữa màn hình trước khi bấm, giống người dùng thật cuộn rồi mới chạm.
+    const rawClick = pg.click.bind(pg);
+    pg.click = async (sel, ...a) => {
+      await pg.waitForSelector(sel);
+      await pg.evaluate((s) => { const e = document.querySelector(s); if (e) e.scrollIntoView({ block: 'center', inline: 'nearest' }); }, sel);
+      try { return await rawClick(sel, ...a); } catch (e) { throw new Error(`click(${sel}) trên máy ${name}: ${e.message}`); }
+    };
     await pg.goto(base);
     if (register) {
       await pg.waitForSelector('#a-sw');
