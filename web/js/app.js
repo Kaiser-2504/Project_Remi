@@ -783,6 +783,23 @@ function daysText(d){
   return DAY_ORDER.filter(x=>d.indexOf(x)>=0).map(x=>DAY_LABEL[x]).join(' ');
 }
 function habitDone(h){return Math.min(hTimes(h).length,h.log[dKey(new Date())]||0)}
+/** Dòng "🔥 chuỗi ngày · tỉ lệ" cho thẻ thói quen. Một ngày tính là xong khi đủ số lần. */
+function habitStreakLine(h){
+  const S=window.RemiStats;
+  if(!S||h.once)return '';
+  const goal=hTimes(h).length;
+  const days=Object.keys(h.log).filter(k=>(h.log[k]||0)>=goal);
+  if(!days.length)return '';
+  const today=new Date();
+  const first=Object.keys(h.log).filter(k=>(h.log[k]||0)>0).sort()[0];
+  const since=Math.round((new Date(dKey(today)+'T00:00:00')-new Date(first+'T00:00:00'))/86400000)+1;
+  const s=S.habitStreak(days,h.days,today);
+  const r=S.completionRate(days,h.days,Math.max(1,Math.min(7,since)),today);
+  const parts=[];
+  if(s.current>0)parts.push('🔥 '+s.current+' ngày liên tiếp');
+  if(r.total>0)parts.push(r.pct+'% trong '+r.total+' ngày');
+  return parts.length?'<p class="hstreak">'+esc(parts.join(' · '))+'</p>':'';
+}
 function ring(h){
   const pct=habitDone(h)/hTimes(h).length,C=2*Math.PI*28;
   return '<div class="ring"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--line)" stroke-width="7"/>'+
@@ -793,7 +810,7 @@ function habitCard(h,full){
   const onToday=habitActive(h,now);
   const pm=h.portionMl;
   const status=!onToday?'Hôm nay nghỉ':pm?(done*pm)+' / '+(goal*pm)+' ml hôm nay':goal===1?('Lúc '+ts[0]+', '+(all?'đã xong':'chưa làm')):done+' / '+goal+' lần hôm nay';
-  let h2='<div class="hcard'+(full?' full':'')+'" data-hid="'+h.id+'" role="button" tabindex="0" aria-label="Mở chi tiết '+esc(h.title)+'"><div class="hhead">'+ring(h)+'<div><h3>'+esc(h.title)+'</h3><p>'+status+'</p></div></div>';
+  let h2='<div class="hcard'+(full?' full':'')+'" data-hid="'+h.id+'" role="button" tabindex="0" aria-label="Mở chi tiết '+esc(h.title)+'"><div class="hhead">'+ring(h)+'<div><h3>'+esc(h.title)+'</h3><p>'+status+'</p>'+habitStreakLine(h)+'</div></div>';
   if(full){
     const nxt=onToday?ts.slice().sort().find(t=>{const [H,M]=t.split(':').map(Number);const a=new Date(now);a.setHours(H,M,0,0);return a>now}):null;
     h2+='<div class="chips">'+ts.slice().sort().map(t=>'<span class="chip'+(t===nxt?' lead':'')+'">'+esc(t)+'</span>').join('')+'<span class="chip ai">'+(h.once?'Chỉ hôm nay':daysText(h.days))+'</span>'+(h.spread?'<span class="chip ai">Tự chia theo giờ dậy</span>':'')+(pm?'<span class="chip ai">'+pm+' ml mỗi lần</span>':'')+'</div>';
