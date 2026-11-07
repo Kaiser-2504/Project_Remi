@@ -1,0 +1,15 @@
+services:
+  remi:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file: .env
+    environment:
+      # Chạy thử qua http://localhost thì cookie Secure không dùng được, bỏ dòng này khi đã có HTTPS
+      COOKIE_SECURE: "0"
+    volumes:
+      - remi-data:/data
+    restart: unless-stopped
+
+volumes:
+  remi-data:

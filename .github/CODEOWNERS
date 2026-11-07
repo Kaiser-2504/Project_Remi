@@ -1,0 +1,9 @@
+# Điền tài khoản GitHub của từng thành viên vào đây rồi bỏ dấu # để GitHub tự gán người duyệt.
+# Dòng sau cùng thắng, nên đặt các quy tắc cụ thể ở cuối.
+#
+# * @thanh-vien-1
+# /server/                @thanh-vien-A
+# /web/sw.js              @thanh-vien-B
+# /ml/                    @thanh-vien-C
+# /web/css/ /web/js/      @thanh-vien-D
+# /.github/ /Dockerfile   @thanh-vien-E

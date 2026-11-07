@@ -1,0 +1,29 @@
+{
+  "name": "remi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remi: trợ lý nhắc việc và thói quen cá nhân, có AI, đồng bộ và thông báo đẩy.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"server/test/*.test.js\"",
+    "test:e2e": "node --disable-warning=ExperimentalWarning e2e/run.js",
+    "icons": "node scripts/make-icons.js",
+    "ml:data": "node ml/gen/generate.js --n 8000 --seed 1 --out ml/data/synth-train.jsonl && node ml/gen/generate.js --n 1500 --seed 2 --out ml/data/synth-val.jsonl && node ml/gen/generate.js --n 1500 --seed 3 --out ml/data/synth-test.jsonl && node ml/train/prepare.js --in ml/data/synth-train.jsonl --out ml/data/train.jsonl",
+    "ml:eval": "node ml/eval/run.js --engine rules --data ml/data/gold.jsonl,ml/data/holdout.jsonl",
+    "test:responsive": "node --disable-warning=ExperimentalWarning e2e/responsive.js",
+    "test:features": "node --disable-warning=ExperimentalWarning e2e/features.js",
+    "tasks:doc": "node scripts/tasks.js",
+    "issues:preview": "node scripts/create-issues.js"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

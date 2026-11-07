@@ -1,0 +1,806 @@
+{
+  "team": [
+    {
+      "id": "A",
+      "name": "Tài khoản và máy chủ",
+      "focus": "Đăng nhập, bảo mật tài khoản, dữ liệu phía máy chủ"
+    },
+    {
+      "id": "B",
+      "name": "Di động và thông báo",
+      "focus": "App trên điện thoại, thông báo, gọi dậy"
+    },
+    {
+      "id": "C",
+      "name": "AI và dữ liệu",
+      "focus": "Hiểu câu nói trên máy, kho món ăn, huấn luyện model"
+    },
+    {
+      "id": "D",
+      "name": "Giao diện và trải nghiệm",
+      "focus": "Màn hình, trợ năng, chia sẻ, đa ngôn ngữ"
+    },
+    {
+      "id": "E",
+      "name": "Nền tảng và chất lượng",
+      "focus": "Triển khai, CI, công cụ, bảo mật, giám sát"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1",
+      "track": "A",
+      "title": "Quên mật khẩu và đặt lại qua email",
+      "points": 5,
+      "depends": [],
+      "files": [
+        "server/routes.js",
+        "server/auth.js",
+        "server/db.js",
+        "web/js/app.js"
+      ],
+      "context": "Hiện người dùng quên mật khẩu là mất tài khoản. Chưa có dịch vụ gửi email.",
+      "todo": [
+        "Thêm POST /api/auth/forgot và POST /api/auth/reset.",
+        "Bảng password_resets: token lưu dạng băm, hết hạn sau 60 phút, chỉ dùng một lần.",
+        "Bộ gửi email tách riêng (cấu hình SMTP bằng biến môi trường MAIL_*) để test thay được bằng bộ giả.",
+        "Thêm liên kết Quên mật khẩu vào màn đăng nhập.",
+        "Đổi mật khẩu xong thì huỷ mọi phiên đang đăng nhập."
+      ],
+      "criteria": [
+        "Trả lời giống hệt dù email có tài khoản hay không (không lộ email nào có tài khoản)",
+        "Token dùng lần hai bị từ chối, token quá hạn bị từ chối",
+        "Có giới hạn số lần yêu cầu theo email và IP",
+        "Có test máy chủ cho các trường hợp trên và một test đầu-cuối đổi mật khẩu"
+      ],
+      "labels": [
+        "backend",
+        "security"
+      ]
+    },
+    {
+      "id": "A2",
+      "track": "A",
+      "title": "Xác minh email khi đăng ký",
+      "points": 3,
+      "depends": [
+        "A1"
+      ],
+      "files": [
+        "server/routes.js",
+        "server/db.js",
+        "web/js/app.js"
+      ],
+      "context": "Hiện đăng ký bằng email bất kỳ, kể cả email không phải của mình.",
+      "todo": [
+        "Thêm cột verified_at và liên kết xác minh gửi qua bộ gửi email của A1.",
+        "Chưa xác minh vẫn dùng được nhưng có banner nhắc, cấu hình ALLOW_UNVERIFIED để siết chặt.",
+        "Gửi lại email xác minh có giới hạn tần suất."
+      ],
+      "criteria": [
+        "Bấm liên kết thì tài khoản được đánh dấu đã xác minh",
+        "Banner biến mất sau khi xác minh",
+        "Có test máy chủ và cập nhật README"
+      ],
+      "labels": [
+        "backend"
+      ]
+    },
+    {
+      "id": "A3",
+      "track": "A",
+      "title": "Danh sách thiết bị đăng nhập và đăng xuất từ xa",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "server/routes.js",
+        "server/auth.js",
+        "web/js/app.js"
+      ],
+      "context": "Bảng sessions đã lưu user agent nhưng người dùng không xem hay huỷ được phiên nào.",
+      "todo": [
+        "GET /api/sessions và DELETE /api/sessions/:id (chỉ phiên của chính mình).",
+        "Mục Thiết bị đăng nhập trong Hồ sơ: đánh dấu thiết bị hiện tại, nút Đăng xuất thiết bị khác."
+      ],
+      "criteria": [
+        "Không huỷ được phiên của người khác (có test)",
+        "Huỷ phiên khác thì thiết bị đó nhận 401 ở lần gọi kế tiếp",
+        "Có test máy chủ"
+      ],
+      "labels": [
+        "backend",
+        "frontend"
+      ]
+    },
+    {
+      "id": "A4",
+      "track": "A",
+      "title": "Lưu bộ đếm giới hạn vào SQLite",
+      "points": 2,
+      "depends": [],
+      "files": [
+        "server/auth.js",
+        "server/routes.js",
+        "server/db.js"
+      ],
+      "context": "Giới hạn thử đăng nhập và đăng ký đang nằm trong bộ nhớ, khởi động lại là mất.",
+      "todo": [
+        "Bảng rate_limits (khoá, số lần, hết hạn) dùng chung cho đăng nhập, đăng ký và quên mật khẩu.",
+        "Dọn các dòng hết hạn định kỳ."
+      ],
+      "criteria": [
+        "Khởi động lại máy chủ không xoá bộ đếm (có test)",
+        "Có test dọn dẹp dòng hết hạn"
+      ],
+      "labels": [
+        "backend",
+        "security"
+      ]
+    },
+    {
+      "id": "A5",
+      "track": "A",
+      "title": "Sao lưu SQLite tự động và khôi phục",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "server/db.js",
+        "server/index.js",
+        "Dockerfile"
+      ],
+      "context": "Toàn bộ dữ liệu người dùng nằm trong một file; mất file là mất tất cả.",
+      "todo": [
+        "Lệnh npm run backup dùng VACUUM INTO ra file có dấu thời gian.",
+        "Tuỳ chọn chạy sao lưu định kỳ trong máy chủ (BACKUP_EVERY_HOURS), giữ N bản gần nhất.",
+        "Hướng dẫn khôi phục và một lệnh kiểm tra bản sao lưu mở được."
+      ],
+      "criteria": [
+        "Sao lưu khi máy chủ đang chạy không làm hỏng dữ liệu",
+        "Có test: sao lưu rồi khôi phục ra cùng số người dùng và việc",
+        "Có mục Sao lưu trong README"
+      ],
+      "labels": [
+        "backend",
+        "ops"
+      ]
+    },
+    {
+      "id": "A6",
+      "track": "A",
+      "title": "Xuất và nhập dữ liệu cá nhân",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "server/routes.js",
+        "web/js/app.js"
+      ],
+      "context": "Người dùng chưa có cách lấy dữ liệu của mình ra khỏi Remi.",
+      "todo": [
+        "GET /api/export trả toàn bộ dữ liệu của người dùng dạng JSON có phiên bản định dạng.",
+        "POST /api/import kiểm tra chặt rồi gộp vào dữ liệu hiện có.",
+        "Nút Xuất và Nhập trong Hồ sơ."
+      ],
+      "criteria": [
+        "Xuất rồi nhập sang tài khoản mới ra dữ liệu giống hệt (có test)",
+        "Tệp sai định dạng bị từ chối với thông báo rõ",
+        "Có test máy chủ"
+      ],
+      "labels": [
+        "backend",
+        "frontend"
+      ]
+    },
+    {
+      "id": "B1",
+      "track": "B",
+      "title": "Bọc ứng dụng bằng Capacitor (iOS và Android)",
+      "points": 5,
+      "depends": [],
+      "files": [
+        "web/index.html",
+        "web/manifest.webmanifest",
+        "package.json"
+      ],
+      "context": "Mới có bản web cài được (PWA). Muốn lên cửa hàng ứng dụng cần bản native bọc bên ngoài.",
+      "todo": [
+        "Thêm Capacitor, tạo dự án android và ios dùng thư mục web/.",
+        "Cấu hình địa chỉ máy chủ (SERVER_URL) vì app native không cùng nguồn với máy chủ.",
+        "Phiên đăng nhập trên WebView: dùng Bearer token (máy chủ đã hỗ trợ) thay cho cookie nếu cần.",
+        "Biểu tượng và màn hình khởi động từ web/icons.",
+        "Tài liệu build và chạy thử trên máy ảo và máy thật."
+      ],
+      "criteria": [
+        "Đăng nhập, tạo việc và đồng bộ chạy được trong app Android và iOS",
+        "Có hướng dẫn từng bước trong docs/MOBILE.md",
+        "Không làm hỏng bản web hiện tại (npm test và test:e2e vẫn qua)"
+      ],
+      "labels": [
+        "mobile"
+      ]
+    },
+    {
+      "id": "B2",
+      "track": "B",
+      "title": "Thông báo cục bộ hẹn ngay trên máy",
+      "points": 5,
+      "depends": [
+        "B1"
+      ],
+      "files": [
+        "web/js/app.js",
+        "web/sw.js"
+      ],
+      "context": "Thông báo hiện nay đi qua máy chủ. Thông báo hẹn ngay trên máy hoạt động tin cậy hơn và không cần máy chủ biết nội dung.",
+      "todo": [
+        "Dùng plugin Local Notifications của Capacitor.",
+        "Dựng lại các thông báo từ buildSchedule() mỗi khi dữ liệu đổi (huỷ cái cũ, đặt cái mới).",
+        "Hỗ trợ cuộc gọi dậy chỉ khi vẫn ở trạng thái ngủ.",
+        "Không đặt trùng với thông báo đẩy từ máy chủ."
+      ],
+      "criteria": [
+        "Tắt mạng và đóng app vẫn nhận nhắc đúng giờ trên máy thật",
+        "Sửa hay xoá việc thì thông báo cũ biến mất",
+        "Có ghi chú kết quả thử trên ít nhất hai máy"
+      ],
+      "labels": [
+        "mobile"
+      ]
+    },
+    {
+      "id": "B3",
+      "track": "B",
+      "title": "Kiểm thử thông báo đẩy thật trên Chrome, Safari iOS, Android",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "server/push.js",
+        "server/scheduler.js",
+        "web/sw.js"
+      ],
+      "context": "Thư viện web-push chưa từng được thử gửi thật tới thiết bị trong quá trình phát triển.",
+      "todo": [
+        "Cài web-push, cấu hình VAPID, chạy máy chủ có HTTPS (có thể dùng tunnel).",
+        "Thử Chrome máy tính, Chrome Android, Safari iOS 16.4 trở lên (đã thêm vào Màn hình chính).",
+        "Ghi bảng kết quả vào docs/PUSH-TEST.md; sửa lỗi gặp phải; xử lý đăng ký hết hạn."
+      ],
+      "criteria": [
+        "Nút gửi thử /api/push/test nhận được ở cả ba nền tảng",
+        "Đăng ký hết hạn (410) tự bị xoá",
+        "Có docs/PUSH-TEST.md với bảng kết quả và phiên bản thiết bị"
+      ],
+      "labels": [
+        "mobile",
+        "backend"
+      ]
+    },
+    {
+      "id": "B4",
+      "track": "B",
+      "title": "Nút hành động trên thông báo",
+      "points": 3,
+      "depends": [
+        "B3"
+      ],
+      "files": [
+        "web/sw.js",
+        "server/routes.js",
+        "web/js/app.js"
+      ],
+      "context": "Người dùng phải mở app để bấm Xong. Cần bấm ngay trên thông báo.",
+      "todo": [
+        "Thêm nút Xong, Nhắc lại sau 10 phút, và Đã uống X ml cho thói quen nước.",
+        "Xử lý ở service worker và gửi về app hoặc API nhỏ để ghi nhận.",
+        "Nhắc lại sau 10 phút tạo một lời nhắc mới."
+      ],
+      "criteria": [
+        "Bấm Xong trên thông báo thì việc hoặc mốc thói quen được đánh dấu",
+        "Nhắc lại sau 10 phút hoạt động đúng một lần",
+        "Có test cho phần xử lý ở máy chủ nếu có API mới"
+      ],
+      "labels": [
+        "mobile",
+        "frontend"
+      ]
+    },
+    {
+      "id": "B5",
+      "track": "B",
+      "title": "Độ tin cậy cuộc gọi dậy trên điện thoại thật",
+      "points": 3,
+      "depends": [
+        "B2"
+      ],
+      "files": [
+        "web/js/app.js"
+      ],
+      "context": "Gọi dậy là tính năng dễ gây thất vọng nhất nếu thông báo bị hệ thống chặn.",
+      "todo": [
+        "Thử với Tiết kiệm pin, Tập trung, Không làm phiền, khoá màn hình lâu trên iOS và Android.",
+        "Ghi lại tỉ lệ nhận đúng giờ.",
+        "Thêm màn hướng dẫn trong app và đề xuất đặt thêm báo thức hệ thống.",
+        "Báo cáo xem có cần xin quyền đặc biệt của Apple (Critical Alerts) hay không."
+      ],
+      "criteria": [
+        "Có báo cáo kết quả thử trên ít nhất 3 máy",
+        "Có màn hướng dẫn trong app",
+        "Quyết định rõ có làm tiếp Critical Alerts hay không"
+      ],
+      "labels": [
+        "mobile",
+        "research"
+      ]
+    },
+    {
+      "id": "C1",
+      "track": "C",
+      "title": "Nối bộ hiểu câu trên máy vào bản web chính",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "web/js/local-parse.js",
+        "web/js/app.js",
+        "web/data/dishes.json"
+      ],
+      "context": "Bộ hiểu câu theo luật đã có và đã đo, nhưng chưa được dùng trong bản web chính. Bản HTML đơn trong standalone/ đã có cách nối làm mẫu.",
+      "todo": [
+        "Nhúng local-parse.js và dữ liệu món ăn vào web/index.html.",
+        "Thêm lựa chọn Tự động hoặc Chỉ trên máy trong Hồ sơ.",
+        "Khi AI lỗi hoặc mất mạng thì đọc trên máy và nói rõ trong form.",
+        "Chế độ Chỉ trên máy không được gọi /api/ai/parse."
+      ],
+      "criteria": [
+        "Có test đầu-cuối: chế độ Chỉ trên máy không gửi yêu cầu AI nào",
+        "Mất mạng vẫn tạo được việc bằng câu nói",
+        "Giữ nguyên hành vi hiện tại khi chọn Tự động và AI hoạt động"
+      ],
+      "labels": [
+        "ai",
+        "frontend"
+      ]
+    },
+    {
+      "id": "C2",
+      "track": "C",
+      "title": "Báo \"không chắc\" và chiến lược lai luật rồi AI",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "web/js/local-parse.js",
+        "ml/eval/run.js"
+      ],
+      "context": "Bộ luật hiện luôn trả lời, kể cả khi không hiểu. Cần biết khi nào nên hỏi AI hoặc hỏi lại người dùng.",
+      "todo": [
+        "Bộ luật trả thêm độ tin cậy và lý do (không thấy giờ, giờ mơ hồ, nhiều ngày...).",
+        "Quy tắc lai: chắc thì dùng luôn, không chắc thì gọi AI hoặc hiện cảnh báo.",
+        "Thêm số đo \"không chắc nhưng sai\" vào bộ đo."
+      ],
+      "criteria": [
+        "Trên gold và holdout, các mẫu sai phải có độ tin cậy thấp hơn các mẫu đúng (báo cáo số liệu)",
+        "Có test cho từng lý do không chắc",
+        "Cập nhật ml/README.md"
+      ],
+      "labels": [
+        "ai"
+      ]
+    },
+    {
+      "id": "C3",
+      "track": "C",
+      "title": "Mở rộng kho món ăn lên ít nhất 100 món",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "web/data/dishes.json",
+        "server/test/ml.test.js"
+      ],
+      "context": "Kho hiện có 15 món, là mẫu. Món ngoài kho thì phải nhờ AI hoặc người dùng tự thêm.",
+      "todo": [
+        "Thêm món, tên gọi khác và nguyên liệu cho 4 người, tự viết hoặc từ nguồn có giấy phép phù hợp.",
+        "Ghi nguồn và giấy phép vào docs/DATA-SOURCES.md.",
+        "Bổ sung bộ kiểm tra: định lượng đọc được, không trùng tên."
+      ],
+      "criteria": [
+        "Ít nhất 100 món, test kho món vẫn qua",
+        "Có docs/DATA-SOURCES.md nêu rõ nguồn từng nhóm dữ liệu",
+        "Bộ đo ml/eval chạy lại và không giảm điểm"
+      ],
+      "labels": [
+        "ai",
+        "data"
+      ]
+    },
+    {
+      "id": "C4",
+      "track": "C",
+      "title": "Thu dữ liệu thật có đồng ý để làm tập đo và huấn luyện",
+      "points": 5,
+      "depends": [],
+      "files": [
+        "server/routes.js",
+        "server/db.js",
+        "web/js/app.js",
+        "ml/README.md"
+      ],
+      "context": "Số đo hiện tại chỉ trên câu do nhóm tự viết. Cần dữ liệu thật, nhưng chỉ khi người dùng đồng ý rõ ràng.",
+      "todo": [
+        "Màn đồng ý rõ ràng, tắt mặc định, có thể rút lại bất kỳ lúc nào.",
+        "Lưu cặp (câu gõ, bản người dùng đã sửa) sau khi bỏ tên, số điện thoại, địa chỉ.",
+        "Cho người dùng xem và xoá dữ liệu đã đóng góp.",
+        "Công cụ xuất tập đo mù (giữ riêng, không đưa vào huấn luyện)."
+      ],
+      "criteria": [
+        "Không lưu gì nếu chưa đồng ý (có test)",
+        "Rút lại đồng ý thì dữ liệu cũ bị xoá",
+        "Có bộ lọc thông tin cá nhân với test các mẫu thường gặp",
+        "Duyệt lại với người phụ trách quyết định D-5 trước khi bật cho người dùng"
+      ],
+      "labels": [
+        "ai",
+        "privacy",
+        "backend"
+      ]
+    },
+    {
+      "id": "C5",
+      "track": "C",
+      "title": "Tinh chỉnh model nhỏ và so với bộ luật",
+      "points": 5,
+      "depends": [
+        "C2",
+        "C4"
+      ],
+      "files": [
+        "ml/train/lora_finetune.py",
+        "ml/engines/llamacpp.js",
+        "ml/README.md"
+      ],
+      "context": "Kịch bản huấn luyện đã viết nhưng chưa từng chạy vì chưa có GPU.",
+      "todo": [
+        "Chọn model nền nhỏ có giấy phép dùng thương mại phù hợp và hỗ trợ tiếng Việt tốt.",
+        "Chạy ml/train, chuyển GGUF, ép JSON bằng ngữ pháp GBNF.",
+        "Đo trên gold, holdout và tập đo mù của C4; so với bộ luật.",
+        "Đo thời gian trả lời và bộ nhớ trên điện thoại thấp nhất cần hỗ trợ."
+      ],
+      "criteria": [
+        "Có báo cáo số đo cạnh bộ luật, nêu cả những chỗ model kém hơn",
+        "JSON hợp lệ 100% nhờ ngữ pháp",
+        "Chỉ đề xuất đưa vào app nếu đạt các tiêu chí trong ml/README.md"
+      ],
+      "labels": [
+        "ai",
+        "research"
+      ]
+    },
+    {
+      "id": "D1",
+      "track": "D",
+      "title": "Chia sẻ danh sách đi chợ và việc với người thân",
+      "points": 5,
+      "depends": [],
+      "files": [
+        "server/routes.js",
+        "server/db.js",
+        "web/js/app.js"
+      ],
+      "context": "Việc đi chợ thường là của cả nhà. Hiện mỗi tài khoản là một ngăn riêng.",
+      "todo": [
+        "Mô hình chia sẻ: người mời, người nhận, quyền xem hoặc sửa, thu hồi.",
+        "Mời bằng liên kết hoặc email; chỉ chia sẻ từng việc hoặc danh sách, không chia sẻ cả tài khoản.",
+        "Đồng bộ thay đổi hai chiều, xử lý xung đột theo mục.",
+        "Quyết định D-1 (kiến trúc riêng tư) phải được chốt trước khi bắt đầu."
+      ],
+      "criteria": [
+        "Hai tài khoản cùng tick một danh sách đi chợ và thấy thay đổi của nhau",
+        "Thu hồi quyền thì người kia không còn thấy dữ liệu",
+        "Có test máy chủ về quyền truy cập, không ai đọc được dữ liệu chưa được chia sẻ"
+      ],
+      "labels": [
+        "frontend",
+        "backend"
+      ]
+    },
+    {
+      "id": "D2",
+      "track": "D",
+      "title": "Trợ năng: bàn phím và đọc màn hình",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "web/js/app.js",
+        "web/css/app.css",
+        "web/index.html"
+      ],
+      "context": "Các hộp thoại và bộ chọn mới chưa được kiểm tra bằng bàn phím hay trình đọc màn hình.",
+      "todo": [
+        "Bẫy tiêu điểm trong hộp thoại, trả tiêu điểm về nút đã mở, aria-modal chuẩn.",
+        "Thứ tự Tab hợp lý cho bộ chọn giờ, nút chọn nhanh và danh sách đi chợ.",
+        "Kiểm tra bằng VoiceOver hoặc NVDA, tương phản màu đạt mức AA.",
+        "Thêm một số kiểm tra tự động vào e2e."
+      ],
+      "criteria": [
+        "Dùng được toàn bộ luồng tạo việc và chia nước chỉ bằng bàn phím",
+        "Trình đọc màn hình đọc được nhãn các nút + và −",
+        "Có báo cáo kiểm tra và test tự động cho focus trap"
+      ],
+      "labels": [
+        "frontend",
+        "a11y"
+      ]
+    },
+    {
+      "id": "D3",
+      "track": "D",
+      "title": "Tìm kiếm việc, thói quen và ghi chú",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "web/js/app.js",
+        "web/css/app.css"
+      ],
+      "context": "Dữ liệu càng nhiều càng khó tìm lại một ghi chú hay một món đã nhớ.",
+      "todo": [
+        "Ô tìm (phím Ctrl hoặc Cmd cộng K) tìm trong việc, thói quen, ghi chú ngày và nguyên liệu.",
+        "Tìm không dấu vẫn ra kết quả có dấu.",
+        "Kết quả mở thẳng khung chi tiết hoặc ngày trong Lịch."
+      ],
+      "criteria": [
+        "Gõ \"hop\" tìm ra \"Họp\"",
+        "Chọn kết quả mở đúng nơi",
+        "Có test đầu-cuối"
+      ],
+      "labels": [
+        "frontend"
+      ]
+    },
+    {
+      "id": "D4",
+      "track": "D",
+      "title": "Sửa kế hoạch uống nước và xem tiến độ 7 ngày",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "web/js/app.js",
+        "web/css/app.css"
+      ],
+      "context": "Khung chi tiết thói quen mới chỉ đổi được lượng mỗi lần, chưa đổi được tổng lượng, số lần, khung giờ như lúc tạo.",
+      "todo": [
+        "Dùng lại khối Chia lượng nước trong khung chi tiết thói quen.",
+        "Biểu đồ cột 7 ngày gần nhất (ml đã uống) dựa trên nhật ký đã có."
+      ],
+      "criteria": [
+        "Đổi kế hoạch thì lịch nhắc ngày hôm nay và các ngày sau cập nhật",
+        "Biểu đồ đúng với dữ liệu nhật ký (có test)",
+        "Không tràn ngang ở 320px"
+      ],
+      "labels": [
+        "frontend"
+      ]
+    },
+    {
+      "id": "D5",
+      "track": "D",
+      "title": "Đa ngôn ngữ: tiếng Việt và tiếng Anh",
+      "points": 5,
+      "depends": [],
+      "files": [
+        "web/js/app.js",
+        "web/index.html",
+        "server/ai.js"
+      ],
+      "context": "Mọi chữ hiện nằm cứng trong mã. Muốn có bản tiếng Anh phải tách ra.",
+      "todo": [
+        "Tách chuỗi sang web/js/i18n.js (tiếng Việt, tiếng Anh).",
+        "Lời nhắc, giọng nhắc và các câu gọi tên cũng theo ngôn ngữ.",
+        "Prompt AI và bộ hiểu câu theo ngôn ngữ đã chọn (tiếng Anh dùng AI trước, bộ luật sau).",
+        "Chọn ngôn ngữ trong Hồ sơ, mặc định theo trình duyệt."
+      ],
+      "criteria": [
+        "Test tự động báo lỗi nếu còn chuỗi tiếng Việt cứng ngoài tệp ngôn ngữ",
+        "Đổi ngôn ngữ không cần tải lại trang",
+        "Ngày giờ định dạng theo ngôn ngữ"
+      ],
+      "labels": [
+        "frontend",
+        "i18n"
+      ]
+    },
+    {
+      "id": "E1",
+      "track": "E",
+      "title": "Triển khai thử lên máy chủ thật",
+      "points": 5,
+      "depends": [],
+      "files": [
+        "Dockerfile",
+        "docker-compose.yml",
+        ".env.example",
+        "README.md"
+      ],
+      "context": "Docker và compose đã viết nhưng chưa từng được build hoặc chạy trên máy chủ thật có HTTPS.",
+      "todo": [
+        "Chạy docker build và compose, sửa lỗi nếu có (kèm package-lock.json).",
+        "Chọn nhà cung cấp, bật HTTPS và tên miền, gắn ổ đĩa cho /data.",
+        "Điền biến môi trường thật (ANTHROPIC_API_KEY, TRUST_PROXY=1, VAPID).",
+        "Viết docs/DEPLOY.md từng bước và kiểm tra /api/health từ ngoài."
+      ],
+      "criteria": [
+        "Có địa chỉ chạy được, đăng ký và tạo việc thành công",
+        "Khởi động lại container không mất dữ liệu",
+        "docs/DEPLOY.md đủ để người khác làm lại từ đầu"
+      ],
+      "labels": [
+        "ops"
+      ]
+    },
+    {
+      "id": "E2",
+      "track": "E",
+      "title": "Làm CI chạy ổn định cả bài kiểm thử trình duyệt",
+      "points": 3,
+      "depends": [],
+      "files": [
+        ".github/workflows/ci.yml",
+        "package.json"
+      ],
+      "context": "Công việc CI hiện chỉ chạy test máy chủ; job e2e đang để continue-on-error vì chưa được kiểm chứng trên GitHub.",
+      "todo": [
+        "Làm cho npm run test:e2e, test:responsive và test:features chạy xanh trên GitHub Actions.",
+        "Lưu cache trình duyệt, đính kèm ảnh chụp màn hình khi lỗi.",
+        "Bỏ continue-on-error và đặt các job thành bắt buộc trong bảo vệ nhánh main."
+      ],
+      "criteria": [
+        "Ba bộ test trình duyệt xanh trên 5 lần chạy liên tiếp",
+        "Pull request không gộp được khi CI đỏ",
+        "Thời gian CI hợp lý, ghi vào CONTRIBUTING.md"
+      ],
+      "labels": [
+        "ops",
+        "testing"
+      ]
+    },
+    {
+      "id": "E3",
+      "track": "E",
+      "title": "ESLint, Prettier và kiểm tra trước khi commit",
+      "points": 2,
+      "depends": [],
+      "files": [
+        "package.json",
+        ".editorconfig"
+      ],
+      "context": "Chưa có công cụ thống nhất cách viết mã giữa 5 người.",
+      "todo": [
+        "Thêm ESLint và Prettier với cấu hình tối thiểu hợp với mã hiện tại.",
+        "npm run lint và npm run format, chạy trong CI.",
+        "Hook commit chạy lint cho tệp đã đổi."
+      ],
+      "criteria": [
+        "npm run lint xanh trên toàn bộ mã hiện có",
+        "CI báo đỏ khi sai quy tắc",
+        "Có hướng dẫn cài hook trong CONTRIBUTING.md"
+      ],
+      "labels": [
+        "tooling"
+      ]
+    },
+    {
+      "id": "E4",
+      "track": "E",
+      "title": "Tự lưu font và rà soát bảo mật",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "server/http.js",
+        "web/index.html",
+        "web/css/app.css"
+      ],
+      "context": "Trang đang tải font từ Google Fonts (lộ địa chỉ IP người dùng cho bên thứ ba) và CSP phải mở cho bên đó.",
+      "todo": [
+        "Tự lưu font Be Vietnam Pro trong web/fonts (kiểm tra giấy phép), bỏ liên kết Google Fonts.",
+        "Thu hẹp CSP bỏ googleapis và gstatic, cập nhật service worker.",
+        "Rà soát theo danh sách OWASP ASVS mức cơ bản và ghi báo cáo vào docs/SECURITY-REVIEW.md."
+      ],
+      "criteria": [
+        "Không còn yêu cầu mạng nào tới bên thứ ba khi mở trang (kiểm bằng test)",
+        "Giao diện hiển thị đúng tiếng Việt có dấu với font mới",
+        "Báo cáo liệt kê phát hiện và mức độ ưu tiên"
+      ],
+      "labels": [
+        "security",
+        "frontend"
+      ]
+    },
+    {
+      "id": "E5",
+      "track": "E",
+      "title": "Hợp nhất bản HTML đơn với bản web chính",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "standalone/remi.html",
+        "web/index.html",
+        "web/js/app.js"
+      ],
+      "context": "standalone/remi.html là ảnh chụp từ một nhánh mã riêng. Hai bản sẽ lệch dần nếu để vậy.",
+      "todo": [
+        "Viết script tạo file HTML đơn từ web/ (nhúng CSS, JS, dữ liệu) thay cho chỉnh tay.",
+        "Kiểm thử file sinh ra trong CI bằng bộ test trình duyệt.",
+        "Xoá bản lệch và ghi cách tạo lại vào standalone/README.md."
+      ],
+      "criteria": [
+        "npm run build:standalone tạo ra file chạy được khi mở trực tiếp",
+        "CI kiểm tra file sinh ra",
+        "Chỉ còn một nguồn mã duy nhất"
+      ],
+      "labels": [
+        "tooling",
+        "frontend"
+      ]
+    },
+    {
+      "id": "E6",
+      "track": "E",
+      "title": "Giám sát: nhật ký, sức khoẻ và cảnh báo lỗi",
+      "points": 3,
+      "depends": [],
+      "files": [
+        "server/index.js",
+        "server/scheduler.js",
+        "server/routes.js"
+      ],
+      "context": "Khi chạy thật cần biết thông báo có đang được gửi hay không.",
+      "todo": [
+        "Nhật ký JSON có cấp độ và mã yêu cầu.",
+        "/api/health trả thêm trạng thái cơ sở dữ liệu và độ trễ của bộ gửi lời nhắc.",
+        "Đếm lời nhắc đã gửi, bỏ qua, lỗi; cảnh báo lỗi qua webhook hoặc Sentry."
+      ],
+      "criteria": [
+        "Có test cho /api/health khi cơ sở dữ liệu lỗi",
+        "Nhật ký không chứa mật khẩu, token hay nội dung câu nói",
+        "Có tài liệu cách đọc số liệu"
+      ],
+      "labels": [
+        "ops",
+        "backend"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D-1",
+      "title": "Kiến trúc riêng tư",
+      "body": "Chỉ câu nói không rời máy (giữ đồng bộ và thông báo qua máy chủ), hay mọi dữ liệu không rời máy (local-first, cần app native, thông báo cục bộ)? Ảnh hưởng B2, C1, D1 và nhóm A.",
+      "owner": "cả nhóm"
+    },
+    {
+      "id": "D-2",
+      "title": "Giấy phép mã nguồn",
+      "body": "Hiện package.json ghi UNLICENSED và chưa có tệp LICENSE. Chọn giấy phép trước khi mở repo cho người ngoài.",
+      "owner": "người đứng tên repo"
+    },
+    {
+      "id": "D-3",
+      "title": "Tài khoản cửa hàng ứng dụng",
+      "body": "Cần tài khoản Apple Developer và Google Play Developer (kiểm tra phí hiện hành) và người đứng tên.",
+      "owner": "người đứng tên repo"
+    },
+    {
+      "id": "D-4",
+      "title": "Hosting và dịch vụ email",
+      "body": "Chọn nơi chạy máy chủ và dịch vụ gửi email giao dịch cho A1, A2.",
+      "owner": "cả nhóm"
+    },
+    {
+      "id": "D-5",
+      "title": "Chính sách dữ liệu và điều khoản",
+      "body": "Soạn chính sách quyền riêng tư trước khi thu dữ liệu huấn luyện (C4) hay mở cho người dùng thật.",
+      "owner": "cả nhóm"
+    },
+    {
+      "id": "D-6",
+      "title": "Quy ước làm việc",
+      "body": "Quy ước nhánh, số người duyệt mỗi pull request, bắt buộc CI xanh. Đề xuất mặc định trong CONTRIBUTING.md.",
+      "owner": "cả nhóm"
+    }
+  ]
+}
