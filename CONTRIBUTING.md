@@ -20,6 +20,8 @@ Mở http://localhost:3000. Chưa có `ANTHROPIC_API_KEY` thì câu nói chưa �
 | `npm run test:e2e` | Đăng ký, AI, đồng bộ hai thiết bị, thông báo, đăng xuất | Có |
 | `npm run test:responsive` | Bố cục ở 7 cỡ màn hình | Có |
 | `npm run test:features` | Chia lượng nước, bộ chọn ngày giờ | Có |
+| `npm run test:kitchen` | Tab Bếp (nhóm B): thực đơn tuần, đi chợ, tủ đồ, gợi ý món, đồng bộ hai máy | Có |
+| `npm run test:mutation` | Kiểm thử đột biến cho `web/js/kitchen.js` (khoảng 1 phút) | Không |
 | `npm run ml:eval` | Chất lượng bộ hiểu câu trên các câu viết tay | Không |
 
 Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chrome thì đặt `CHROME_PATH` trỏ tới nó.
@@ -51,7 +53,7 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 | `e2e/` | Các bộ test trình duyệt |
 | `standalone/` | Bản HTML đơn chạy không cần máy chủ (ảnh chụp, xem README trong đó) |
 | `docs/` | Hướng dẫn đưa lên GitHub |
-| `scripts/` | Công cụ nhỏ: xuất biểu tượng |
+| `scripts/` | Công cụ nhỏ: xuất biểu tượng, kiểm thử đột biến |
 
 ## Mẹo khi dùng terminal
 

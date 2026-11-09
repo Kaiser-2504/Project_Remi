@@ -57,7 +57,7 @@ const SIZES = [
     for (const s of SIZES) {
       await pg.setViewport({ width: s.w, height: s.h });
       await sleep(250);
-      for (const tab of ['today', 'cal', 'soon', 'habits']) {
+      for (const tab of ['today', 'cal', 'soon', 'habits', 'kitchen']) {
         await pg.evaluate((t) => document.querySelector(`nav.tabs button[data-tab="${t}"]`).click(), tab);
         await sleep(120);
         const m = await pg.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth }));
