@@ -1453,6 +1453,7 @@ const Sync={
     if(s.sleep)state.sleep=s.sleep;
     state.greeted=s.greeted||'';
     state.badges=window.RemiStats.normBadges(s.badges);
+    state.kitchen=window.RemiKitchen.normalizeKitchen(s.kitchen);
     state.meta=Object.assign({dnU:{},dishU:{},mealU:{},deleted:{},profileU:0,sleepU:0},s.meta||{});
     state.habits.forEach(h=>{if(!h.log)h.log={};if(!Array.isArray(h.days)||!h.days.length)h.days=[0,1,2,3,4,5,6];if(!Array.isArray(h.times)||!h.times.length)h.times=['07:00']});
     this.init();persist();
