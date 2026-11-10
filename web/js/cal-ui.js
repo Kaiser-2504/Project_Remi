@@ -55,7 +55,8 @@ window.RemiCalUI = function (c) {
         '<button type="button" data-act="cx-view" data-v="' + v[0] + '" class="' + (view === v[0] ? 'on' : '') + '">' + v[1] + '</button>').join('') +
       '</div><div class="cxtools"><button type="button" class="addt" data-act="cx-free">🕐 Giờ trống</button>' +
       '<button type="button" class="addt" data-act="cx-export">⬇ .ics</button>' +
-      '<button type="button" class="addt" data-act="cx-import">⬆ Nhập</button></div></div>';
+      '<button type="button" class="addt" data-act="cx-import">⬆ Nhập</button>' +
+      '<button type="button" class="addt" data-act="cx-link">🔗 Liên kết</button></div></div>';
   }
 
   /* ---------- vẽ timeline ---------- */
@@ -325,6 +326,49 @@ window.RemiCalUI = function (c) {
     inp.click();
   }
 
+  /* ---------- liên kết lịch để thuê bao ---------- */
+  async function openLink() {
+    const API = window.RemiAPI, sh = c.sheet();
+    sh.innerHTML = '<button class="sx" id="lk-x" type="button" aria-label="Đóng">✕</button><div class="grab"></div>' +
+      '<h3 style="margin:0 0 10px">Liên kết lịch</h3><div id="lk-body"><p class="dhint">Đang tải…</p></div>';
+    document.body.classList.add('sheet-open');
+    sh.querySelector('#lk-x').onclick = c.closeSheet;
+    const body = sh.querySelector('#lk-body');
+    let token = null, armed = false;
+    const urlOf = (t) => location.origin + '/api/cal.ics?t=' + t;
+    const fail = (e) => c.alertUser('🔗', 'Chưa làm được', (e && e.message) || 'Thử lại sau nhé.');
+    const paint = () => {
+      armed = false;
+      if (!token) {
+        body.innerHTML = '<p class="dhint" style="margin:0 0 12px">Tạo một đường dẫn riêng để Google Calendar, Apple Lịch hoặc Outlook tự cập nhật việc của bạn từ Remi (chỉ xem, không sửa được).</p>' +
+          '<button class="aibtn" id="lk-new" type="button">🔗 Tạo liên kết</button>';
+        body.querySelector('#lk-new').onclick = async () => { try { token = (await API.post('/api/cal/link', {})).token; paint(); } catch (e) { fail(e); } };
+        return;
+      }
+      body.innerHTML = '<div class="field" style="margin-top:0"><label for="lk-url">Đường dẫn của bạn</label>' +
+        '<input class="title-in" id="lk-url" readonly style="font-size:13px" value="' + esc(urlOf(token)) + '"></div>' +
+        '<div class="sbtns" style="margin-top:8px"><button class="sec" id="lk-off" type="button">Tắt liên kết</button><button class="pri" id="lk-copy" type="button">Sao chép</button></div>' +
+        '<button class="aibtn" id="lk-re" type="button" style="margin-top:10px">Tạo lại liên kết</button>' +
+        '<div class="blk" style="margin-top:14px"><h4>Cách dùng</h4><ul class="tips">' +
+        '<li>Google Calendar: Cài đặt, Thêm lịch, Từ URL, dán đường dẫn.</li>' +
+        '<li>Apple Lịch: Tệp, Đăng ký lịch mới, dán đường dẫn.</li>' +
+        '<li>Ai có đường dẫn đều xem được lịch của bạn. Nếu lộ, bấm Tạo lại để đường dẫn cũ hết dùng.</li></ul></div>';
+      const inp = body.querySelector('#lk-url');
+      inp.onfocus = () => inp.select();
+      body.querySelector('#lk-copy').onclick = async () => {
+        try { await navigator.clipboard.writeText(urlOf(token)); } catch (e) { inp.select(); try { document.execCommand('copy'); } catch (e2) { /* bỏ qua */ } }
+        c.alertUser('🔗', 'Đã sao chép', 'Dán vào Google Calendar hoặc Apple Lịch nhé.');
+      };
+      body.querySelector('#lk-re').onclick = async (ev) => {
+        if (!armed) { armed = true; ev.target.textContent = 'Chạm lần nữa: đường dẫn cũ sẽ hết dùng'; return; }
+        try { token = (await API.post('/api/cal/link', {})).token; paint(); } catch (e) { fail(e); }
+      };
+      body.querySelector('#lk-off').onclick = async () => { try { await API.del('/api/cal/link', {}); token = null; paint(); } catch (e) { fail(e); } };
+    };
+    try { token = (await API.get('/api/cal/link')).token || null; } catch (e) { body.innerHTML = '<p class="dhint">Không tải được: ' + esc((e && e.message) || 'lỗi') + '</p>'; return; }
+    paint();
+  }
+
   /* ---------- điều khiển từ app.js ---------- */
   function act(a, el) {
     if (a === 'cx-view') { view = el.dataset.v; c.store.set('remi.calview', view); c.render(); }
@@ -334,6 +378,7 @@ window.RemiCalUI = function (c) {
     else if (a === 'cx-free') openFree(c.getSel());
     else if (a === 'cx-export') exportIcs();
     else if (a === 'cx-import') importIcs();
+    else if (a === 'cx-link') openLink();
   }
   return { isTimeline: () => view !== 'month', bar: bar, render: render, act: act, openFree: openFree, importText: importText };
 };

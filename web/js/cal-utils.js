@@ -108,7 +108,9 @@
       if (e.allDay) {
         L.push(`DTSTART;VALUE=DATE:${fmtDate(s)}`, `DTEND;VALUE=DATE:${fmtDate(en)}`);
       } else {
-        L.push(`DTSTART:${fmtUTC(s)}`, `DTEND:${fmtUTC(en)}`);
+        // floating: giờ "treo", hiện đúng số giờ ghi trong việc ở mọi múi giờ (server không biết múi giờ của người dùng)
+        const f = (ms) => (e.floating ? fmtUTC(ms).slice(0, -1) : fmtUTC(ms));
+        L.push(`DTSTART:${f(s)}`, `DTEND:${f(en)}`);
       }
       L.push(`SUMMARY:${esc(e.title)}`);
       if (e.repeat === 'daily') L.push('RRULE:FREQ=DAILY');
