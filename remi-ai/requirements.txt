@@ -1,0 +1,4 @@
+numpy>=1.24
+# Tuỳ chọn:
+#   matplotlib   để vẽ đồ thị (train.py --plot)
+#   scikit-learn để đối chiếu với bản tự cài (train.py --sklearn-check)

@@ -1,0 +1,30 @@
+{"id":"h01","family":"task","input":"tối nay nhớ gọi điện cho dì Ba lúc 8h","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T20:00","title":"gọi điện cho dì ba"}}
+{"id":"h02","family":"task","input":"nhắc tui đóng tiền học cho con vào thứ sáu tuần này","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-06T09:00","title":"đóng tiền học cho con"}}
+{"id":"h03","family":"task","input":"sáng mai 5h45 ra sân bay","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T05:45","title":"ra sân bay"}}
+{"id":"h04","family":"shopping","input":"đi chợ mua đồ nấu bún chả 6h chiều nay","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T18:00","shopping":true,"servings":4,"leadMinutes":60,"title":"bún chả"}}
+{"id":"h05","family":"habit","input":"uống nước 3 lít mỗi ngày nhé","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"uống nước","habit":{"recurring":true,"spread":{"count":12,"from":"wake","to":"bed"}}}}
+{"id":"h06","family":"habit","input":"hôm nay uống đủ 2 lít nước thôi, đến 8h tối","now":"2026-11-04T10:00","expect":{"intent":"habit","habit":{"recurring":false,"spread":{"count":8,"from":"now","to":"20:00"}}}}
+{"id":"h07","family":"habit","input":"mỗi tối trước khi ngủ thiền 10 phút","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"thiền 10 phút","habit":{"recurring":true,"times":["21:00"]}}}
+{"id":"h08","family":"habit","input":"tập gym thứ 3, 5, 7 lúc 5h30 chiều","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"tập gym","habit":{"recurring":true,"days":[2,4,6],"times":["17:30"]}}}
+{"id":"h09","family":"habit","input":"cuối tuần đọc sách 30 trang","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"đọc sách 30 trang","habit":{"recurring":true,"days":[6,0],"times":["07:00"]}}}
+{"id":"h10","family":"relative","input":"nhắc tôi tắt bếp sau 20 phút","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T10:20","title":"tắt bếp"}}
+{"id":"h11","family":"relative","input":"2 tiếng nữa gọi lại cho khách","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T12:00","title":"gọi lại cho khách"}}
+{"id":"h12","family":"task","input":"mai nhớ mang ô","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T09:00","title":"mang ô"}}
+{"id":"h13","family":"task","input":"chiều chủ nhật 4h đá bóng với anh em","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-08T16:00","title":"đá bóng với anh em"}}
+{"id":"h14","family":"repeat","input":"8h sáng thứ hai hàng tuần họp tuần","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-09T08:00","repeat":"weekly","title":"họp tuần"}}
+{"id":"h15","family":"task","input":"ngày 1/12 nộp thuế","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-12-01T09:00","title":"nộp thuế"}}
+{"id":"h16","family":"shopping","input":"đi siêu thị 2h chiều chủ nhật cho 2 người","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-08T14:00","shopping":true,"servings":2}}
+{"id":"h17","family":"yearend","input":"mai 8h sáng đi làm thủ tục","now":"2026-12-30T21:30","expect":{"intent":"task","when":"2026-12-31T08:00","title":"đi làm thủ tục"}}
+{"id":"h18","family":"yearend","input":"ngày 5/1 họp lúc 9h","now":"2026-12-30T21:30","expect":{"intent":"task","when":"2027-01-05T09:00","title":"họp"}}
+{"id":"h19","family":"yearend","input":"thứ 2 tuần sau 8h họp","now":"2026-12-30T21:30","expect":{"intent":"task","when":"2027-01-04T08:00","title":"họp"}}
+{"id":"h20","family":"task","input":"7h tối hôm nay họp lớp","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T19:00","title":"họp lớp"}}
+{"id":"h21","family":"task","input":"nhắc mình lúc 9h phải gọi cho ngân hàng","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T09:00","title":"gọi cho ngân hàng"}}
+{"id":"h22","family":"shopping","input":"nấu canh bí đỏ cho 4 người, đi chợ 5h chiều mai","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T17:00","shopping":true,"servings":4,"title":"canh bí đỏ","items":["Bí đỏ","Thịt heo xay","Hành lá","Tỏi"]}}
+{"id":"h23","family":"shopping","input":"mua sữa cho bé 6h tối nay","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T18:00","shopping":true,"leadMinutes":60}}
+{"id":"h24","family":"habit","input":"đi bộ 20 phút buổi sáng mỗi ngày","now":"2026-11-04T10:00","expect":{"intent":"habit","title":"đi bộ 20 phút","habit":{"recurring":true,"times":["07:00"],"days":[0,1,2,3,4,5,6]}}}
+{"id":"h25","family":"task","input":"ăn sáng với khách hàng 7h30 thứ năm","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T07:30","title":"ăn sáng với khách hàng"}}
+{"id":"h26","family":"task","input":"hẹn khám lúc 15h30 ngày 10/11, nhắc trước 2 tiếng","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-10T15:30","leadMinutes":120,"title":"hẹn khám"}}
+{"id":"h27","family":"repeat","input":"chủ nhật hàng tuần 9h đi lễ","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-08T09:00","repeat":"weekly","title":"đi lễ"}}
+{"id":"h28","family":"repeat","input":"gọi mẹ mỗi tối 8h","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-04T20:00","repeat":"daily","title":"gọi mẹ"}}
+{"id":"h29","family":"task","input":"nhắc tôi 1h chiều mai khám mắt","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-05T13:00","title":"khám mắt"}}
+{"id":"h30","family":"task","input":"thứ 6 này 10h đi làm giấy khai sinh cho con","now":"2026-11-04T10:00","expect":{"intent":"task","when":"2026-11-06T10:00","title":"đi làm giấy khai sinh cho con"}}

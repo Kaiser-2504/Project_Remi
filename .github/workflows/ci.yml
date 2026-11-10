@@ -37,3 +37,4 @@ jobs:
       - run: npm run test:e2e
       - run: npm run test:responsive
       - run: npm run test:features
+      - run: npm run test:kitchen

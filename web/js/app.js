@@ -38,7 +38,8 @@ const state={
   greeted:store.get('remi.greeted',''),
   pantry:store.get('remi.pantry',{}),
   dishes:store.get('remi.dishes',{}),
-  dayNotes:store.get('remi.daynotes',{})
+  dayNotes:store.get('remi.daynotes',{}),
+  kitchen:window.RemiKitchen.normalizeKitchen(store.get('remi.kitchen',null))   // nhóm B: thực đơn tuần, tủ đồ, món của tôi
 };
 if(!Array.isArray(state.tasks)) state.tasks=[];
 if(!Array.isArray(state.habits)) state.habits=[];
@@ -60,12 +61,12 @@ state.habits.forEach(h=>{
 if(!state.fired||typeof state.fired!=='object') state.fired={};
 state.meta=store.get('remi.meta',null);
 if(!state.meta||typeof state.meta!=='object')state.meta={};
-['dnU','dishU','deleted'].forEach(k=>{if(!state.meta[k]||typeof state.meta[k]!=='object')state.meta[k]={}});
+['dnU','dishU','mealU','deleted'].forEach(k=>{if(!state.meta[k]||typeof state.meta[k]!=='object')state.meta[k]={}});
 state.meta.profileU=state.meta.profileU||0;state.meta.sleepU=state.meta.sleepU||0;
 function persist(){
   store.set('remi.tasks',state.tasks);store.set('remi.habits',state.habits);store.set('remi.fired',state.fired);store.set('remi.profile',state.profile);
   store.set('remi.sleep',state.sleep);store.set('remi.greeted',state.greeted);store.set('remi.pantry',state.pantry);store.set('remi.dishes',state.dishes);
-  store.set('remi.daynotes',state.dayNotes);store.set('remi.meta',state.meta);
+  store.set('remi.daynotes',state.dayNotes);store.set('remi.kitchen',state.kitchen);store.set('remi.meta',state.meta);
 }
 function save(){
   const keys=Object.keys(state.fired);
@@ -75,6 +76,14 @@ function save(){
   Sync.afterSave();
 }
 let tab='today';
+/* Nhóm B: tab Bếp (thực đơn tuần, tủ đồ, món của tôi). Giao diện nằm ở kitchen-ui.js, logic ở kitchen.js. */
+const KUI=window.RemiKitchenUI({
+  state:state,store:store,esc:esc,uid:uid,
+  save:()=>save(),render:()=>render(),closeSheet:()=>closeSheet(),
+  alertUser:(a,b,c,d)=>alertUser(a,b,c,d),toast:m=>toast(m),pantryAdd:n=>pantryAdd(n),
+  whenBlockHtml:(w,l,r,px)=>whenBlockHtml(w,l,r,px),bindWhenBlock:px=>bindWhenBlock(px),toLocal:d=>toLocal(d),
+  goTab:t=>{tab=t;render();window.scrollTo({top:0})}
+});
 const openIds=new Set();
 
 /* ---------- sleep, wake & day window ---------- */
@@ -369,6 +378,7 @@ let busy=false;
 async function submit(textArg){
   const text=(typeof textArg==='string'?textArg:$('#ta').value).trim();
   if(!text||busy)return;
+  if(/^(hôm nay|tối nay|trưa nay|nay)?\s*(nấu|ăn) gì( hôm nay| tối nay| trưa nay)?\s*\??$/i.test(text)){$('#ta').value='';KUI.openToday();return}   // nhóm B: hỏi nhanh "hôm nay nấu gì"
   busy=true;$('#composer').classList.add('busy');$('#send').disabled=true;
   let parsed=null;
   try{
@@ -864,6 +874,7 @@ function render(){
   h+='<h2>Việc hôm nay<span class="sub">'+open.length+' việc còn lại</span></h2>';
   h+=open.length?open.map(taskCard).join(''):'<div class="empty"><b>'+(done.length?'Xong hết rồi!':'Chưa có việc nào hôm nay')+'</b>'+(done.length?'Bạn đã hoàn thành mọi việc hôm nay.':'Chọn một mục ở trên hoặc gõ vào ô trống, Remi sẽ lo phần còn lại.')+'</div>';
   if(done.length)h+='<h2>Đã xong</h2>'+done.map(taskCard).join('');
+  h=KUI.todayBanner()+h;
   $('#view-today').innerHTML=h;
 
   /* soon */
@@ -885,7 +896,8 @@ function render(){
   $('#view-habits').innerHTML=hb;
 
   renderCal();
-  ['today','soon','habits','cal'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
+  if(tab==='kitchen')KUI.render($('#view-kitchen'));
+  ['today','soon','habits','cal','kitchen'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
   $('#quick').hidden=(tab!=='today');$('#sleep').hidden=(tab!=='today'||(state.sleep.awake&&!nearBed()));$('#suggest').hidden=(tab!=='today');$('#today-habits').hidden=(tab!=='today');document.body.dataset.tab=tab;
   document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
 }
@@ -904,6 +916,7 @@ function openTask(id){
      '<div class="addrow"><input id="t-add" maxlength="40" aria-label="Thêm mục"><button type="button" class="addt" id="t-addb">Thêm</button></div></div>';
   h+='<div class="field"><label for="t-note">Ghi chú</label><textarea class="note" id="t-note" rows="3">'+esc(t.note||'')+'</textarea></div>';
   if((t.tips||[]).length)h+='<div class="blk"><h4>Mẹo từ Remi</h4><ul class="tips">'+t.tips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';
+  if(t.shop)h+='<button class="aibtn" id="t-stock" type="button">🧺 Cất đồ đã mua vào tủ</button>';
   h+='<div class="sbtns"><button class="sec" id="t-del" type="button">Xoá</button><button class="pri" id="t-done" type="button">Xong</button></div>';
   sh.innerHTML=h;
   document.body.classList.add('sheet-open');
@@ -915,6 +928,7 @@ function openTask(id){
   };
   rList();
   $('#t-x').onclick=closeSheet;
+  if($('#t-stock'))$('#t-stock').onclick=()=>{if(KUI.stockFromTask(t))rList()};
   $('#t-title').addEventListener('input',e=>{const st=splitTitle(e.target.value,t.emoji);t.emoji=st.emoji;t.title=st.title;save()});
   $('#t-when').addEventListener('change',e=>{if(e.target.value){t.when=e.target.value;save()}});
   $('#t-lead').addEventListener('change',e=>{t.leadMin=parseInt(e.target.value,10)||0;save()});
@@ -1280,6 +1294,8 @@ function mergeSnapshots(L,R){
   const dn=mapMerge(L.dayNotes,R.dayNotes,lm.dnU,rm.dnU);
   const dish=mapMerge(L.dishes,R.dishes,lm.dishU,rm.dishU);
   out.dayNotes=dn.res;out.dishes=dish.res;
+  const kit=window.RemiKitchen.mergeKitchen(L.kitchen,R.kitchen,lm.mealU,rm.mealU,deleted);
+  out.kitchen=kit.kitchen;
   const pantry={};
   [L.pantry||{},R.pantry||{}].forEach(p=>Object.keys(p).forEach(k=>{
     const e=p[k];if(!pantry[k]||(e.n||0)>(pantry[k].n||0))pantry[k]=e;
@@ -1289,14 +1305,14 @@ function mergeSnapshots(L,R){
   out.profile=pickU(L.profile,lm.profileU,R.profile,rm.profileU);
   out.sleep=pickU(L.sleep,lm.sleepU,R.sleep,rm.sleepU);
   out.greeted=(L.greeted||'')>(R.greeted||'')?L.greeted:(R.greeted||'');
-  out.meta={dnU:dn.u,dishU:dish.u,profileU:Math.max(lm.profileU||0,rm.profileU||0),sleepU:Math.max(lm.sleepU||0,rm.sleepU||0),deleted:deleted};
+  out.meta={dnU:dn.u,dishU:dish.u,mealU:kit.mealU,profileU:Math.max(lm.profileU||0,rm.profileU||0),sleepU:Math.max(lm.sleepU||0,rm.sleepU||0),deleted:deleted};
   return out;
 }
 
 const Sync={
   base:store.get('remi.base',0),
   dirty:store.get('remi.dirty',false),
-  sig:{t:{},h:{},dn:{},dish:{},profile:'',sleep:''},
+  sig:{t:{},h:{},dn:{},dish:{},st:{},rc:{},meal:{},profile:'',sleep:''},
   timer:null,busy:false,started:false,lastFull:0,
   /** Ghi lại "chữ ký" hiện tại để không đóng dấu lại dữ liệu đã có. */
   init(){
@@ -1304,6 +1320,9 @@ const Sync={
     this.sig.h={};state.habits.forEach(h=>{this.sig.h[h.id]=sigOf(h)});
     this.sig.dn=Object.assign({},state.dayNotes);
     this.sig.dish={};Object.keys(state.dishes).forEach(k=>{this.sig.dish[k]=JSON.stringify(state.dishes[k])});
+    this.sig.st={};state.kitchen.stock.forEach(x=>{this.sig.st[x.id]=sigOf(x)});
+    this.sig.rc={};state.kitchen.recipes.forEach(x=>{this.sig.rc[x.id]=sigOf(x)});
+    this.sig.meal={};Object.keys(state.kitchen.meals).forEach(k=>{this.sig.meal[k]=JSON.stringify(state.kitchen.meals[k])});
     this.sig.profile=JSON.stringify(state.profile);
     this.sig.sleep=JSON.stringify(state.sleep);
   },
@@ -1316,6 +1335,11 @@ const Sync={
       Object.keys(sg).forEach(id=>{if(!ids[id]){delete sg[id];m.deleted[id]=now;changed=true}});
     };
     items(state.tasks,this.sig.t);items(state.habits,this.sig.h);
+    items(state.kitchen.stock,this.sig.st);items(state.kitchen.recipes,this.sig.rc);
+    new Set(Object.keys(state.kitchen.meals).concat(Object.keys(this.sig.meal))).forEach(k=>{
+      const cur=state.kitchen.meals[k]===undefined?undefined:JSON.stringify(state.kitchen.meals[k]);
+      if(cur!==this.sig.meal[k]){m.mealU[k]=now;changed=true;if(cur===undefined)delete this.sig.meal[k];else this.sig.meal[k]=cur}
+    });
     new Set(Object.keys(state.dayNotes).concat(Object.keys(this.sig.dn))).forEach(k=>{
       if(state.dayNotes[k]!==this.sig.dn[k]){
         m.dnU[k]=now;changed=true;
@@ -1337,8 +1361,8 @@ const Sync={
     const m=state.meta,dn=Object.assign({},state.dayNotes),dish=Object.assign({},state.dishes);
     Object.keys(m.dnU).forEach(k=>{if(dn[k]===undefined)dn[k]=''});
     Object.keys(m.dishU).forEach(k=>{if(dish[k]===undefined)dish[k]=null});
-    return {v:1,tasks:state.tasks,habits:state.habits,dayNotes:dn,pantry:state.pantry,dishes:dish,profile:state.profile,sleep:state.sleep,greeted:state.greeted,
-      meta:{dnU:m.dnU,dishU:m.dishU,profileU:m.profileU,sleepU:m.sleepU,deleted:m.deleted}};
+    return {v:1,tasks:state.tasks,habits:state.habits,dayNotes:dn,pantry:state.pantry,dishes:dish,profile:state.profile,sleep:state.sleep,greeted:state.greeted,kitchen:state.kitchen,
+      meta:{dnU:m.dnU,dishU:m.dishU,mealU:m.mealU,profileU:m.profileU,sleepU:m.sleepU,deleted:m.deleted}};
   },
   apply(s){
     state.tasks=s.tasks||[];state.habits=s.habits||[];
@@ -1348,7 +1372,8 @@ const Sync={
     state.profile=s.profile||null;
     if(s.sleep)state.sleep=s.sleep;
     state.greeted=s.greeted||'';
-    state.meta=Object.assign({dnU:{},dishU:{},deleted:{},profileU:0,sleepU:0},s.meta||{});
+    state.kitchen=window.RemiKitchen.normalizeKitchen(s.kitchen);
+    state.meta=Object.assign({dnU:{},dishU:{},mealU:{},deleted:{},profileU:0,sleepU:0},s.meta||{});
     state.habits.forEach(h=>{if(!h.log)h.log={};if(!Array.isArray(h.days)||!h.days.length)h.days=[0,1,2,3,4,5,6];if(!Array.isArray(h.times)||!h.times.length)h.times=['07:00']});
     this.init();persist();
   },
@@ -1434,6 +1459,7 @@ function buildSchedule(){
       });
     }
   });
+  window.RemiKitchen.expiryReminders(state.kitchen.stock,now).forEach(r=>add(r.key,r.at,r.title,r.body));   // nhóm B: đồ sắp hết hạn
   if(!state.sleep.awake){
     const wp=wakePlan();
     if(wp){
