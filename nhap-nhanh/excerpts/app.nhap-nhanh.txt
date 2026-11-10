@@ -1,0 +1,216 @@
+// NHẬP NHANH: các đoạn mã trong app.js
+// Đây là bản TRÍCH để đọc, không chạy độc lập. Số dòng là của web/js/app.js trong gói này.
+
+// ======== web/js/app.js dòng 340 đến 406: gọi AI, chuẩn hoá kết quả, báo lỗi (defaultWhen, normalize, submit, aiHelp) ========
+/* ---------- AI ---------- */
+function defaultWhen(){const d=new Date();d.setHours(d.getHours()+1,0,0,0);return d}
+function normalize(r,text){
+  r=r||{};
+  const intent=(r.intent==='habit'&&r.habit)?'habit':'task';
+  const out={
+    intent,title:String(r.title||text).slice(0,80),
+    emoji:r.emoji||(intent==='habit'?'🎯':'📌'),
+    assumption:r.assumption?String(r.assumption).slice(0,60):'',
+    summary:r.summary?String(r.summary).slice(0,90):'',
+    checklist:Array.isArray(r.checklist)?r.checklist.slice(0,16).map(c=>({item:String((c&&c.item)||c),qty:String((c&&c.qty)||''),done:false})):[],
+    tips:Array.isArray(r.tips)?r.tips.slice(0,2).map(t=>String(t).slice(0,70)):[]
+  };
+  if(intent==='habit'){
+    const h=r.habit;
+    const rec=!!h.recurring;
+    const times=(Array.isArray(h.times)?h.times:[]).filter(x=>/^\d{1,2}:\d{2}$/.test(x)).map(x=>x.padStart(5,'0'));
+    const days=(Array.isArray(h.days)?h.days:[]).map(Number).filter(d=>d>=0&&d<=6);
+    const fix=x=>/^\d{1,2}:\d{2}$/.test(String(x))?String(x).padStart(5,'0'):String(x);
+    let sp=null;
+    if(h.spread&&Number(h.spread.count)>0){
+      const f=fix(h.spread.from),t=fix(h.spread.to);
+      sp={count:Math.min(20,Math.round(Number(h.spread.count))),from:/^(now|wake|\d{2}:\d{2})$/.test(f)?f:(rec?'wake':'now'),to:/^(bed|\d{2}:\d{2})$/.test(t)?t:'bed'};
+    }
+    let tms=times;
+    const sp0=sp?Object.assign({},sp):null;
+    if(sp){tms=calcSpread(sp);if(!rec)sp=null}
+    let ml=Number(h.ml);
+    if(!(ml>=100&&ml<=10000)){
+      ml=null;
+      const mm=/(\d+(?:[.,]\d+)?)\s*(lít|lit|l|ml)\b/i.exec(String(r.title||text));
+      if(mm){const n=parseFloat(mm[1].replace(',','.'));ml=/^ml$/i.test(mm[2])?n:n*1000}
+    }
+    out.habit={recurring:rec,times:tms.length?tms:['07:00'],days:days.length?Array.from(new Set(days)).sort():[0,1,2,3,4,5,6],spread:sp,waterSpec:sp0,ml:ml?Math.round(ml):null};
+  }else{
+    let d=r.when?new Date(r.when):null;if(d&&isNaN(d))d=null;
+    out.when=toLocal(d||defaultWhen());
+    out.leadMin=Math.max(0,Math.min(1440,parseInt(r.leadMinutes,10)||0));
+    out.repeat=(r.repeat==='daily'||r.repeat==='weekly')?r.repeat:'none';
+    out.shopping=(r.shopping!==undefined&&r.shopping!==null)?!!r.shopping:/chợ|siêu thị|mua sắm|đi mua|nấu/i.test(out.title);
+    out.servings=Math.max(1,Math.min(20,parseInt(r.servings,10)||4));
+  }
+  return out;
+}
+let busy=false;
+async function submit(textArg){
+  const text=(typeof textArg==='string'?textArg:$('#ta').value).trim();
+  if(!text||busy)return;
+  busy=true;$('#composer').classList.add('busy');$('#send').disabled=true;
+  let parsed=null;
+  try{
+    const d0=new Date();
+    const r=await API.post('/api/ai/parse',{text:text,now:toLocal(d0),weekday:WD[d0.getDay()]});
+    parsed=normalize(r.data,text);
+  }catch(e){
+    if(e.status===401){busy=false;logoutLocal();return}
+    alertUser('🤖',e.network?'Cần có mạng để Remi hiểu câu của bạn':'Remi chưa hiểu được lúc này',aiHelp(e));
+  }
+  busy=false;$('#composer').classList.remove('busy');$('#send').disabled=false;
+  if(parsed)openSheet(parsed,'ai');   // lỗi thì giữ nguyên câu đã gõ để thử lại
+}
+function aiHelp(e){
+  if(e.network)return 'Bạn vẫn dùng được các nút Đặt nhắc hẹn, Hẹn lịch và Thêm thói quen.';
+  if(e.code==='ai_limit')return e.message;
+  if(e.code==='ai_disabled')return 'Máy chủ này chưa bật AI. Nhờ người quản trị điền khóa AI nhé.';
+  return 'Thử lại sau ít phút, hoặc dùng các nút tạo nhanh ở trên.';
+}
+
+// ======== web/js/app.js dòng 572 đến 627: khung xem lại câu đã hiểu trước khi lưu (openSheet) ========
+function openSheet(p,mode){
+  draft=p;
+  const sh=$('#sheet');
+  const note=p.assumption||p.summary;
+  let h='<div class="grab"></div>';
+  if(mode!=='manual')h+='<div class="understood"><span aria-hidden="true">✨</span><span>'+esc(note||(p.intent==='habit'?(p.habit&&p.habit.recurring?'Một thói quen lặp lại.':'Chỉ nhắc trong hôm nay.'):'Một việc cần nhớ.'))+(p.engine==='local'?'<small class="eng">'+(p.why?'AI chưa dùng được nên Remi đọc ngay trên máy':'Đọc ngay trên máy, không gửi đi đâu')+'</small>':'')+'</span></div>';
+  h+='<div class="field"><label for="f-title">Tên</label><input class="title-in" id="f-title" value="'+esc(p.emoji+' '+p.title)+'"></div>';
+  if(p.intent==='task'){
+    h+=whenBlockHtml(p.when,p.leadMin,p.repeat,'f');
+    if(p.shopping)h+=shopHtml(p);
+    if(!p.shopping&&p.checklist.length){
+      h+='<div class="blk"><h4>Cần chuẩn bị ('+p.checklist.length+' mục)</h4>'+p.checklist.map(c=>'<div class="li"><span>'+esc(c.item)+'</span><span>'+esc(c.qty)+'</span></div>').join('')+'</div>';
+    }
+    if(p.tips.length){
+      h+='<div class="blk"><h4>Mẹo từ Remi</h4><ul class="tips">'+p.tips.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></div>';
+    }
+  }else{
+    h+=habitFormHtml(p);
+  }
+  if(mode==='manual')h+='<button class="aibtn" id="s-ai" type="button">✨ Nhờ AI điền giúp</button>';
+  h+='<div class="sbtns"><button class="sec" id="s-cancel" type="button">Huỷ</button><button class="pri" id="s-ok" type="button">'+(p.intent==='habit'?'Bắt đầu thói quen':'Thêm vào lịch')+'</button></div>';
+  sh.innerHTML=h;
+  document.body.classList.add('sheet-open');
+  if(p.intent==='task')bindWhenBlock('f');
+  $('#s-cancel').onclick=closeSheet;
+  $('#s-ok').onclick=confirmDraft;
+  if(p.intent==='habit')initHabitForm();
+  if(p.intent==='task'&&p.shopping)initShop();
+  if($('#s-ai'))$('#s-ai').onclick=()=>{const v=splitTitle($('#f-title').value,'').title;if(v==='Việc mới'){$('#f-title').focus();return}closeSheet();submit(v)};
+  if(mode==='manual')setTimeout(()=>{const f=$('#f-title');if(f){f.focus();const l=f.value.length;f.setSelectionRange(l,l)}},300);
+}
+const DAY_ORDER=[1,2,3,4,5,6,0],DAY_LABEL={1:'T2',2:'T3',3:'T4',4:'T5',5:'T6',6:'T7',0:'CN'};
+const TIME_PRESETS=[['Sáng','07:00'],['Trưa','12:00'],['Chiều','17:00'],['Tối','21:00']];
+const EMOJI_GUESS=[[/nước/i,'💧'],[/giãn|yoga|thiền|duỗi/i,'🧘'],[/chạy|đi bộ|cardio/i,'🏃'],[/gym|tập|plank|hít đất/i,'💪'],[/đọc|sách/i,'📖'],[/thuốc|vitamin/i,'💊'],[/ngủ/i,'😴'],[/(^|\s)ăn|rau|trái cây|hoa quả/i,'🍎'],[/viết|nhật ký/i,'✍️'],[/dọn|lau nhà|quét/i,'🧹'],[/học|từ vựng|tiếng anh/i,'📚'],[/đàn|guitar|nhạc/i,'🎸']];
+function guessEmoji(t){for(let i=0;i<EMOJI_GUESS.length;i++){if(EMOJI_GUESS[i][0].test(t))return EMOJI_GUESS[i][1]}return null}
+let hf=null;
+let shop=null;
+function servingsHtml(id,n){
+  return '<div class="serv"><span>Số người ăn</span><div class="qs"><button type="button" data-sv="-1" aria-label="Giảm số người ăn">−</button><b id="'+id+'" aria-live="polite">'+n+'</b><button type="button" data-sv="1" aria-label="Tăng số người ăn">+</button></div></div>';
+}
+function qrowHtml(i,name,qty){
+  const can=canStep(qty);
+  return '<div class="qrow" data-i="'+i+'"><span class="qn">'+esc(name)+'</span><div class="qs">'+
+    '<button type="button" data-q="-1" aria-label="Giảm '+esc(name)+'"'+(can?'':' disabled')+'>−</button>'+
+    '<input class="qv" value="'+esc(qty||'')+'" maxlength="24" aria-label="Số lượng '+esc(name)+'">'+
+    '<button type="button" data-q="1" aria-label="Tăng '+esc(name)+'"'+(can?'':' disabled')+'>+</button></div>'+
+    '<button type="button" class="lx" data-rm aria-label="Bỏ '+esc(name)+'">×</button></div>';
+}
+const CATALOG=[
+  ['Thịt, cá, trứng',['Thịt ba chỉ','Thịt bò','Thịt heo xay','Sườn heo','Thịt gà','Đùi gà','Cánh gà','Cá','Tôm','Mực','Trứng gà','Đậu hũ','Xúc xích','Lạp xưởng']],
+  ['Rau củ',['Hành tây','Hành lá','Tỏi','Gừng','Sả','Ớt','Cà chua','Khoai tây','Khoai lang','Cà rốt','Bông cải xanh','Bắp cải','Cải thìa','Rau muống','Xà lách','Dưa leo','Bí đỏ','Cà tím','Đậu que','Ớt chuông','Nấm','Giá đỗ','Ngò rí','Rau thơm','Chanh','Chuối','Táo','Cam']],
+  ['Gia vị',['Muối','Đường','Nước mắm','Nước tương','Dầu ăn','Dầu hào','Tiêu xay','Hạt nêm','Bột ngọt','Bột cà ri','Nước cốt dừa','Bột nghệ','Ngũ vị hương','Giấm','Tương ớt','Tương cà','Lá chanh','Hoa hồi','Quế','Bột ớt']],
+  ['Khác',['Gạo','Mì gói','Bún','Phở','Bánh mì','Sữa','Bơ','Phô mai','Bột mì','Bột năng','Đậu phộng','Nước suối','Nước ngọt','Giấy ăn','Túi rác']]
+];
+const norm=x=>String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+const MY_GROUPS=['Lần trước bạn mua','Remi gợi ý','Bạn đã thêm'];
+
+// ======== web/js/app.js dòng 767 đến 791: bấm Thêm: tạo việc hoặc thói quen từ khung xem lại (confirmDraft) ========
+function confirmDraft(){
+  if(!draft)return;
+  const p=draft;const st=splitTitle($('#f-title').value,p.emoji);
+  if(p.intent==='habit'){
+    const emoji=(st.emoji==='🎯'&&guessEmoji(st.title))||st.emoji;
+    const hb={id:uid(),title:st.title,emoji:emoji,times:hf.times.length?hf.times:['07:00'],days:hf.days.length?hf.days:[0,1,2,3,4,5,6],log:{}};
+    if(hf.once){hb.once=true;hb.date=dKey(new Date())}
+    else if(hf.spread){hb.spread=hf.spread}
+    if(hf.portionMl){hb.portionMl=hf.portionMl;hb.waterMl=hf.waterMl}
+    state.habits.push(hb);
+    tab='habits';
+  }else{
+    const w=$('#f-when').value||p.when;
+    const cl=(p.shopping&&shop)?shop.items.filter(x=>x.on).map(x=>({item:x.item,qty:x.qty,done:false})):p.checklist;
+    state.tasks.push({id:uid(),title:st.title,emoji:st.emoji,when:w,leadMin:parseInt($('#f-lead').value,10)||0,repeat:$('#f-rep').value,
+      summary:p.summary,checklist:cl,tips:p.tips,shop:!!p.shopping,servings:(p.shopping&&shop)?shop.servings:undefined,done:false});
+    if(p.shopping&&cl.length){cl.forEach(x=>pantryAdd(x.item));saveDish(st.title,cl,shop&&shop.servings)}
+    const d=new Date(w);
+    if(fromCal){calSel=dKey(d);calY=d.getFullYear();calM=d.getMonth();tab='cal'}
+    else tab=dKey(d)<=dKey(new Date())?'today':'soon';
+  }
+  $('#ta').value='';
+  closeSheet();save();render();tick();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ======== web/js/app.js dòng 1134 đến 1140: tạo tay bằng ô tạo nhanh, dùng chung khung xem lại (openManual) ========
+function openManual(kind,date){
+  if(kind==='habit'){
+    openSheet(normalize({intent:'habit',title:'',emoji:'🎯',habit:{recurring:true,times:['07:00'],days:[0,1,2,3,4,5,6]}},''),'manual');
+  }else{
+    openSheet(normalize({intent:'task',title:'',emoji:kind==='event'?'📅':'⏰',when:(date&&date!==dKey(new Date()))?date+'T09:00':toLocal(defaultWhen()),leadMinutes:kind==='event'?30:0,repeat:'none'},''),'manual');
+  }
+}
+
+// ======== web/js/app.js dòng 1142 đến 1148: nút gợi ý và ô tạo nhanh (phần đầu của khối sự kiện) ========
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const ex=e.target.closest('[data-ex]');
+  if(ex){submit(ex.dataset.ex);return}
+  const nw=e.target.closest('[data-new]');
+  if(nw){openManual(nw.dataset.new);return}
+  const card=e.target.closest('.task[data-id]');
+
+// ======== web/js/app.js dòng 1180 đến 1181: nút Thêm và phím Enter ========
+$('#send').addEventListener('click',submit);
+$('#ta').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit()}});
+
+// ======== web/js/app.js dòng 1211 đến 1227: nhập bằng giọng nói (Web Speech API) ========
+/* voice */
+(function(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const mic=$('#mic');
+  if(!SR){mic.style.display='none';return}
+  let rec=null,on=false;
+  mic.addEventListener('click',()=>{
+    if(on&&rec){try{rec.stop()}catch(e){}return}
+    try{
+      rec=new SR();rec.lang='vi-VN';rec.interimResults=true;rec.continuous=false;
+      rec.onresult=ev=>{let t='';for(let i=0;i<ev.results.length;i++)t+=ev.results[i][0].transcript;$('#ta').value=t};
+      rec.onend=()=>{on=false;mic.classList.remove('rec');if($('#ta').value.trim())submit()};
+      rec.onerror=()=>{on=false;mic.classList.remove('rec');alertUser('🎙️','Không dùng được micro','Hãy cho phép micro hoặc gõ trực tiếp.')};
+      rec.start();on=true;mic.classList.add('rec');
+    }catch(e){on=false;mic.classList.remove('rec')}
+  });
+})();
+
+// ======== web/js/app.js dòng 242 đến 258: thông báo trong app: dùng để báo lỗi AI (alertUser) ========
+/* ---------- alerts ---------- */
+function alertUser(emoji,title,body,action){
+  const box=$('#alerts');
+  const el=document.createElement('div');
+  el.className='alert';
+  el.innerHTML='<div class="em">'+(ALERT_ICON[emoji]||esc(emoji))+'</div><div class="tx"><b>'+esc(title)+'</b><span>'+esc(body)+'</span></div><button class="x" aria-label="Đóng">×</button>';
+  if(action){
+    const acts=document.createElement('div');acts.className='acts';
+    const b=document.createElement('button');b.textContent=action.label;
+    b.onclick=()=>{action.fn();el.remove()};
+    acts.appendChild(b);el.querySelector('.tx').appendChild(acts);
+  }
+  el.querySelector('.x').onclick=()=>el.remove();
+  box.appendChild(el);
+  setTimeout(()=>el.remove(),25000);
+  try{if(navigator.vibrate)navigator.vibrate([120,60,120])}catch(e){}
+}
