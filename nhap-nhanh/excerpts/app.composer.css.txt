@@ -1,0 +1,41 @@
+/* web/css/app.css dòng 68 đến 107: ô nhập, nút micro, nút Thêm, gợi ý, ba ô tạo nhanh */
+/* ---------- 4. Ô nhập câu nói ---------- */
+.composer{margin-top:16px;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-xl);padding:8px 8px 8px 16px;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+.composer:focus-within{border-color:var(--ai);box-shadow:0 0 0 4px rgba(91,63,214,.14),var(--shadow)}
+.cwrap{display:flex;align-items:center;gap:8px}
+.spark{color:var(--ai);display:grid;place-items:center;flex:none}
+.composer textarea{display:block;flex:1;min-width:0;width:auto;height:44px;margin:0;padding:10px 0;border:0;background:transparent;resize:none;outline:none;overflow:hidden;font-size:17px;line-height:24px;color:var(--ink)}
+.cbtns{display:flex;gap:8px;margin-left:0}
+.icon-btn{width:46px;height:46px;border-radius:var(--r-md);border:0;display:grid;place-items:center;background:var(--surface-2);color:var(--ink)}
+.icon-btn.rec{background:var(--warn-soft);color:var(--warn)}
+.send{height:46px;padding:0 18px;border:0;border-radius:var(--r-md);display:flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(204,67,9,.3)}
+.send:disabled{opacity:.6}
+.thinking{display:none;align-items:center;gap:10px;margin:4px 0 6px;font-size:14px;color:var(--ai-text);font-weight:500}
+.composer.busy .thinking{display:flex}
+.pulse{display:inline-flex;gap:4px}
+.pulse i{width:7px;height:7px;border-radius:50%;background:var(--ai);animation:pl 1s infinite ease-in-out}
+.pulse i:nth-child(2){animation-delay:.15s}.pulse i:nth-child(3){animation-delay:.3s}
+@keyframes pl{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+
+/* ---------- 5. Gợi ý và ô tạo nhanh ---------- */
+h2{font-size:17px;font-weight:700;margin:26px 0 12px;letter-spacing:-.015em}
+.sub{color:var(--muted);font-size:13px;font-weight:500;margin-left:6px}
+.sgrid{display:flex;flex-wrap:wrap;gap:8px}
+.sgrid button{display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 16px 6px 6px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:15px;font-weight:600;text-align:left;box-shadow:var(--shadow-sm)}
+.sgrid button:active{background:var(--surface-2)}
+.sgrid .se{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--ai-soft);color:var(--ai-text)}
+.sgrid .se svg{width:18px;height:18px}
+.sgrid button:nth-child(3n+1) .se{background:var(--accent-soft);color:var(--accent-text)}
+.sgrid button:nth-child(3n) .se{background:var(--ok-soft);color:var(--ok-text)}
+.quick{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.qtile{border:1px solid rgba(255,255,255,.6);border-radius:var(--r-xl);padding:14px 12px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:14px;text-align:left;color:var(--ink);font-size:14px;line-height:1.25;min-height:120px;box-shadow:var(--shadow-sm);transition:transform .15s var(--ease),box-shadow .15s}
+.qtile:active{transform:scale(.97)}
+.qtile b{font-weight:700}
+.qtile .qi{width:46px;height:46px;border-radius:15px;background:#fff;display:grid;place-items:center;box-shadow:0 2px 8px rgba(120,60,20,.1)}
+.qtile .qi svg{width:24px;height:24px}
+.t-rem{background:linear-gradient(160deg,#FFEBDD,#FFD7BC)}.t-rem .qi{color:var(--accent)}
+.t-cal{background:linear-gradient(160deg,#F1EDFF,#DED6FF)}.t-cal .qi{color:var(--ai)}
+.t-hab{background:linear-gradient(160deg,#E2F7F2,#C3EBE2)}.t-hab .qi{color:var(--ok)}
+.aibtn{width:100%;height:48px;border-radius:var(--r-md);border:1.5px solid var(--ai);background:var(--ai-soft);color:var(--ai-text);font-weight:600;margin-top:18px}
+.aibtn + .sbtns{margin-top:10px}
+
