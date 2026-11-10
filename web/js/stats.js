@@ -136,6 +136,80 @@
     });
     return out + '</svg>';
   }
+    // ---- Huy hiệu (C3) ----
+  const BADGE_DEFS = [
+    { id: 'first',    emoji: '🌱', name: 'Bước đầu tiên',   desc: 'Làm xong một thói quen lần đầu',              metric: 'total',      target: 1 },
+    { id: 'streak3',  emoji: '🔥', name: 'Khởi động',        desc: 'Giữ một thói quen 3 ngày liên tiếp',          metric: 'streak',     target: 3 },
+    { id: 'streak7',  emoji: '🔥', name: 'Một tuần đều đặn', desc: 'Giữ một thói quen 7 ngày liên tiếp',          metric: 'streak',     target: 7 },
+    { id: 'streak14', emoji: '🔥', name: 'Hai tuần bền bỉ',  desc: 'Giữ một thói quen 14 ngày liên tiếp',         metric: 'streak',     target: 14 },
+    { id: 'streak30', emoji: '🏆', name: 'Một tháng kiên trì', desc: 'Giữ một thói quen 30 ngày liên tiếp',       metric: 'streak',     target: 30 },
+    { id: 'water1',   emoji: '💧', name: 'Giọt đầu tiên',    desc: 'Uống đủ nước trong một ngày',                 metric: 'waterDays',  target: 1 },
+    { id: 'water5',   emoji: '🥤', name: 'Thấm giọng',       desc: 'Uống đủ nước 5 ngày',                         metric: 'waterDays',  target: 5 },
+    { id: 'water20',  emoji: '🌊', name: 'Biển xanh',        desc: 'Uống đủ nước 20 ngày',                        metric: 'waterDays',  target: 20 },
+    { id: 'total25',  emoji: '⭐', name: '25 lần',           desc: 'Tổng cộng 25 lần làm thói quen',              metric: 'total',      target: 25 },
+    { id: 'total100', emoji: '🏅', name: '100 lần',          desc: 'Tổng cộng 100 lần làm thói quen',             metric: 'total',      target: 100 },
+    { id: 'multi3',   emoji: '🌟', name: 'Ngày trọn vẹn',    desc: 'Đạt mục tiêu 3 thói quen trong cùng một ngày', metric: 'multi',     target: 3 },
+    { id: 'active14', emoji: '📅', name: 'Có mặt đều đặn',   desc: 'Có làm thói quen trong 14 ngày khác nhau',    metric: 'activeDays', target: 14 },
+  ];
+
+  // goalOf(h): số lần cần làm mỗi ngày của thói quen h.
+  function badgeMetrics(habits, today, goalOf) {
+    const t = today || new Date();
+    let total = 0, streak = 0;
+    const active = new Set(), waterSet = new Set(), perDay = {};
+    habits.forEach((h) => {
+      const log = h.log || {};
+      const goal = Math.max(1, goalOf(h));
+      const done = [];
+      Object.keys(log).forEach((k) => {
+        const v = Number(log[k]) || 0;
+        if (v <= 0) return;
+        total += v;
+        active.add(k);
+        if (v >= goal) {
+          done.push(k);
+          perDay[k] = (perDay[k] || 0) + 1;
+          if (h.portionMl) waterSet.add(k);
+        }
+      });
+      if (!h.once && done.length) streak = Math.max(streak, habitStreak(done, h.days, t).longest);
+    });
+    const multi = Object.keys(perDay).reduce((m, k) => Math.max(m, perDay[k]), 0);
+    return { total, streak, waterDays: waterSet.size, multi, activeDays: active.size };
+  }
+
+  function evaluateBadges(habits, today, opts) {
+    const goalOf = (opts && opts.goalOf) || ((h) => (h.times || []).length);
+    const m = badgeMetrics(habits || [], today, goalOf);
+    return BADGE_DEFS.map((b) => {
+      const value = m[b.metric] || 0;
+      return Object.assign({}, b, { value: Math.min(value, b.target), earned: value >= b.target });
+    });
+  }
+
+  // Huy hiệu đã mở khoá lưu dạng { seeded: thời điểm, got: { id: thời điểm } }. Đã mở thì không bị thu hồi.
+  function normBadges(v) {
+    const out = { seeded: 0, got: {} };
+    if (!v || typeof v !== 'object') return out;
+    out.seeded = Number(v.seeded) || 0;
+    if (v.got && typeof v.got === 'object') {
+      Object.keys(v.got).forEach((id) => {
+        const ts = Number(v.got[id]);
+        if (ts > 0) out.got[id] = ts;
+      });
+    }
+    return out;
+  }
+
+  // Gộp hai máy: lấy hợp, giữ thời điểm mở khoá sớm nhất.
+  function mergeBadges(a, b) {
+    a = normBadges(a); b = normBadges(b);
+    const out = { seeded: Math.max(a.seeded, b.seeded), got: {} };
+    new Set(Object.keys(a.got).concat(Object.keys(b.got))).forEach((id) => {
+      out.got[id] = Math.min(a.got[id] || Infinity, b.got[id] || Infinity);
+    });
+    return out;
+  }
   const BADGES = [
     { id: 'streak3', days: 3, name: 'Khởi động' },
     { id: 'streak7', days: 7, name: 'Một tuần đều đặn' },
@@ -149,6 +223,7 @@
   const api = {
     dayKey, computeStreak, habitStreak, completionRate,
     series, barChartSvg,
+    evaluateBadges, normBadges, mergeBadges, BADGE_DEFS,
     tally, lastNDays, badgesFor, BADGES,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
