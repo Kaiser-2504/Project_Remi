@@ -841,6 +841,50 @@ function habitCard(h,full){
   if(full) h2+='<button class="linkbtn" data-act="hdel" data-id="'+h.id+'">Xoá thói quen</button>';
   return h2+'</div>';
 }
+/* ---------- thống kê ---------- */
+let statRange=7;
+const waterMlOn=k=>state.habits.reduce((s,h)=>s+(h.portionMl?(h.log[k]||0)*h.portionMl:0),0);
+const habitTimesOn=k=>state.habits.reduce((s,h)=>s+(h.portionMl?0:(h.log[k]||0)),0);
+/** Tỉ lệ hoàn thành n ngày gần nhất, không tính những ngày trước khi thói quen có dữ liệu đầu tiên. */
+function habitStats(h,n){
+  const S=window.RemiStats;
+  const goal=hTimes(h).length;
+  const logged=Object.keys(h.log).filter(k=>(h.log[k]||0)>0).sort();
+  if(!S||!logged.length)return null;
+  const days=Object.keys(h.log).filter(k=>(h.log[k]||0)>=goal);
+  const today=new Date();
+  const since=Math.round((new Date(dKey(today)+'T00:00:00')-new Date(logged[0]+'T00:00:00'))/86400000)+1;
+  return S.completionRate(days,h.days,Math.max(1,Math.min(n,since)),today);
+}
+function renderStats(){
+  if(tab!=='stats')return;
+  const S=window.RemiStats,host=$('#view-stats');
+  if(!S)return;
+  const n=statRange,today=new Date();
+  let h='<h2>Thống kê</h2><div class="seg" id="st-seg">'+
+    [[7,'7 ngày'],[30,'30 ngày']].map(o=>'<button type="button" class="'+(o[0]===n?'on':'')+'" data-act="strange" data-n="'+o[0]+'">'+o[1]+'</button>').join('')+'</div>';
+  const water=S.series(n,waterMlOn,today),acts=S.series(n,habitTimesOn,today);
+  const hasWater=water.some(p=>p.value>0),hasActs=acts.some(p=>p.value>0);
+  if(!hasWater&&!hasActs){
+    h+='<div class="empty"><b>Chưa có dữ liệu</b>Tick vài thói quen, biểu đồ sẽ hiện ở đây.</div>';
+  }else{
+    h+='<div class="stgrid">';
+    if(hasWater){
+      const tot=water.reduce((s,p)=>s+p.value,0),dn=water.filter(p=>p.value>0).length;
+      h+='<section class="stcard"><h3>Nước uống mỗi ngày</h3><p class="dhint" style="margin:0">Trung bình '+fmtNum(Math.round(tot/dn))+' ml trong những ngày có uống</p>'+S.barChartSvg(water,{label:'Nước uống mỗi ngày'})+'</section>';
+    }
+    if(hasActs){
+      const tot=acts.reduce((s,p)=>s+p.value,0);
+      h+='<section class="stcard"><h3>Số lần làm thói quen</h3><p class="dhint" style="margin:0">Tổng '+tot+' lần trong '+n+' ngày</p>'+S.barChartSvg(acts,{label:'Số lần làm thói quen mỗi ngày'})+'</section>';
+    }
+    const rows=state.habits.filter(x=>!x.once).map(x=>({x:x,s:habitStats(x,n)})).filter(r=>r.s&&r.s.total>0);
+    if(rows.length){
+      h+='<section class="stcard"><h3>Tỉ lệ hoàn thành</h3>'+rows.map(r=>'<div class="prow"><div class="ptop"><span>'+esc(r.x.emoji)+' '+esc(r.x.title)+'</span><b>'+r.s.pct+'%</b></div><div class="pbar"><i style="width:'+r.s.pct+'%"></i></div><small>'+r.s.done+' / '+r.s.total+' ngày</small></div>').join('')+'</section>';
+    }
+    h+='</div>';
+  }
+  host.innerHTML=h;
+}
 function taskCard(t){
   const d=t.when?new Date(t.when):null,now=new Date();
   const lead=d&&t.leadMin?new Date(d.getTime()-t.leadMin*60000):null;
@@ -904,9 +948,9 @@ function render(){
   hb+='<button class="send" style="margin-top:6px" data-act="newhabit" type="button">Thêm thói quen</button>';
   $('#view-habits').innerHTML=hb;
 
-  renderCal();
+  renderCal();renderStats();
   if(tab==='kitchen')KUI.render($('#view-kitchen'));
-  ['today','soon','habits','cal','kitchen'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
+  ['today','soon','habits','cal','kitchen','stats'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
   $('#quick').hidden=(tab!=='today');$('#sleep').hidden=(tab!=='today'||(state.sleep.awake&&!nearBed()));$('#suggest').hidden=(tab!=='today');$('#today-habits').hidden=(tab!=='today');document.body.dataset.tab=tab;
   document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
 }
@@ -1211,6 +1255,7 @@ document.addEventListener('click',e=>{
   else if(act==='caladd'){openManual('reminder',calSel);fromCal=true}
   else if(act==='hdel'){state.habits=state.habits.filter(h=>h.id!==id);save();render()}
   else if(act==='newhabit'){openManual('habit')}
+    else if(act==='strange'){statRange=Number(el.dataset.n);render()}
   else if(act==='notif'){enablePush()}
   else if(act.indexOf('cx-')===0){CUI.act(act,el)}
 });

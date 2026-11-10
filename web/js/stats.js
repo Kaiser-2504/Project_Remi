@@ -100,7 +100,42 @@
     }
     return out;
   }
+  // Dãy n ngày gần nhất (cũ -> mới). getter(key) trả số cho ngày 'YYYY-MM-DD'.
+  function series(n, getter, today) {
+    const end = parseKey(dayKey(today || new Date()));
+    const out = [];
+    for (let i = n - 1; i >= 0; i--) {
+      const d = addDays(end, -i);
+      const k = dayKey(d);
+      out.push({ key: k, day: d.getDate(), wd: d.getDay(), value: Number(getter(k)) || 0 });
+    }
+    return out;
+  }
 
+  const WD_SHORT = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+  // Biểu đồ cột bằng SVG tự vẽ, không dùng thư viện.
+  function barChartSvg(points, opts) {
+    opts = opts || {};
+    const W = 320, H = 150, padX = 6, padTop = 16, padBottom = 22;
+    const n = points.length;
+    const max = Math.max(opts.min || 1, ...points.map((p) => p.value));
+    const chartH = H - padTop - padBottom;
+    const slot = (W - padX * 2) / Math.max(1, n);
+    const bw = Math.max(3, Math.min(26, slot * 0.62));
+    const showVals = n <= 7;
+    let out = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (opts.label || 'Biểu đồ') + '">';
+    out += '<line class="axis" x1="' + padX + '" y1="' + (padTop + chartH) + '" x2="' + (W - padX) + '" y2="' + (padTop + chartH) + '"/>';
+    points.forEach((p, i) => {
+      const x = padX + i * slot + (slot - bw) / 2;
+      const h = p.value > 0 ? Math.max(3, Math.round((p.value / max) * chartH)) : 0;
+      const y = padTop + chartH - h;
+      if (h) out += '<rect class="bar" x="' + x.toFixed(1) + '" y="' + y + '" width="' + bw.toFixed(1) + '" height="' + h + '" rx="3"/>';
+      if (showVals && p.value > 0) out += '<text class="val" x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 4) + '" text-anchor="middle">' + Math.round(p.value) + '</text>';
+      if (n <= 7 || i % 5 === 0 || i === n - 1) out += '<text class="lbl" x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + (n <= 7 ? WD_SHORT[p.wd] : p.day) + '</text>';
+    });
+    return out + '</svg>';
+  }
   const BADGES = [
     { id: 'streak3', days: 3, name: 'Khởi động' },
     { id: 'streak7', days: 7, name: 'Một tuần đều đặn' },
@@ -113,6 +148,7 @@
 
   const api = {
     dayKey, computeStreak, habitStreak, completionRate,
+    series, barChartSvg,
     tally, lastNDays, badgesFor, BADGES,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

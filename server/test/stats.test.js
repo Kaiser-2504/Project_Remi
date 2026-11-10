@@ -37,3 +37,19 @@ test('tỉ lệ hoàn thành chỉ tính ngày trong lịch', () => {
   const r = S.completionRate(['2026-11-03', '2026-11-07'], SCHEDULE, 7, TODAY);
   assert.deepStrictEqual(r, { done: 2, total: 3, pct: 67 });
 });
+test('series trả đúng n ngày, cũ đến mới', () => {
+  const s = S.series(7, (k) => (k === '2026-11-07' ? 5 : 0), TODAY);
+  assert.strictEqual(s.length, 7);
+  assert.strictEqual(s[0].key, '2026-11-01');
+  assert.strictEqual(s[6].key, '2026-11-07');
+  assert.strictEqual(s[6].value, 5);
+});
+
+test('biểu đồ cột: đủ số cột, không lỗi khi toàn số 0', () => {
+  const pts = S.series(7, (k) => (k === '2026-11-06' ? 2000 : k === '2026-11-07' ? 1000 : 0), TODAY);
+  const svg = S.barChartSvg(pts, { label: 'Nước uống' });
+  assert.ok(svg.startsWith('<svg'));
+  assert.strictEqual((svg.match(/class="bar"/g) || []).length, 2);
+  const empty = S.barChartSvg(S.series(30, () => 0, TODAY));
+  assert.strictEqual((empty.match(/class="bar"/g) || []).length, 0);
+});

@@ -597,3 +597,20 @@ nav.tabs button{min-width:0;white-space:nowrap}
   .kmeal:hover{filter:brightness(.96)}
   .kadd:hover{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}
 }
+/* ===================== Trang Thống kê (C2) ===================== */
+nav.tabs div{grid-template-columns:repeat(6,1fr)}
+#st-seg{margin:10px 0 14px}
+.stgrid{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:960px){.stgrid{grid-template-columns:1fr 1fr}}
+.stcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+.stcard h3{margin:0 0 4px;font-size:15px}
+.chart{width:100%;height:auto;display:block;margin-top:8px}
+.chart .bar{fill:var(--ok)}
+.chart .axis{stroke:var(--line);stroke-width:1}
+.chart .lbl,.chart .val{fill:var(--muted);font-size:10px}
+.chart .val{font-weight:600}
+.prow{margin-top:12px}
+.ptop{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.pbar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 2px}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.prow small{color:var(--muted)}
