@@ -24,6 +24,11 @@ function createApp(cfg = loadConfig(), deps = {}) {
       const url = new URL(req.url, 'http://localhost');
       if (url.pathname.startsWith('/api/')) {
         const r = await api(req, url);
+        // Nhóm D: phản hồi chữ thuần (file .ics) thay vì JSON
+        if (r.raw !== undefined) {
+          res.writeHead(r.status || 200, { ...secHeaders, ...(r.headers || {}) });
+          return res.end(r.raw);
+        }
         return sendJson(res, r.status || 200, r.json, { ...secHeaders, ...(r.headers || {}) });
       }
       if (req.method !== 'GET' && req.method !== 'HEAD') {

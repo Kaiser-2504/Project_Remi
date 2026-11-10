@@ -193,6 +193,9 @@ function createApi({ db, cfg, push, log = console, fetchImpl }) {
     return { json: { data } };
   });
 
+  // Nhóm D: liên kết lịch để thuê bao (.ics)
+  require('./cal-link').registerCalLink({ db, on, HttpError });
+
   /** Xử lý một yêu cầu /api/*. Trả về { status, json, headers }. */
   return async function handle(req, url) {
     const route = routes[`${req.method} ${url.pathname}`];
