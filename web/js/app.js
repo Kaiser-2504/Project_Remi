@@ -441,6 +441,13 @@ function bindChips(id,onPick){
     onPick(b.dataset.v);
   });
 }
+const DUR_OPTS=[[15,'15 phút'],[30,'30 phút'],[45,'45 phút'],[60,'1 giờ'],[90,'1,5 giờ'],[120,'2 giờ'],[180,'3 giờ']];
+function durHtml(px,val){
+  val=val||30;
+  const o=DUR_OPTS.some(x=>x[0]===val)?DUR_OPTS:DUR_OPTS.concat([[val,leadText(val)]]).sort((a,b)=>a[0]-b[0]);
+  return '<div class="field"><label>Kéo dài</label><input type="hidden" id="'+px+'-dur" value="'+val+'">'+chipsHtml(px+'-durc',o,val)+'</div>';
+}
+function bindDur(px,onPick){const h=document.getElementById(px+'-dur');bindChips(px+'-durc',v=>{h.value=v;if(onPick)onPick(+v)})}
 const LEAD_OPTS=[[0,'Đúng giờ'],[10,'10 phút'],[30,'30 phút'],[60,'1 giờ'],[120,'2 giờ'],[1440,'1 ngày']];
 const REP_OPTS=[['none','Một lần'],['daily','Hằng ngày'],['weekly','Hằng tuần']];
 const TIME_QUICK=['06:00','07:00','09:00','12:00','15:00','19:00','21:00'];
@@ -572,6 +579,7 @@ function openSheet(p,mode){
   h+='<div class="field"><label for="f-title">Tên</label><input class="title-in" id="f-title" value="'+esc(p.emoji+' '+p.title)+'"></div>';
   if(p.intent==='task'){
     h+=whenBlockHtml(p.when,p.leadMin,p.repeat,'f');
+    h+=durHtml('f',p.durMin);
     if(p.shopping)h+=shopHtml(p);
     if(!p.shopping&&p.checklist.length){
       h+='<div class="blk"><h4>Cần chuẩn bị ('+p.checklist.length+' mục)</h4>'+p.checklist.map(c=>'<div class="li"><span>'+esc(c.item)+'</span><span>'+esc(c.qty)+'</span></div>').join('')+'</div>';
@@ -587,6 +595,7 @@ function openSheet(p,mode){
   sh.innerHTML=h;
   document.body.classList.add('sheet-open');
   if(p.intent==='task')bindWhenBlock('f');
+  if(p.intent==='task')bindDur('f');
   $('#s-cancel').onclick=closeSheet;
   $('#s-ok').onclick=confirmDraft;
   if(p.intent==='habit')initHabitForm();
@@ -772,7 +781,7 @@ function confirmDraft(){
   }else{
     const w=$('#f-when').value||p.when;
     const cl=(p.shopping&&shop)?shop.items.filter(x=>x.on).map(x=>({item:x.item,qty:x.qty,done:false})):p.checklist;
-    state.tasks.push({id:uid(),title:st.title,emoji:st.emoji,when:w,leadMin:parseInt($('#f-lead').value,10)||0,repeat:$('#f-rep').value,
+    state.tasks.push({id:uid(),title:st.title,emoji:st.emoji,when:w,durMin:parseInt($('#f-dur').value,10)||30,leadMin:parseInt($('#f-lead').value,10)||0,repeat:$('#f-rep').value,
       summary:p.summary,checklist:cl,tips:p.tips,shop:!!p.shopping,servings:(p.shopping&&shop)?shop.servings:undefined,done:false});
     if(p.shopping&&cl.length){cl.forEach(x=>pantryAdd(x.item));saveDish(st.title,cl,shop&&shop.servings)}
     const d=new Date(w);
@@ -895,6 +904,7 @@ function openTask(id){
   h+='<div class="field" style="margin-top:0"><label for="t-title">Tên</label><input class="title-in" id="t-title" value="'+esc(t.emoji+' '+t.title)+'"></div>';
   h+='<label class="donechk"><input type="checkbox" id="t-chk"'+(t.done?' checked':'')+'><span>Đã hoàn thành</span></label>';
   h+=whenBlockHtml(t.when||toLocal(defaultWhen()),t.leadMin||0,t.repeat||'none','t');
+  h+=durHtml('t',t.durMin);
   h+='<div class="blk"><h4>'+(t.shop?'Danh sách đi chợ':'Danh sách')+'</h4>'+(t.shop?servingsHtml('t-sv',t.servings||4):'')+'<div id="t-list"></div>'+
      '<div class="addrow"><input id="t-add" maxlength="40" aria-label="Thêm mục"><button type="button" class="addt" id="t-addb">Thêm</button></div></div>';
   h+='<div class="field"><label for="t-note">Ghi chú</label><textarea class="note" id="t-note" rows="3">'+esc(t.note||'')+'</textarea></div>';
@@ -904,6 +914,7 @@ function openTask(id){
   sh.innerHTML=h;
   document.body.classList.add('sheet-open');
   bindWhenBlock('t');
+  bindDur('t',v=>{t.durMin=v;save()});
   const rList=()=>{
     const L=t.checklist||[];
     $('#t-list').innerHTML=L.length?'<div class="lh"><span></span><span>Món</span><span>Số lượng</span><span></span></div>'+
@@ -1077,9 +1088,10 @@ function renderCal(){
   const host=$('#view-cal'),ae=document.activeElement;
   if(ae&&host.contains(ae)&&/^(TEXTAREA|INPUT)$/.test(ae.tagName))return;
   calInit();
+  if(CUI.isTimeline()){CUI.render(host);return}
   const now=new Date(),todayKey=dKey(now);
   const first=new Date(calY,calM,1),offset=(first.getDay()+6)%7,dim=new Date(calY,calM+1,0).getDate();
-  let h='<div class="calgrid"><div class="calleft"><div class="calnow" id="cal-now"></div>';
+  let h=CUI.bar()+'<div class="calgrid"><div class="calleft"><div class="calnow" id="cal-now"></div>';
   h+='<div class="calh"><button type="button" data-act="calprev" aria-label="Tháng trước">‹</button><h2>Tháng '+(calM+1)+', '+calY+'</h2><button type="button" data-act="calnext" aria-label="Tháng sau">›</button><button type="button" class="todaybtn" data-act="caltoday">Hôm nay</button></div>';
   h+='<div class="wk">'+['T2','T3','T4','T5','T6','T7','CN'].map(x=>'<span>'+x+'</span>').join('')+'</div><div class="cgrid">';
   for(let i=0;i<offset;i++)h+='<span></span>';
@@ -1129,14 +1141,30 @@ function renderCal(){
   tickClock();
 }
 
-function openManual(kind,date){
+function calAdd(key,time,dur){openManual('reminder',key,time,dur);fromCal=true}
+function openManual(kind,date,time,dur){
   if(kind==='habit'){
     openSheet(normalize({intent:'habit',title:'',emoji:'🎯',habit:{recurring:true,times:['07:00'],days:[0,1,2,3,4,5,6]}},''),'manual');
   }else{
-    openSheet(normalize({intent:'task',title:'',emoji:kind==='event'?'📅':'⏰',when:(date&&date!==dKey(new Date()))?date+'T09:00':toLocal(defaultWhen()),leadMinutes:kind==='event'?30:0,repeat:'none'},''),'manual');
+    const when=date?((date===dKey(new Date())&&!time)?toLocal(defaultWhen()):date+'T'+(time||'09:00')):toLocal(defaultWhen());
+    const p=normalize({intent:'task',title:'',emoji:kind==='event'?'📅':'⏰',when:when,leadMinutes:kind==='event'?30:0,repeat:'none'},'');
+    if(dur)p.durMin=dur;
+    openSheet(p,'manual');
   }
 }
 
+const CUI=window.RemiCalUI({
+  state:state,store:store,esc:esc,dKey:dKey,WDS:WDS,uid:uid,toLocal:toLocal,splitTitle:splitTitle,
+  projTasks:k=>projTasks(k),habitsOn:k=>habitsOn(k),
+  habitTimes:(h,k)=>(k===dKey(new Date())?hTimes(h):h.times).slice().sort(),
+  fullDay:k=>fullDay(k),profileWake:()=>profileWake(),profileBed:()=>profileBed(),
+  getSel:()=>calSel,
+  setSel:k=>{calSel=k;const d=new Date(k+'T00:00:00');calY=d.getFullYear();calM=d.getMonth()},
+  addAt:(k,t,d)=>calAdd(k,t,d),openTask:id=>openTask(id),
+  save:()=>save(),render:()=>render(),tick:()=>tick(),
+  alertUser:(a,b,c,d)=>alertUser(a,b,c,d),
+  sheet:()=>$('#sheet'),closeSheet:()=>closeSheet()
+});
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
   const ex=e.target.closest('[data-ex]');
@@ -1167,6 +1195,7 @@ document.addEventListener('click',e=>{
   else if(act==='hdel'){state.habits=state.habits.filter(h=>h.id!==id);save();render()}
   else if(act==='newhabit'){openManual('habit')}
   else if(act==='notif'){enablePush()}
+  else if(act.indexOf('cx-')===0){CUI.act(act,el)}
 });
 document.addEventListener('change',e=>{
   const el=e.target.closest('[data-act="cl"]');if(!el)return;
