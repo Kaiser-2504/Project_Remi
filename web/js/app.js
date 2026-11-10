@@ -46,6 +46,7 @@ if(!Array.isArray(state.habits)) state.habits=[];
 if(!state.pantry||typeof state.pantry!=='object'||Array.isArray(state.pantry))state.pantry={};
 if(!state.dishes||typeof state.dishes!=='object'||Array.isArray(state.dishes))state.dishes={};
 if(!state.dayNotes||typeof state.dayNotes!=='object'||Array.isArray(state.dayNotes))state.dayNotes={};
+state.badges=window.RemiStats.normBadges(store.get('remi.badges',null));
 function sleepDayKey(){return dKey(new Date(Date.now()-4*3600000))}
 if(!state.sleep||typeof state.sleep!=='object'){const hr0=new Date().getHours();state.sleep={day:sleepDayKey(),awake:hr0>=6&&hr0<23,wakeAt:null}}
 state.habits.forEach(h=>{
@@ -66,9 +67,10 @@ state.meta.profileU=state.meta.profileU||0;state.meta.sleepU=state.meta.sleepU||
 function persist(){
   store.set('remi.tasks',state.tasks);store.set('remi.habits',state.habits);store.set('remi.fired',state.fired);store.set('remi.profile',state.profile);
   store.set('remi.sleep',state.sleep);store.set('remi.greeted',state.greeted);store.set('remi.pantry',state.pantry);store.set('remi.dishes',state.dishes);
-  store.set('remi.daynotes',state.dayNotes);store.set('remi.kitchen',state.kitchen);store.set('remi.meta',state.meta);
+  store.set('remi.daynotes',state.dayNotes);store.set('remi.badges',state.badges);store.set('remi.kitchen',state.kitchen);store.set('remi.meta',state.meta);
 }
 function save(){
+  checkBadges();
   const keys=Object.keys(state.fired);
   if(keys.length>400){keys.slice(0,keys.length-300).forEach(k=>delete state.fired[k])}
   Sync.stamp();
@@ -876,6 +878,36 @@ function renderStats(){
   }
   host.innerHTML=h;
 }
+/* ---------- huy hiệu (C3) ---------- */
+function badgeList(){
+  const S=window.RemiStats;
+  return S?S.evaluateBadges(state.habits,new Date(),{goalOf:h=>hTimes(h).length}):[];
+}
+/** Mở khoá huy hiệu mới. Lần chạy đầu chỉ ghi nhận thầm những huy hiệu đã đạt từ trước (không báo). Trả về true nếu có thay đổi. */
+function checkBadges(){
+  const list=badgeList();
+  if(!list.length)return false;
+  const b=state.badges,now=Date.now(),fresh=[];
+  list.forEach(x=>{if(x.earned&&!b.got[x.id]){b.got[x.id]=now;fresh.push(x)}});
+  const first=!b.seeded;
+  if(first)b.seeded=now;
+  else fresh.forEach(x=>alertUser(x.emoji,'Huy hiệu mới: '+x.name,x.desc));
+  return first||fresh.length>0;
+}
+function renderBadges(){
+  if(tab!=='stats')return;
+  const list=badgeList();
+  if(!list.length)return;
+  const got=state.badges.got;
+  const n=list.filter(x=>got[x.id]||x.earned).length;
+  let h='<h2 style="margin-top:22px">Huy hiệu<span class="sub">'+n+' / '+list.length+'</span></h2><div class="bgrid">';
+  list.forEach(x=>{
+    const on=!!(got[x.id]||x.earned),pct=Math.round(x.value/x.target*100);
+    h+='<div class="bd'+(on?'':' off')+'"><div class="bi" aria-hidden="true">'+x.emoji+'</div><b>'+esc(x.name)+'</b><small>'+esc(x.desc)+'</small>'+
+      (on?'<span class="bok">Đã mở khoá</span>':'<div class="pbar"><i style="width:'+pct+'%"></i></div><small>'+x.value+' / '+x.target+'</small>')+'</div>';
+  });
+  $('#view-stats').insertAdjacentHTML('beforeend',h+'</div>');
+}
 function taskCard(t){
   const d=t.when?new Date(t.when):null,now=new Date();
   const lead=d&&t.leadMin?new Date(d.getTime()-t.leadMin*60000):null;
@@ -939,7 +971,7 @@ function render(){
   hb+='<button class="send" style="margin-top:6px" data-act="newhabit" type="button">Thêm thói quen</button>';
   $('#view-habits').innerHTML=hb;
 
-  renderCal();renderStats();
+  renderCal();renderStats();renderBadges();
   if(tab==='kitchen')KUI.render($('#view-kitchen'));
   ['today','soon','habits','cal','kitchen','stats'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
   $('#quick').hidden=(tab!=='today');$('#sleep').hidden=(tab!=='today'||(state.sleep.awake&&!nearBed()));$('#suggest').hidden=(tab!=='today');$('#today-habits').hidden=(tab!=='today');document.body.dataset.tab=tab;
@@ -1341,6 +1373,7 @@ function mergeSnapshots(L,R){
   out.dayNotes=dn.res;out.dishes=dish.res;
   const kit=window.RemiKitchen.mergeKitchen(L.kitchen,R.kitchen,lm.mealU,rm.mealU,deleted);
   out.kitchen=kit.kitchen;
+  out.badges=window.RemiStats.mergeBadges(L.badges,R.badges);
   const pantry={};
   [L.pantry||{},R.pantry||{}].forEach(p=>Object.keys(p).forEach(k=>{
     const e=p[k];if(!pantry[k]||(e.n||0)>(pantry[k].n||0))pantry[k]=e;
@@ -1370,6 +1403,7 @@ const Sync={
     this.sig.meal={};Object.keys(state.kitchen.meals).forEach(k=>{this.sig.meal[k]=JSON.stringify(state.kitchen.meals[k])});
     this.sig.profile=JSON.stringify(state.profile);
     this.sig.sleep=JSON.stringify(state.sleep);
+    this.sig.bd=JSON.stringify(state.badges);
   },
   /** So với lần trước, mục nào đổi thì đóng dấu thời gian; mục nào mất thì ghi bia mộ. */
   stamp(){
@@ -1400,13 +1434,14 @@ const Sync={
     });
     const p=JSON.stringify(state.profile);if(p!==this.sig.profile){m.profileU=now;this.sig.profile=p;changed=true}
     const sl=JSON.stringify(state.sleep);if(sl!==this.sig.sleep){m.sleepU=now;this.sig.sleep=sl;changed=true}
+    const bd=JSON.stringify(state.badges);if(bd!==this.sig.bd){this.sig.bd=bd;changed=true}
     if(changed){this.dirty=true;store.set('remi.dirty',true)}
   },
   snapshot(){
     const m=state.meta,dn=Object.assign({},state.dayNotes),dish=Object.assign({},state.dishes);
     Object.keys(m.dnU).forEach(k=>{if(dn[k]===undefined)dn[k]=''});
     Object.keys(m.dishU).forEach(k=>{if(dish[k]===undefined)dish[k]=null});
-    return {v:1,tasks:state.tasks,habits:state.habits,dayNotes:dn,pantry:state.pantry,dishes:dish,profile:state.profile,sleep:state.sleep,greeted:state.greeted,kitchen:state.kitchen,
+    return {v:1,tasks:state.tasks,habits:state.habits,dayNotes:dn,pantry:state.pantry,dishes:dish,profile:state.profile,sleep:state.sleep,   greeted:state.greeted,kitchen:state.kitchen,badges:state.badges,
       meta:{dnU:m.dnU,dishU:m.dishU,mealU:m.mealU,profileU:m.profileU,sleepU:m.sleepU,deleted:m.deleted}};
   },
   apply(s){
@@ -1417,7 +1452,7 @@ const Sync={
     state.profile=s.profile||null;
     if(s.sleep)state.sleep=s.sleep;
     state.greeted=s.greeted||'';
-    state.kitchen=window.RemiKitchen.normalizeKitchen(s.kitchen);
+    state.badges=window.RemiStats.normBadges(s.badges);
     state.meta=Object.assign({dnU:{},dishU:{},mealU:{},deleted:{},profileU:0,sleepU:0},s.meta||{});
     state.habits.forEach(h=>{if(!h.log)h.log={};if(!Array.isArray(h.days)||!h.days.length)h.days=[0,1,2,3,4,5,6];if(!Array.isArray(h.times)||!h.times.length)h.times=['07:00']});
     this.init();persist();
@@ -1616,6 +1651,7 @@ function registerSW(){
 /* start */
 Sync.init();
 registerSW();
+if(checkBadges())save();
 render();tick();
 setInterval(tick,15000);
 tickClock();setInterval(tickClock,1000);

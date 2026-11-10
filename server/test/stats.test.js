@@ -53,3 +53,46 @@ test('biểu đồ cột: đủ số cột, không lỗi khi toàn số 0', () =
   const empty = S.barChartSvg(S.series(30, () => 0, TODAY));
   assert.strictEqual((empty.match(/class="bar"/g) || []).length, 0);
 });
+
+test('huy hiệu: dữ liệu rỗng không mở khoá gì', () => {
+  const r = S.evaluateBadges([], TODAY);
+  assert.strictEqual(r.length, 12);
+  assert.strictEqual(r.filter((b) => b.earned).length, 0);
+});
+
+test('huy hiệu: 3 ngày liên tiếp mở Khởi động, chưa tới 7 ngày', () => {
+  const h = { id: 'a', times: ['07:00'], days: [0, 1, 2, 3, 4, 5, 6], log: { '2026-11-05': 1, '2026-11-06': 1, '2026-11-07': 1 } };
+  const r = S.evaluateBadges([h], TODAY);
+  const get = (id) => r.find((b) => b.id === id);
+  assert.ok(get('first').earned);
+  assert.ok(get('streak3').earned);
+  assert.ok(!get('streak7').earned);
+  assert.strictEqual(get('streak7').value, 3);
+});
+
+test('huy hiệu nước: chỉ tính ngày đủ mục tiêu', () => {
+  const w = { id: 'w', times: ['08:00', '12:00'], portionMl: 250, days: [0, 1, 2, 3, 4, 5, 6], log: { '2026-11-06': 2, '2026-11-07': 1 } };
+  const r = S.evaluateBadges([w], TODAY);
+  assert.ok(r.find((b) => b.id === 'water1').earned);
+  assert.strictEqual(r.find((b) => b.id === 'water5').value, 1);
+});
+
+test('huy hiệu: 3 thói quen đủ mục tiêu trong một ngày', () => {
+  const mk = (id) => ({ id, times: ['07:00'], days: [0, 1, 2, 3, 4, 5, 6], log: { '2026-11-07': 1 } });
+  const r = S.evaluateBadges([mk('a'), mk('b'), mk('c')], TODAY);
+  assert.ok(r.find((b) => b.id === 'multi3').earned);
+});
+
+test('mergeBadges: hợp hai máy, giữ thời điểm sớm nhất', () => {
+  const m = S.mergeBadges(
+    { seeded: 5, got: { first: 100, streak3: 300 } },
+    { seeded: 9, got: { first: 200, water1: 400 } }
+  );
+  assert.strictEqual(m.seeded, 9);
+  assert.deepStrictEqual(m.got, { first: 100, streak3: 300, water1: 400 });
+});
+
+test('normBadges: dữ liệu hỏng trả về rỗng hoặc bỏ mục sai', () => {
+  assert.deepStrictEqual(S.normBadges('lỗi'), { seeded: 0, got: {} });
+  assert.deepStrictEqual(S.normBadges({ seeded: 'x', got: { a: -1, b: 5 } }), { seeded: 0, got: { b: 5 } });
+});
