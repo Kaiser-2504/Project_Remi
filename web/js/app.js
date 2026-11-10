@@ -1680,7 +1680,6 @@ function registerSW(){
 /* start */
 Sync.init();
 registerSW();
-if(checkBadges())save();
 render();tick();
 setInterval(tick,15000);
 tickClock();setInterval(tickClock,1000);
