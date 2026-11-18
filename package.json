@@ -24,8 +24,10 @@
     "test:mutation": "node scripts/mutation-test.js web/js/kitchen.js server/test/kitchen.test.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "postgres": "^4.1.1",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "puppeteer": "^22.0.0"
