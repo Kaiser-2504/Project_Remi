@@ -11,7 +11,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "prebuild": "node scripts/copy-web.mjs",
+    "predev": "node scripts/copy-web.mjs"
   },
   "keywords": [],
   "author": "",
