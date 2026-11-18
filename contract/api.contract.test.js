@@ -52,7 +52,8 @@ function client() {
 
 const PASSWORD = 'mat-khau-hop-dong-123';
 /**
- * Chỉ tạo 3 người dùng cho cả bộ test (đăng ký bị giới hạn theo IP, vài lần chạy liên tiếp không được làm hết lượt):
+ * Chỉ tạo 3 người dùng cho cả bộ test (đăng ký bị giới hạn theo IP, vài lần chạy liên tiếp không được làm hết lượt;
+ * các lần đăng ký thử sai ở dưới cũng tính vào giới hạn đó, tổng cộng dưới 10 lần mỗi lần chạy):
  *   fresh  để kiểm tra trạng thái ban đầu và xoá tài khoản; main và other dùng chung, các test không giả định phiên bản bắt đầu từ 0.
  */
 const users = {};
@@ -265,6 +266,29 @@ test('ai: chưa bật AI thì 503 ai_disabled; đã bật thì trả { data } đ
   assert.ok([502, 503].includes(r.status), 'trạng thái bất ngờ: ' + r.status);
   assert.match(r.json.error, /^ai_/);
   assert.ok(!JSON.stringify(r.json).match(/sk-ant|x-api-key/i)); // khóa không bao giờ lộ
+});
+
+/* ------------------------------------------------------------------ tài khoản (phần Người 3, chỉ kiểm điều test cần dựa vào) */
+test('tài khoản: email trùng 409, sai mật khẩu 401, đăng nhập đúng 200, đăng xuất thì phiên mất hiệu lực', async () => {
+  const c = await user('other');
+  assertError(await client().req('POST', '/api/auth/register', { email: c.email.toUpperCase(), name: 'Trùng', password: PASSWORD }), 409, 'email_taken');
+  assertError(await client().req('POST', '/api/auth/login', { email: c.email, password: 'sai-mat-khau-123' }), 401, 'bad_credentials');
+  assertError(await client().req('POST', '/api/auth/login', { email: 'khong-ton-tai@example.com', password: PASSWORD }), 401, 'bad_credentials');
+  const second = client();
+  const ok = await second.req('POST', '/api/auth/login', { email: c.email, password: PASSWORD });
+  assert.equal(ok.status, 200); assert.equal(ok.json.user.email, c.email);
+  assert.equal((await second.req('GET', '/api/me')).status, 200);
+  assert.equal((await second.req('POST', '/api/auth/logout', {})).status, 200);
+  assertError(await second.req('GET', '/api/me'), 401, 'unauthorized');
+  assert.equal((await c.req('GET', '/api/me')).status, 200); // phiên khác vẫn còn
+});
+
+test('tài khoản: đầu vào đăng ký sai trả mã riêng', async () => {
+  const c = client();
+  const base = { email: `x-${Date.now()}@example.com`, name: 'Xíu', password: PASSWORD };
+  assertError(await c.req('POST', '/api/auth/register', { ...base, email: "a'; DROP TABLE users;--" }), 400, 'bad_email');
+  assertError(await c.req('POST', '/api/auth/register', { ...base, name: '' }), 400, 'bad_name');
+  assertError(await c.req('POST', '/api/auth/register', { ...base, password: '1234567' }), 400, 'bad_password');
 });
 
 /* ------------------------------------------------------------------ xoá tài khoản */

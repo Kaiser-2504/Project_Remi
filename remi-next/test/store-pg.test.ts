@@ -1,7 +1,8 @@
 /**
- * Chạy store-pg.ts trên Postgres THẬT. Bỏ qua nếu không đặt PG_TEST_URL, ví dụ:
+ * Chạy store-pg.ts trên Postgres THẬT với schema của remi-next/standalone/schema.sql (có khóa ngoại tới users).
+ * Bỏ qua nếu không đặt PG_TEST_URL, ví dụ:
  *   PG_TEST_URL="host=/tmp/pg port=5439 dbname=remitest"
- * (chỉ dùng cho kiểm thử cục bộ; CI chạy contract test với DB thật qua BACKEND_URL)
+ * (chỉ dùng cho kiểm thử cục bộ; xoá sạch bảng users và mọi bảng liên quan trong DB thử đó)
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,7 +17,9 @@ const conn = () => createSql({ host: kv.host, port: Number(kv.port), db: kv.dbna
 test.before(async () => {
   if (!cfg) return;
   const c = conn();
-  await c.sql`TRUNCATE states, reminders, push_subs, ai_usage`;
+  await c.sql`TRUNCATE users CASCADE`; // kéo theo mọi bảng có khóa ngoại tới users (schema thật có ON DELETE CASCADE)
+  const ids = ['u-a', 'u-r', 'u-r2', 'u-sqli', 'u-ai', 'u-ai2', 'u-floor', 'u-nobody', 'u-p', 'u-khac', ...Array.from({ length: 10 }, (_, i) => 'u-race' + i)];
+  for (const id of ids) await c.sql`INSERT INTO users(id, email, name, pass, created_at) VALUES(${id}, ${id + '@test.local'}, ${id}, 'x', 1)`;
   c.close();
 });
 const rem = (key: string, at = 1000, extra = {}) => ({ key, at, title: 'T' + key, body: '', cond: '' as const, ...extra });

@@ -9,7 +9,6 @@ import type { Sql } from '../lib/store-pg.ts';
 const END = '@@END@@';
 const lit = (v: any): string => {
   if (v && v.__json !== undefined) return `'${JSON.stringify(v.__json).replace(/'/g, "''")}'::jsonb`;
-  if (v && v.__arr) return `ARRAY[${v.__arr.map(lit).join(',')}]::${v.__type}[]`;
   if (v === null || v === undefined) return 'NULL';
   if (typeof v === 'number') return String(v);
   return `'${String(v).replace(/'/g, "''")}'`;
@@ -53,7 +52,6 @@ export function createSql(opts: { host: string; port: number; db: string }): Con
     const f: any = (strings: TemplateStringsArray, ...vals: any[]) =>
       run(strings.reduce((acc, s, i) => acc + s + (i < vals.length ? lit(vals[i]) : ''), ''));
     f.json = (v: unknown) => ({ __json: v });
-    f.array = (values: any[], type = 'text') => ({ __arr: values, __type: type });
     f.begin = async (fn: (tx: Sql) => Promise<any>) => {
       await run('BEGIN');
       try { const r = await fn(f); await run('COMMIT'); return r; }
@@ -62,4 +60,30 @@ export function createSql(opts: { host: string; port: number; db: string }): Con
     return f;
   };
   return { sql: make(), close: () => p.stdin.end() };
+}
+
+/**
+ * Nhóm kết nối: mỗi câu lệnh lẻ dùng một kết nối rảnh, còn `begin` giữ nguyên một kết nối từ BEGIN tới COMMIT,
+ * nên nhiều yêu cầu đến cùng lúc không trộn lẫn giao dịch (giống `postgres.js`). Chỉ dùng để kiểm thử.
+ */
+export function createPool(opts: { host: string; port: number; db: string }, size = 6): Conn {
+  const conns = Array.from({ length: size }, () => createSql(opts));
+  const idle = [...conns];
+  const waiting: Array<(c: Conn) => void> = [];
+  const acquire = () => new Promise<Conn>((res) => (idle.length ? res(idle.pop()!) : waiting.push(res)));
+  const release = (c: Conn) => { const w = waiting.shift(); if (w) w(c); else idle.push(c); };
+  const make = (pinned?: Conn): Sql => {
+    const f: any = async (strings: TemplateStringsArray, ...vals: any[]) => {
+      if (pinned) return pinned.sql(strings, ...vals);
+      const c = await acquire();
+      try { return await c.sql(strings, ...vals); } finally { release(c); }
+    };
+    f.json = (v: unknown) => ({ __json: v });
+    f.begin = async (fn: (tx: Sql) => Promise<any>) => {
+      const c = await acquire();
+      try { return await c.sql.begin(fn); } finally { release(c); }
+    };
+    return f;
+  };
+  return { sql: make(), close: () => conns.forEach((c) => c.close()) };
 }
