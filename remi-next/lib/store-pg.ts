@@ -17,7 +17,6 @@ export interface Sql {
   (strings: TemplateStringsArray, ...values: any[]): Promise<any[]>;
   begin<T>(fn: (tx: Sql) => Promise<T>): Promise<T>;
   json(value: unknown): any;
-  array(values: any[], type?: string): any;
 }
 
 export function createPgStore(sql: Sql): DataStore {
@@ -78,15 +77,19 @@ export function createPgStore(sql: Sql): DataStore {
   };
 }
 
-/** Thay lịch nhắc chưa gửi của người dùng bằng danh sách mới, bằng hai câu lệnh (không lặp từng dòng). */
+/**
+ * Thay lịch nhắc chưa gửi của người dùng bằng danh sách mới, bằng hai câu lệnh (không lặp từng dòng).
+ * Danh sách đi vào dưới dạng MỘT tham số JSON (`tx.json`), không dùng tham số kiểu mảng: postgres.js v4
+ * đã bỏ `sql.array()` và cách truyền mảng thay đổi giữa các phiên bản, còn `sql.json` thì ổn định.
+ */
 async function syncReminders(tx: Sql, userId: string, list: Reminder[]) {
-  const keys = list.map((r) => r.key);
-  await tx`DELETE FROM reminders WHERE user_id = ${userId} AND sent = 0 AND NOT (key = ANY(${tx.array(keys, 'text')}))`;
-  if (!list.length) return;
+  const rows = list.map((r) => ({ key: r.key, at: r.at, title: r.title, body: r.body, cond: r.cond }));
+  await tx`DELETE FROM reminders WHERE user_id = ${userId} AND sent = 0
+    AND NOT EXISTS (SELECT 1 FROM jsonb_to_recordset(${tx.json(rows)}::jsonb) AS x(key text) WHERE x.key = reminders.key)`;
+  if (!rows.length) return;
   await tx`INSERT INTO reminders(user_id, key, fire_at, title, body, cond, sent)
-    SELECT ${userId}, x.k, x.a, x.t, x.b, x.c, 0
-    FROM unnest(${tx.array(keys, 'text')}, ${tx.array(list.map((r) => r.at), 'bigint')}, ${tx.array(list.map((r) => r.title), 'text')},
-                ${tx.array(list.map((r) => r.body), 'text')}, ${tx.array(list.map((r) => r.cond), 'text')}) AS x(k, a, t, b, c)
+    SELECT ${userId}::text, x.key, x.at, x.title, x.body, x.cond, 0
+    FROM jsonb_to_recordset(${tx.json(rows)}::jsonb) AS x(key text, at bigint, title text, body text, cond text)
     ON CONFLICT (user_id, key) DO UPDATE SET fire_at = excluded.fire_at, title = excluded.title, body = excluded.body, cond = excluded.cond
     WHERE reminders.sent = 0`;
 }
