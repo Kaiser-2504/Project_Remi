@@ -499,6 +499,7 @@ body.sheet-open .sheet{pointer-events:auto}
 .wsum b{font-size:17px;color:var(--ai-text)}
 .wsum span{font-size:13px;color:var(--muted);line-height:1.4}
 .eng{display:block;font-weight:500;font-size:12px;opacity:.8;margin-top:2px}
+.hstreak{margin:4px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 /* ===================== Nhóm B: tab Bếp (thực đơn tuần, tủ đồ, món của tôi) ===================== */
 nav.tabs div{grid-template-columns:repeat(5,1fr)}
