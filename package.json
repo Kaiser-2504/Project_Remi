@@ -20,7 +20,6 @@
     "test:kitchen": "node --disable-warning=ExperimentalWarning e2e/kitchen.js",
     "test:contract": "node --disable-warning=ExperimentalWarning --test \"contract/*.test.js\"",
     "test:next": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"remi-next/test/*.test.ts\"",
-    "api:standalone": "node --disable-warning=ExperimentalWarning remi-next/standalone/server.ts",
     "test:mutation": "node scripts/mutation-test.js web/js/kitchen.js server/test/kitchen.test.js"
   },
   "dependencies": {
