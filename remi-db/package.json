@@ -1,0 +1,18 @@
+{
+  "name": "remi-db",
+  "private": true,
+  "type": "module",
+  "description": "Lớp dữ liệu Remi trên Supabase Postgres (Người 1 / D1)",
+  "scripts": {
+    "migrate": "node --env-file-if-exists=.env db/migrate.mjs",
+    "verify:rls": "node --env-file-if-exists=.env db/run-sql.mjs db/verify-rls.sql",
+    "smoke": "node --env-file-if-exists=.env db/run-sql.mjs db/smoke.sql",
+    "test:repo": "node --env-file-if-exists=.env --import tsx --test test/repo.test.ts"
+  },
+  "dependencies": {
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}
