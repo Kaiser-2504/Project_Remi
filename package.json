@@ -2,16 +2,23 @@
   "name": "remi",
   "version": "0.1.0",
   "private": true,
-  "description": "Remi: trợ lý nhắc việc và thói quen cá nhân, có AI, đồng bộ và thông báo đẩy.",
+  "description": "Remi: trợ lý nhắc việc và thói quen cá nhân, có AI, đồng bộ và thông báo đẩy. Một ứng dụng Next.js triển khai trên Vercel, dữ liệu trên Supabase.",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=22.13"
   },
   "scripts": {
-    "start": "node --disable-warning=ExperimentalWarning server/index.js",
-    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
-    "test": "node --disable-warning=ExperimentalWarning --test \"server/test/*.test.js\"",
+    "dev": "node scripts/sync-public.js && next dev",
+    "build": "node scripts/sync-public.js && next build",
+    "start": "next start",
+    "start:legacy": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev:legacy": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"server/test/*.test.js\" \"lib/test/*.test.js\"",
     "test:e2e": "node --disable-warning=ExperimentalWarning e2e/run.js",
+    "db:migrate": "node --env-file-if-exists=.env db/migrate.mjs",
+    "db:verify-rls": "node --env-file-if-exists=.env db/run-sql.mjs db/verify-rls.sql",
+    "db:smoke": "node --env-file-if-exists=.env db/run-sql.mjs db/smoke.sql",
+    "test:db": "node --env-file-if-exists=.env --test db/test/repo.test.js",
     "icons": "node scripts/make-icons.js",
     "ml:data": "node ml/gen/generate.js --n 8000 --seed 1 --out ml/data/synth-train.jsonl && node ml/gen/generate.js --n 1500 --seed 2 --out ml/data/synth-val.jsonl && node ml/gen/generate.js --n 1500 --seed 3 --out ml/data/synth-test.jsonl && node ml/train/prepare.js --in ml/data/synth-train.jsonl --out ml/data/train.jsonl",
     "ml:eval": "node ml/eval/run.js --engine rules --data ml/data/gold.jsonl,ml/data/holdout.jsonl",
@@ -23,10 +30,11 @@
     "test:mutation": "node scripts/mutation-test.js web/js/kitchen.js server/test/kitchen.test.js"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "postgres": "^4.1.1",
-    "web-push": "^3.6.7",
-    "zod": "^4.6.7"
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "postgres": "^3.4.5",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "puppeteer": "^22.0.0"

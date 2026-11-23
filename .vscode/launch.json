@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Remi: chạy máy chủ (đọc .env)",
+      "program": "${workspaceFolder}/server/index.js",
+      "runtimeArgs": ["--disable-warning=ExperimentalWarning", "--env-file-if-exists=.env"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Remi: chỉ giao diện, không cần backend (mock)",
+      "program": "${workspaceFolder}/devtools/dev-server.js",
+      "args": ["--mock"],
+      "console": "integratedTerminal"
+    }
+  ]
+}

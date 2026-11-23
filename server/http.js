@@ -2,14 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-class HttpError extends Error {
-  constructor(status, code, message, extra) {
-    super(message || code);
-    this.status = status;
-    this.code = code;
-    this.extra = extra || {};
-  }
-}
+const { HttpError } = require('../lib/errors');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

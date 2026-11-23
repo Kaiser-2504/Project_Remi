@@ -1,0 +1,88 @@
+diff --git a/.env.example b/.env.example
+index c771c6a..88b27ea 100644
+--- a/.env.example
++++ b/.env.example
+@@ -1,7 +1,9 @@
+ # Sao chép thành .env rồi chỉnh. Không bao giờ đưa file .env lên GitHub.
+ 
+ PORT=3000
+-NODE_ENV=production
++# Chạy ở máy cá nhân: để dòng NODE_ENV dưới đây bị tắt (có dấu #). Khi triển khai thật thì bỏ dấu # để bật chế độ production
++# (khi đó thiếu ANTHROPIC_API_KEY là máy chủ không khởi động, và cookie chỉ gửi qua HTTPS). Docker đã tự đặt production.
++# NODE_ENV=production
+ # Nơi lưu cơ sở dữ liệu SQLite (trong Docker là /data, được gắn volume)
+ DATA_DIR=./data
+ 
+diff --git a/.vscode/launch.json b/.vscode/launch.json
+new file mode 100644
+index 0000000..180dc88
+--- /dev/null
++++ b/.vscode/launch.json
+@@ -0,0 +1,21 @@
++{
++  "version": "0.2.0",
++  "configurations": [
++    {
++      "type": "node",
++      "request": "launch",
++      "name": "Remi: chạy máy chủ (đọc .env)",
++      "program": "${workspaceFolder}/server/index.js",
++      "runtimeArgs": ["--disable-warning=ExperimentalWarning", "--env-file-if-exists=.env"],
++      "console": "integratedTerminal"
++    },
++    {
++      "type": "node",
++      "request": "launch",
++      "name": "Remi: chỉ giao diện, không cần backend (mock)",
++      "program": "${workspaceFolder}/devtools/dev-server.js",
++      "args": ["--mock"],
++      "console": "integratedTerminal"
++    }
++  ]
++}
+diff --git a/package.json b/package.json
+index 3f60dcb..7f7978c 100644
+--- a/package.json
++++ b/package.json
+@@ -8,8 +8,8 @@
+     "node": ">=22.13"
+   },
+   "scripts": {
+-    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+-    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
++    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env server/index.js",
++    "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env --watch server/index.js",
+     "test": "node --disable-warning=ExperimentalWarning --test \"server/test/*.test.js\" \"devtools/test/*.test.js\"",
+     "test:e2e": "node --disable-warning=ExperimentalWarning e2e/run.js",
+     "icons": "node scripts/make-icons.js",
+diff --git a/server/index.js b/server/index.js
+index cece7e4..859d4d5 100644
+--- a/server/index.js
++++ b/server/index.js
+@@ -66,7 +66,7 @@ if (require.main === module) {
+   app.scheduler.start();
+   app.listen().then((addr) => {
+     console.log(`Remi chạy tại http://localhost:${addr.port}`);
+-    if (!cfg.anthropicKey) console.log('[ai] Chưa có ANTHROPIC_API_KEY: câu nói chưa được AI hiểu. Điền khóa vào .env rồi chạy lại. Các nút tạo nhanh vẫn dùng được.');
++    if (!cfg.anthropicKey) console.log('[ai] Chưa có ANTHROPIC_API_KEY: câu nói chưa được AI hiểu. Điền khóa vào tệp .env (npm start tự đọc tệp này) rồi chạy lại. Các nút tạo nhanh vẫn dùng được.');
+   });
+   const stop = () => app.close().then(() => process.exit(0));
+   process.on('SIGINT', stop);
+diff --git a/server/test/repo.test.js b/server/test/repo.test.js
+index a50cf74..c795f60 100644
+--- a/server/test/repo.test.js
++++ b/server/test/repo.test.js
+@@ -17,3 +17,13 @@ test('.gitignore vẫn chặn bí mật và dữ liệu chạy thật', () => {
+   const lines = fs.readFileSync(path.join(root, '.gitignore'), 'utf8').split('\n').map((l) => l.trim());
+   for (const must of ['node_modules/', '.env', '*.sqlite']) assert.ok(lines.includes(must), 'thiếu ' + must);
+ });
++
++test('npm start và npm run dev đọc tệp .env (máy chủ chỉ đọc process.env, không tự mở .env)', () => {
++  const scripts = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).scripts;
++  for (const k of ['start', 'dev']) assert.match(scripts[k], /--env-file-if-exists=\.env/, `script ${k} phải nạp .env`);
++});
++
++test('.env.example không bật production mặc định (sao chép nguyên vẹn ra máy cá nhân sẽ khiến máy chủ đòi khóa AI và cookie Secure)', () => {
++  const lines = fs.readFileSync(path.join(root, '.env.example'), 'utf8').split('\n').map((l) => l.trim());
++  assert.ok(!lines.some((l) => /^NODE_ENV\s*=\s*production/.test(l)), 'dòng NODE_ENV=production phải được comment trong .env.example');
++});
