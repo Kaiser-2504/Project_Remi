@@ -4,3 +4,9 @@ data
 .git
 e2e
 *.md
+
+.next
+public
+.vercel
+db
+app

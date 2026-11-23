@@ -1,0 +1,16 @@
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/package.json b/package.json[m
+[1mindex ac56e8d..ef5dc34 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -8,8 +8,8 @@[m
+     "node": ">=22.13"[m
+   },[m
+   "scripts": {[m
+[31m-    "start": "node --disable-warning=ExperimentalWarning server/index.js",[m
+[31m-    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",[m
+[32m+[m[32m    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env server/index.js",[m
+[32m+[m[32m    "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env --watch server/index.js",[m
+     "test": "node --disable-warning=ExperimentalWarning --test \"server/test/*.test.js\"",[m
+     "test:e2e": "node --disable-warning=ExperimentalWarning e2e/run.js",[m
+     "icons": "node scripts/make-icons.js",[m

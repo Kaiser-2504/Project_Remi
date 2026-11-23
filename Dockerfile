@@ -1,8 +1,10 @@
 FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production DATA_DIR=/data PORT=3000
-COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
+# Bản Docker/SQLite chỉ cần web-push; Next.js, React, postgres chỉ dùng khi deploy lên Vercel.
+RUN echo '{"name":"remi-legacy","private":true,"dependencies":{"web-push":"^3.6.7"}}' > package.json \
+ && npm install --omit=dev
+COPY lib ./lib
 COPY server ./server
 COPY web ./web
 RUN mkdir -p /data && chown -R node:node /data

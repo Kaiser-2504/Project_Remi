@@ -1,0 +1,11 @@
+# Không đưa lên Vercel: máy chủ Node cũ, phần AI/ML của môn học, bản demo, tài liệu, kiểm thử trình duyệt.
+/server
+/remi-ai
+/ml
+/nhap-nhanh
+/standalone
+/e2e
+/docs
+/Dockerfile
+/docker-compose.yml
+/.github

@@ -8,3 +8,10 @@ node_modules/
 ml/data/synth-*.jsonl
 ml/data/train.jsonl
 ml/out/
+# Next.js
+/.next/
+/out/
+/public/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
