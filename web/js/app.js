@@ -46,6 +46,7 @@ if(!Array.isArray(state.habits)) state.habits=[];
 if(!state.pantry||typeof state.pantry!=='object'||Array.isArray(state.pantry))state.pantry={};
 if(!state.dishes||typeof state.dishes!=='object'||Array.isArray(state.dishes))state.dishes={};
 if(!state.dayNotes||typeof state.dayNotes!=='object'||Array.isArray(state.dayNotes))state.dayNotes={};
+state.badges=window.RemiStats.normBadges(store.get('remi.badges',null));
 function sleepDayKey(){return dKey(new Date(Date.now()-4*3600000))}
 if(!state.sleep||typeof state.sleep!=='object'){const hr0=new Date().getHours();state.sleep={day:sleepDayKey(),awake:hr0>=6&&hr0<23,wakeAt:null}}
 state.habits.forEach(h=>{
@@ -66,9 +67,10 @@ state.meta.profileU=state.meta.profileU||0;state.meta.sleepU=state.meta.sleepU||
 function persist(){
   store.set('remi.tasks',state.tasks);store.set('remi.habits',state.habits);store.set('remi.fired',state.fired);store.set('remi.profile',state.profile);
   store.set('remi.sleep',state.sleep);store.set('remi.greeted',state.greeted);store.set('remi.pantry',state.pantry);store.set('remi.dishes',state.dishes);
-  store.set('remi.daynotes',state.dayNotes);store.set('remi.kitchen',state.kitchen);store.set('remi.meta',state.meta);
+  store.set('remi.daynotes',state.dayNotes);store.set('remi.badges',state.badges);store.set('remi.kitchen',state.kitchen);store.set('remi.meta',state.meta);
 }
 function save(){
+  checkBadges();
   const keys=Object.keys(state.fired);
   if(keys.length>400){keys.slice(0,keys.length-300).forEach(k=>delete state.fired[k])}
   Sync.stamp();
@@ -441,6 +443,13 @@ function bindChips(id,onPick){
     onPick(b.dataset.v);
   });
 }
+const DUR_OPTS=[[15,'15 phút'],[30,'30 phút'],[45,'45 phút'],[60,'1 giờ'],[90,'1,5 giờ'],[120,'2 giờ'],[180,'3 giờ']];
+function durHtml(px,val){
+  val=val||30;
+  const o=DUR_OPTS.some(x=>x[0]===val)?DUR_OPTS:DUR_OPTS.concat([[val,leadText(val)]]).sort((a,b)=>a[0]-b[0]);
+  return '<div class="field"><label>Kéo dài</label><input type="hidden" id="'+px+'-dur" value="'+val+'">'+chipsHtml(px+'-durc',o,val)+'</div>';
+}
+function bindDur(px,onPick){const h=document.getElementById(px+'-dur');bindChips(px+'-durc',v=>{h.value=v;if(onPick)onPick(+v)})}
 const LEAD_OPTS=[[0,'Đúng giờ'],[10,'10 phút'],[30,'30 phút'],[60,'1 giờ'],[120,'2 giờ'],[1440,'1 ngày']];
 const REP_OPTS=[['none','Một lần'],['daily','Hằng ngày'],['weekly','Hằng tuần']];
 const TIME_QUICK=['06:00','07:00','09:00','12:00','15:00','19:00','21:00'];
@@ -572,6 +581,7 @@ function openSheet(p,mode){
   h+='<div class="field"><label for="f-title">Tên</label><input class="title-in" id="f-title" value="'+esc(p.emoji+' '+p.title)+'"></div>';
   if(p.intent==='task'){
     h+=whenBlockHtml(p.when,p.leadMin,p.repeat,'f');
+    h+=durHtml('f',p.durMin);
     if(p.shopping)h+=shopHtml(p);
     if(!p.shopping&&p.checklist.length){
       h+='<div class="blk"><h4>Cần chuẩn bị ('+p.checklist.length+' mục)</h4>'+p.checklist.map(c=>'<div class="li"><span>'+esc(c.item)+'</span><span>'+esc(c.qty)+'</span></div>').join('')+'</div>';
@@ -587,6 +597,7 @@ function openSheet(p,mode){
   sh.innerHTML=h;
   document.body.classList.add('sheet-open');
   if(p.intent==='task')bindWhenBlock('f');
+  if(p.intent==='task')bindDur('f');
   $('#s-cancel').onclick=closeSheet;
   $('#s-ok').onclick=confirmDraft;
   if(p.intent==='habit')initHabitForm();
@@ -772,7 +783,7 @@ function confirmDraft(){
   }else{
     const w=$('#f-when').value||p.when;
     const cl=(p.shopping&&shop)?shop.items.filter(x=>x.on).map(x=>({item:x.item,qty:x.qty,done:false})):p.checklist;
-    state.tasks.push({id:uid(),title:st.title,emoji:st.emoji,when:w,leadMin:parseInt($('#f-lead').value,10)||0,repeat:$('#f-rep').value,
+    state.tasks.push({id:uid(),title:st.title,emoji:st.emoji,when:w,durMin:parseInt($('#f-dur').value,10)||30,leadMin:parseInt($('#f-lead').value,10)||0,repeat:$('#f-rep').value,
       summary:p.summary,checklist:cl,tips:p.tips,shop:!!p.shopping,servings:(p.shopping&&shop)?shop.servings:undefined,done:false});
     if(p.shopping&&cl.length){cl.forEach(x=>pantryAdd(x.item));saveDish(st.title,cl,shop&&shop.servings)}
     const d=new Date(w);
@@ -793,6 +804,23 @@ function daysText(d){
   return DAY_ORDER.filter(x=>d.indexOf(x)>=0).map(x=>DAY_LABEL[x]).join(' ');
 }
 function habitDone(h){return Math.min(hTimes(h).length,h.log[dKey(new Date())]||0)}
+/** Dòng "🔥 chuỗi ngày · tỉ lệ" cho thẻ thói quen. Một ngày tính là xong khi đủ số lần. */
+function habitStreakLine(h){
+  const S=window.RemiStats;
+  if(!S||h.once)return '';
+  const goal=hTimes(h).length;
+  const days=Object.keys(h.log).filter(k=>(h.log[k]||0)>=goal);
+  if(!days.length)return '';
+  const today=new Date();
+  const first=Object.keys(h.log).filter(k=>(h.log[k]||0)>0).sort()[0];
+  const since=Math.round((new Date(dKey(today)+'T00:00:00')-new Date(first+'T00:00:00'))/86400000)+1;
+  const s=S.habitStreak(days,h.days,today);
+  const r=S.completionRate(days,h.days,Math.max(1,Math.min(7,since)),today);
+  const parts=[];
+  if(s.current>0)parts.push('🔥 '+s.current+' ngày liên tiếp');
+  if(r.total>0)parts.push(r.pct+'% trong '+r.total+' ngày');
+  return parts.length?'<p class="hstreak">'+esc(parts.join(' · '))+'</p>':'';
+}
 function ring(h){
   const pct=habitDone(h)/hTimes(h).length,C=2*Math.PI*28;
   return '<div class="ring"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--line)" stroke-width="7"/>'+
@@ -803,7 +831,7 @@ function habitCard(h,full){
   const onToday=habitActive(h,now);
   const pm=h.portionMl;
   const status=!onToday?'Hôm nay nghỉ':pm?(done*pm)+' / '+(goal*pm)+' ml hôm nay':goal===1?('Lúc '+ts[0]+', '+(all?'đã xong':'chưa làm')):done+' / '+goal+' lần hôm nay';
-  let h2='<div class="hcard'+(full?' full':'')+'" data-hid="'+h.id+'" role="button" tabindex="0" aria-label="Mở chi tiết '+esc(h.title)+'"><div class="hhead">'+ring(h)+'<div><h3>'+esc(h.title)+'</h3><p>'+status+'</p></div></div>';
+  let h2='<div class="hcard'+(full?' full':'')+'" data-hid="'+h.id+'" role="button" tabindex="0" aria-label="Mở chi tiết '+esc(h.title)+'"><div class="hhead">'+ring(h)+'<div><h3>'+esc(h.title)+'</h3><p>'+status+'</p>'+habitStreakLine(h)+'</div></div>';
   if(full){
     const nxt=onToday?ts.slice().sort().find(t=>{const [H,M]=t.split(':').map(Number);const a=new Date(now);a.setHours(H,M,0,0);return a>now}):null;
     h2+='<div class="chips">'+ts.slice().sort().map(t=>'<span class="chip'+(t===nxt?' lead':'')+'">'+esc(t)+'</span>').join('')+'<span class="chip ai">'+(h.once?'Chỉ hôm nay':daysText(h.days))+'</span>'+(h.spread?'<span class="chip ai">Tự chia theo giờ dậy</span>':'')+(pm?'<span class="chip ai">'+pm+' ml mỗi lần</span>':'')+'</div>';
@@ -814,6 +842,80 @@ function habitCard(h,full){
   h2+='</div>';
   if(full) h2+='<button class="linkbtn" data-act="hdel" data-id="'+h.id+'">Xoá thói quen</button>';
   return h2+'</div>';
+}
+/* ---------- thống kê ---------- */
+let statRange=7;
+const waterMlOn=k=>state.habits.reduce((s,h)=>s+(h.portionMl?(h.log[k]||0)*h.portionMl:0),0);
+const habitTimesOn=k=>state.habits.reduce((s,h)=>s+(h.portionMl?0:(h.log[k]||0)),0);
+/** Tỉ lệ hoàn thành n ngày gần nhất, không tính những ngày trước khi thói quen có dữ liệu đầu tiên. */
+function habitStats(h,n){
+  const S=window.RemiStats;
+  const goal=hTimes(h).length;
+  const logged=Object.keys(h.log).filter(k=>(h.log[k]||0)>0).sort();
+  if(!S||!logged.length)return null;
+  const days=Object.keys(h.log).filter(k=>(h.log[k]||0)>=goal);
+  const today=new Date();
+  const since=Math.round((new Date(dKey(today)+'T00:00:00')-new Date(logged[0]+'T00:00:00'))/86400000)+1;
+  return S.completionRate(days,h.days,Math.max(1,Math.min(n,since)),today);
+}
+function renderStats(){
+  if(tab!=='stats')return;
+  const S=window.RemiStats,host=$('#view-stats');
+  if(!S)return;
+  const n=statRange,today=new Date();
+  let h='<h2>Thống kê</h2><div class="seg" id="st-seg">'+
+    [[7,'7 ngày'],[30,'30 ngày']].map(o=>'<button type="button" class="'+(o[0]===n?'on':'')+'" data-act="strange" data-n="'+o[0]+'">'+o[1]+'</button>').join('')+'</div>';
+  const water=S.series(n,waterMlOn,today),acts=S.series(n,habitTimesOn,today);
+  const hasWater=water.some(p=>p.value>0),hasActs=acts.some(p=>p.value>0);
+  if(!hasWater&&!hasActs){
+    h+='<div class="empty"><b>Chưa có dữ liệu</b>Tick vài thói quen, biểu đồ sẽ hiện ở đây.</div>';
+  }else{
+    h+='<div class="stgrid">';
+    if(hasWater){
+      const tot=water.reduce((s,p)=>s+p.value,0),dn=water.filter(p=>p.value>0).length;
+      h+='<section class="stcard"><h3>Nước uống mỗi ngày</h3><p class="dhint" style="margin:0">Trung bình '+fmtNum(Math.round(tot/dn))+' ml trong những ngày có uống</p>'+S.barChartSvg(water,{label:'Nước uống mỗi ngày'})+'</section>';
+    }
+    if(hasActs){
+      const tot=acts.reduce((s,p)=>s+p.value,0);
+      h+='<section class="stcard"><h3>Số lần làm thói quen</h3><p class="dhint" style="margin:0">Tổng '+tot+' lần trong '+n+' ngày</p>'+S.barChartSvg(acts,{label:'Số lần làm thói quen mỗi ngày'})+'</section>';
+    }
+    const rows=state.habits.filter(x=>!x.once).map(x=>({x:x,s:habitStats(x,n)})).filter(r=>r.s&&r.s.total>0);
+    if(rows.length){
+      h+='<section class="stcard"><h3>Tỉ lệ hoàn thành</h3>'+rows.map(r=>'<div class="prow"><div class="ptop"><span>'+esc(r.x.emoji)+' '+esc(r.x.title)+'</span><b>'+r.s.pct+'%</b></div><div class="pbar"><i style="width:'+r.s.pct+'%"></i></div><small>'+r.s.done+' / '+r.s.total+' ngày</small></div>').join('')+'</section>';
+    }
+    h+='</div>';
+  }
+  host.innerHTML=h;
+}
+/* ---------- huy hiệu (C3) ---------- */
+function badgeList(){
+  const S=window.RemiStats;
+  return S?S.evaluateBadges(state.habits,new Date(),{goalOf:h=>hTimes(h).length}):[];
+}
+/** Mở khoá huy hiệu mới. Lần chạy đầu chỉ ghi nhận thầm những huy hiệu đã đạt từ trước (không báo). Trả về true nếu có thay đổi. */
+function checkBadges(){
+  const list=badgeList();
+  if(!list.length)return false;
+  const b=state.badges,now=Date.now(),fresh=[];
+  list.forEach(x=>{if(x.earned&&!b.got[x.id]){b.got[x.id]=now;fresh.push(x)}});
+  const first=!b.seeded;
+  if(first)b.seeded=now;
+  else fresh.forEach(x=>alertUser(x.emoji,'Huy hiệu mới: '+x.name,x.desc));
+  return first||fresh.length>0;
+}
+function renderBadges(){
+  if(tab!=='stats')return;
+  const list=badgeList();
+  if(!list.length)return;
+  const got=state.badges.got;
+  const n=list.filter(x=>got[x.id]||x.earned).length;
+  let h='<h2 style="margin-top:22px">Huy hiệu<span class="sub">'+n+' / '+list.length+'</span></h2><div class="bgrid">';
+  list.forEach(x=>{
+    const on=!!(got[x.id]||x.earned),pct=Math.round(x.value/x.target*100);
+    h+='<div class="bd'+(on?'':' off')+'"><div class="bi" aria-hidden="true">'+x.emoji+'</div><b>'+esc(x.name)+'</b><small>'+esc(x.desc)+'</small>'+
+      (on?'<span class="bok">Đã mở khoá</span>':'<div class="pbar"><i style="width:'+pct+'%"></i></div><small>'+x.value+' / '+x.target+'</small>')+'</div>';
+  });
+  $('#view-stats').insertAdjacentHTML('beforeend',h+'</div>');
 }
 function taskCard(t){
   const d=t.when?new Date(t.when):null,now=new Date();
@@ -878,9 +980,9 @@ function render(){
   hb+='<button class="send" style="margin-top:6px" data-act="newhabit" type="button">Thêm thói quen</button>';
   $('#view-habits').innerHTML=hb;
 
-  renderCal();
+  renderCal();renderStats();renderBadges();
   if(tab==='kitchen')KUI.render($('#view-kitchen'));
-  ['today','soon','habits','cal','kitchen'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
+  ['today','soon','habits','cal','kitchen','stats'].forEach(k=>{$('#view-'+k).hidden=(k!==tab)});
   $('#quick').hidden=(tab!=='today');$('#sleep').hidden=(tab!=='today'||(state.sleep.awake&&!nearBed()));$('#suggest').hidden=(tab!=='today');$('#today-habits').hidden=(tab!=='today');document.body.dataset.tab=tab;
   document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
 }
@@ -895,6 +997,7 @@ function openTask(id){
   h+='<div class="field" style="margin-top:0"><label for="t-title">Tên</label><input class="title-in" id="t-title" value="'+esc(t.emoji+' '+t.title)+'"></div>';
   h+='<label class="donechk"><input type="checkbox" id="t-chk"'+(t.done?' checked':'')+'><span>Đã hoàn thành</span></label>';
   h+=whenBlockHtml(t.when||toLocal(defaultWhen()),t.leadMin||0,t.repeat||'none','t');
+  h+=durHtml('t',t.durMin);
   h+='<div class="blk"><h4>'+(t.shop?'Danh sách đi chợ':'Danh sách')+'</h4>'+(t.shop?servingsHtml('t-sv',t.servings||4):'')+'<div id="t-list"></div>'+
      '<div class="addrow"><input id="t-add" maxlength="40" aria-label="Thêm mục"><button type="button" class="addt" id="t-addb">Thêm</button></div></div>';
   h+='<div class="field"><label for="t-note">Ghi chú</label><textarea class="note" id="t-note" rows="3">'+esc(t.note||'')+'</textarea></div>';
@@ -904,6 +1007,7 @@ function openTask(id){
   sh.innerHTML=h;
   document.body.classList.add('sheet-open');
   bindWhenBlock('t');
+  bindDur('t',v=>{t.durMin=v;save()});
   const rList=()=>{
     const L=t.checklist||[];
     $('#t-list').innerHTML=L.length?'<div class="lh"><span></span><span>Món</span><span>Số lượng</span><span></span></div>'+
@@ -1077,9 +1181,10 @@ function renderCal(){
   const host=$('#view-cal'),ae=document.activeElement;
   if(ae&&host.contains(ae)&&/^(TEXTAREA|INPUT)$/.test(ae.tagName))return;
   calInit();
+  if(CUI.isTimeline()){CUI.render(host);return}
   const now=new Date(),todayKey=dKey(now);
   const first=new Date(calY,calM,1),offset=(first.getDay()+6)%7,dim=new Date(calY,calM+1,0).getDate();
-  let h='<div class="calgrid"><div class="calleft"><div class="calnow" id="cal-now"></div>';
+  let h=CUI.bar()+'<div class="calgrid"><div class="calleft"><div class="calnow" id="cal-now"></div>';
   h+='<div class="calh"><button type="button" data-act="calprev" aria-label="Tháng trước">‹</button><h2>Tháng '+(calM+1)+', '+calY+'</h2><button type="button" data-act="calnext" aria-label="Tháng sau">›</button><button type="button" class="todaybtn" data-act="caltoday">Hôm nay</button></div>';
   h+='<div class="wk">'+['T2','T3','T4','T5','T6','T7','CN'].map(x=>'<span>'+x+'</span>').join('')+'</div><div class="cgrid">';
   for(let i=0;i<offset;i++)h+='<span></span>';
@@ -1129,14 +1234,30 @@ function renderCal(){
   tickClock();
 }
 
-function openManual(kind,date){
+function calAdd(key,time,dur){openManual('reminder',key,time,dur);fromCal=true}
+function openManual(kind,date,time,dur){
   if(kind==='habit'){
     openSheet(normalize({intent:'habit',title:'',emoji:'🎯',habit:{recurring:true,times:['07:00'],days:[0,1,2,3,4,5,6]}},''),'manual');
   }else{
-    openSheet(normalize({intent:'task',title:'',emoji:kind==='event'?'📅':'⏰',when:(date&&date!==dKey(new Date()))?date+'T09:00':toLocal(defaultWhen()),leadMinutes:kind==='event'?30:0,repeat:'none'},''),'manual');
+    const when=date?((date===dKey(new Date())&&!time)?toLocal(defaultWhen()):date+'T'+(time||'09:00')):toLocal(defaultWhen());
+    const p=normalize({intent:'task',title:'',emoji:kind==='event'?'📅':'⏰',when:when,leadMinutes:kind==='event'?30:0,repeat:'none'},'');
+    if(dur)p.durMin=dur;
+    openSheet(p,'manual');
   }
 }
 
+const CUI=window.RemiCalUI({
+  state:state,store:store,esc:esc,dKey:dKey,WDS:WDS,uid:uid,toLocal:toLocal,splitTitle:splitTitle,
+  projTasks:k=>projTasks(k),habitsOn:k=>habitsOn(k),
+  habitTimes:(h,k)=>(k===dKey(new Date())?hTimes(h):h.times).slice().sort(),
+  fullDay:k=>fullDay(k),profileWake:()=>profileWake(),profileBed:()=>profileBed(),
+  getSel:()=>calSel,
+  setSel:k=>{calSel=k;const d=new Date(k+'T00:00:00');calY=d.getFullYear();calM=d.getMonth()},
+  addAt:(k,t,d)=>calAdd(k,t,d),openTask:id=>openTask(id),
+  save:()=>save(),render:()=>render(),tick:()=>tick(),
+  alertUser:(a,b,c,d)=>alertUser(a,b,c,d),
+  sheet:()=>$('#sheet'),closeSheet:()=>closeSheet()
+});
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
   const ex=e.target.closest('[data-ex]');
@@ -1166,7 +1287,9 @@ document.addEventListener('click',e=>{
   else if(act==='caladd'){openManual('reminder',calSel);fromCal=true}
   else if(act==='hdel'){state.habits=state.habits.filter(h=>h.id!==id);save();render()}
   else if(act==='newhabit'){openManual('habit')}
+    else if(act==='strange'){statRange=Number(el.dataset.n);render()}
   else if(act==='notif'){enablePush()}
+  else if(act.indexOf('cx-')===0){CUI.act(act,el)}
 });
 document.addEventListener('change',e=>{
   const el=e.target.closest('[data-act="cl"]');if(!el)return;
@@ -1279,6 +1402,7 @@ function mergeSnapshots(L,R){
   out.dayNotes=dn.res;out.dishes=dish.res;
   const kit=window.RemiKitchen.mergeKitchen(L.kitchen,R.kitchen,lm.mealU,rm.mealU,deleted);
   out.kitchen=kit.kitchen;
+  out.badges=window.RemiStats.mergeBadges(L.badges,R.badges);
   const pantry={};
   [L.pantry||{},R.pantry||{}].forEach(p=>Object.keys(p).forEach(k=>{
     const e=p[k];if(!pantry[k]||(e.n||0)>(pantry[k].n||0))pantry[k]=e;
@@ -1308,6 +1432,7 @@ const Sync={
     this.sig.meal={};Object.keys(state.kitchen.meals).forEach(k=>{this.sig.meal[k]=JSON.stringify(state.kitchen.meals[k])});
     this.sig.profile=JSON.stringify(state.profile);
     this.sig.sleep=JSON.stringify(state.sleep);
+    this.sig.bd=JSON.stringify(state.badges);
   },
   /** So với lần trước, mục nào đổi thì đóng dấu thời gian; mục nào mất thì ghi bia mộ. */
   stamp(){
@@ -1338,13 +1463,14 @@ const Sync={
     });
     const p=JSON.stringify(state.profile);if(p!==this.sig.profile){m.profileU=now;this.sig.profile=p;changed=true}
     const sl=JSON.stringify(state.sleep);if(sl!==this.sig.sleep){m.sleepU=now;this.sig.sleep=sl;changed=true}
+    const bd=JSON.stringify(state.badges);if(bd!==this.sig.bd){this.sig.bd=bd;changed=true}
     if(changed){this.dirty=true;store.set('remi.dirty',true)}
   },
   snapshot(){
     const m=state.meta,dn=Object.assign({},state.dayNotes),dish=Object.assign({},state.dishes);
     Object.keys(m.dnU).forEach(k=>{if(dn[k]===undefined)dn[k]=''});
     Object.keys(m.dishU).forEach(k=>{if(dish[k]===undefined)dish[k]=null});
-    return {v:1,tasks:state.tasks,habits:state.habits,dayNotes:dn,pantry:state.pantry,dishes:dish,profile:state.profile,sleep:state.sleep,greeted:state.greeted,kitchen:state.kitchen,
+    return {v:1,tasks:state.tasks,habits:state.habits,dayNotes:dn,pantry:state.pantry,dishes:dish,profile:state.profile,sleep:state.sleep,   greeted:state.greeted,kitchen:state.kitchen,badges:state.badges,
       meta:{dnU:m.dnU,dishU:m.dishU,mealU:m.mealU,profileU:m.profileU,sleepU:m.sleepU,deleted:m.deleted}};
   },
   apply(s){
@@ -1355,6 +1481,7 @@ const Sync={
     state.profile=s.profile||null;
     if(s.sleep)state.sleep=s.sleep;
     state.greeted=s.greeted||'';
+    state.badges=window.RemiStats.normBadges(s.badges);
     state.kitchen=window.RemiKitchen.normalizeKitchen(s.kitchen);
     state.meta=Object.assign({dnU:{},dishU:{},mealU:{},deleted:{},profileU:0,sleepU:0},s.meta||{});
     state.habits.forEach(h=>{if(!h.log)h.log={};if(!Array.isArray(h.days)||!h.days.length)h.days=[0,1,2,3,4,5,6];if(!Array.isArray(h.times)||!h.times.length)h.times=['07:00']});

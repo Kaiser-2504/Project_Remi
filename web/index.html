@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/cal-ui.css">
 </head>
 <body>
 
@@ -61,6 +62,7 @@
     <div id="view-habits" hidden></div>
     <div id="view-cal" hidden></div>
     <div id="view-kitchen" hidden></div>
+    <div id="view-stats" hidden></div>
   </main>
   </div>
   <aside class="col col-side">
@@ -99,6 +101,10 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 13.9A4 4 0 0 1 7.5 6a5 5 0 0 1 9 0A4 4 0 0 1 18 13.9V20H6z"/><path d="M6 17h12"/></svg>
       Bếp
     </button>
+    <button role="tab" aria-selected="false" data-tab="stats">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+      Thống kê
+    </button>
   </div>
 </nav>
 
@@ -107,8 +113,11 @@
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Xác nhận"></div>
 <script src="/js/api.js"></script>
 <script src="/js/qty.js"></script>
+<script src="/js/stats.js"></script>
 <script src="/js/kitchen.js"></script>
 <script src="/js/kitchen-ui.js"></script>
+<script src="/js/cal-utils.js"></script>
+<script src="/js/cal-ui.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>

@@ -444,6 +444,7 @@ nav.tabs .brand{display:none}
 @media (min-width:960px),(min-width:700px) and (max-height:560px){
   .col-side{display:flex;flex-direction:column;gap:16px}
   .col-side>*{margin-top:0}
+  .col-side #quick{order:-1}
   .col-side #today-habits h2:first-child{margin-top:6px}
   body:not([data-tab="today"]) .col-main #composer{margin-bottom:20px}
   .col-main #composer{max-width:900px}
@@ -499,6 +500,7 @@ body.sheet-open .sheet{pointer-events:auto}
 .wsum b{font-size:17px;color:var(--ai-text)}
 .wsum span{font-size:13px;color:var(--muted);line-height:1.4}
 .eng{display:block;font-weight:500;font-size:12px;opacity:.8;margin-top:2px}
+.hstreak{margin:4px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 /* ===================== Nhóm B: tab Bếp (thực đơn tuần, tủ đồ, món của tôi) ===================== */
 nav.tabs div{grid-template-columns:repeat(5,1fr)}
@@ -595,3 +597,32 @@ nav.tabs button{min-width:0;white-space:nowrap}
   .kmeal:hover{filter:brightness(.96)}
   .kadd:hover{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}
 }
+/* ===================== Trang Thống kê (C2) ===================== */
+nav.tabs div{grid-template-columns:repeat(6,1fr)}
+#st-seg{margin:10px 0 14px}
+.stgrid{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:960px){.stgrid{grid-template-columns:1fr 1fr}}
+.stcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+.stcard h3{margin:0 0 4px;font-size:15px}
+.chart{width:100%;height:auto;display:block;margin-top:8px}
+.chart .bar{fill:var(--ok)}
+.chart .axis{stroke:var(--line);stroke-width:1}
+.chart .lbl,.chart .val{fill:var(--muted);font-size:10px}
+.chart .val{font-weight:600}
+.prow{margin-top:12px}
+.ptop{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.pbar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 2px}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.prow small{color:var(--muted)}
+/* ===================== Huy hiệu (C3) ===================== */
+.bgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:640px){.bgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:960px){.bgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.bd{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;min-width:0}
+.bd .bi{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:var(--accent-soft)}
+.bd b{font-size:14px;line-height:1.3}
+.bd small{font-size:12px;color:var(--muted);line-height:1.35}
+.bd .bok{margin-top:4px;font-size:12px;font-weight:700;color:var(--ok)}
+.bd.off{opacity:.6}
+.bd.off .bi{filter:grayscale(1);background:var(--bg)}
+.bd .pbar{width:100%;margin-top:6px}

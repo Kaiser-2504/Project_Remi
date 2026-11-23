@@ -25,6 +25,8 @@
     "test:responsive": "node --disable-warning=ExperimentalWarning e2e/responsive.js",
     "test:features": "node --disable-warning=ExperimentalWarning e2e/features.js",
     "test:kitchen": "node --disable-warning=ExperimentalWarning e2e/kitchen.js",
+    "test:contract": "node --disable-warning=ExperimentalWarning --test \"contract/*.test.js\"",
+    "test:next": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"remi-next/test/*.test.ts\"",
     "test:mutation": "node scripts/mutation-test.js web/js/kitchen.js server/test/kitchen.test.js"
   },
   "dependencies": {

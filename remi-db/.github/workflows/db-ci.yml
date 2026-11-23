@@ -1,0 +1,42 @@
+# CI cho lớp dữ liệu: dựng Postgres thật, chạy migration, verify-rls và smoke.
+# Không cần Supabase, không cần bí mật — chạy trên mọi PR đụng tới db/.
+name: db-ci
+on:
+  pull_request:
+    paths: [ 'db/**', 'lib/**', 'test/**' ]
+  push:
+    branches: [ main ]
+    paths: [ 'db/**', 'lib/**', 'test/**' ]
+jobs:
+  db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: [ '5432:5432' ]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      PGPASSWORD: postgres
+      DATABASE_URL_DIRECT: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      # Postgres cục bộ không có vai trò anon/authenticated như Supabase: tạo giả để migration chạy hết.
+      - name: Tạo vai trò giả của Supabase
+        run: psql "$DATABASE_URL_DIRECT" -c "create role anon; create role authenticated;"
+      - name: Chạy migration
+        run: psql "$DATABASE_URL_DIRECT" -v ON_ERROR_STOP=1 -f db/migrations/001_init.sql
+      - name: Kiểm tra RLS
+        run: psql "$DATABASE_URL_DIRECT" -v ON_ERROR_STOP=1 -f db/verify-rls.sql
+      - name: Smoke test
+        run: psql "$DATABASE_URL_DIRECT" -v ON_ERROR_STOP=1 -f db/smoke.sql
+      # Test lớp TypeScript (cần driver). Bật khi dự án Next.js đã có tsx.
+      # - uses: actions/setup-node@v4
+      #   with: { node-version: '22' }
+      # - run: npm ci
+      # - run: DATABASE_URL="$DATABASE_URL_DIRECT" npm run test:repo
