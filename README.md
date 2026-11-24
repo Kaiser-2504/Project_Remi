@@ -144,13 +144,6 @@ Mọi yêu cầu ghi cần header `X-Remi: 1` (chống CSRF); app tự thêm.
 
 Việc **nên làm trước khi mở cho người ngoài**: đặt sau HTTPS, đặt `TRUST_PROXY=1` nếu có proxy, sao lưu file `data/remi.sqlite`, thêm xác minh email và quên mật khẩu (hiện chưa có), cân nhắc đặt `ALLOW_REGISTRATION=0` khi chỉ dùng cho gia đình.
 
-## Nút hành động trên thông báo
-
-Thông báo của việc và thói quen đến giờ có hai nút (Android, Chrome, Edge; iPhone chưa hỗ trợ nút nên chỉ hiện thông báo thường):
-- **Nhắc lại sau 10 phút**: chạy thẳng trên máy chủ (`POST /api/reminders/snooze`), không cần mở app. Máy chủ sao chép lời nhắc thành bản `z:<khoá>`; bản này không bị dọn khi đồng bộ. Mất mạng hoặc phiên hết hạn thì mở app.
-- **Xong**: mở app (hoặc gửi tin cho app đang mở) và đánh dấu xong việc, hoặc ghi một lần cho thói quen hôm nay.
-Lời nhắc trước giờ, hạn dùng đồ và gọi dậy không có nút. Bản nhắc lại vẫn gửi dù bạn đã đánh dấu xong việc đó sau khi bấm nhắc lại.
-
 ## Triển khai lên Vercel (Next.js + Supabase)
 
 Repo này chạy được dưới **một ứng dụng Next.js duy nhất** trên Vercel. Giao diện (`web/`) được chép sang `public/` lúc build, API nằm ở `app/api/[...path]/route.js`, dữ liệu ở Supabase Postgres (schema `remi`, bật RLS). Bản Express + SQLite cũ vẫn giữ (`npm run start:legacy`, Docker) để dùng nội bộ.
@@ -161,7 +154,7 @@ Repo này chạy được dưới **một ứng dụng Next.js duy nhất** trê
 Các bước:
 
 1. **Supabase:** chạy `npm run db:migrate` (đặt `DATABASE_URL_DIRECT` trong `.env`) để áp `db/migrations/001_init.sql` và `002_app.sql`. Kiểm tra bằng `npm run db:verify-rls` và `npm run db:smoke`.
-2. **Vercel:** Import repo, Framework Preset *Next.js* (đã có `vercel.json`). Thêm biến môi trường: `DATABASE_URL` (Transaction pooler, cổng 6543), `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `GEMINI_API_KEY` (gói miễn phí) hoặc `ANTHROPIC_API_KEY`, và tuỳ chọn `AI_MODEL`, `AI_DAILY_LIMIT`, `ALLOW_REGISTRATION`. Đặt biến xong phải **Redeploy**.
+2. **Vercel:** Import repo, Framework Preset *Next.js* (đã có `vercel.json`). Thêm biến môi trường: `DATABASE_URL` (Transaction pooler, cổng 6543), `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `ANTHROPIC_API_KEY`, và tuỳ chọn `AI_MODEL`, `AI_DAILY_LIMIT`, `ALLOW_REGISTRATION`. Đặt biến xong phải **Redeploy**.
 3. **Nhắc việc:** mở `db/cron.sql`, thay địa chỉ web và `CRON_SECRET`, chạy trong SQL Editor của Supabase. pg_cron gọi `/api/cron/dispatch` mỗi phút. Nếu Vercel bật Deployment Protection cho production thì pg_net sẽ bị chặn: tắt nó hoặc dùng tên miền riêng.
 4. **Thử:** `https://<app>.vercel.app/api/health?db=1` phải trả `{"ok":true,...,"db":true}`; đăng ký tài khoản, đăng nhập, bật thông báo, gọi thử nhập nhanh.
 
