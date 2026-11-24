@@ -177,7 +177,7 @@ function createApi({ db, cfg, push, log = console, fetchImpl }) {
 
   /* ---------- AI ---------- */
   on('POST', '/api/ai/parse', {}, async ({ user, body }) => {
-    if (!cfg.anthropicKey) throw new HttpError(503, 'ai_disabled', 'Máy chủ chưa bật AI.');
+    if (!ai.aiEnabled(cfg)) throw new HttpError(503, 'ai_disabled', 'Máy chủ chưa bật AI.');
     const input = ai.validateInput(body);
     const day = new Date().toISOString().slice(0, 10);
     const allowed = tx(db, () => {

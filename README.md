@@ -10,11 +10,11 @@ Cần Node.js **22.13 trở lên**.
 
 ```bash
 npm install            # chỉ để cài web-push (thông báo đẩy)
-cp .env.example .env   # rồi điền ANTHROPIC_API_KEY nếu muốn có AI
+cp .env.example .env   # rồi điền GEMINI_API_KEY (hoặc ANTHROPIC_API_KEY) nếu muốn có AI
 npm start              # mở http://localhost:3000
 ```
 
-**Mọi người dùng đều dùng AI** để hiểu câu nói, không còn chế độ cơ bản. Vì vậy cần `ANTHROPIC_API_KEY` trong `.env`:
+**Mọi người dùng đều dùng AI** để hiểu câu nói, không còn chế độ cơ bản. Vì vậy cần `GEMINI_API_KEY` (hoặc `ANTHROPIC_API_KEY`) trong `.env`:
 
 - Chạy thử ở máy cá nhân mà chưa có khóa: app vẫn mở, câu nói chưa được hiểu, chỉ các nút tạo nhanh (Đặt nhắc hẹn, Hẹn lịch, Thêm thói quen) dùng được.
 - Chạy `NODE_ENV=production` (Docker) mà thiếu khóa: máy chủ **từ chối khởi động** và báo lý do.
@@ -204,6 +204,5 @@ Hướng dẫn đẩy lên GitHub ở `docs/GITHUB.md`, quy ước làm việc �
 
 1. Chạy thử trên điện thoại thật qua HTTPS, chỉnh độ tin cậy của thông báo và gọi dậy.
 2. Quên mật khẩu và xác minh email (cần dịch vụ gửi email).
-3. Nút hành động ngay trên thông báo: Xong, Nhắc lại sau 10 phút.
 4. Chia sẻ việc và danh sách đi chợ với người thân.
 5. Gộp theo từng trường nếu cần nhiều người sửa chung một việc.
