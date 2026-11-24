@@ -144,6 +144,13 @@ Mọi yêu cầu ghi cần header `X-Remi: 1` (chống CSRF); app tự thêm.
 
 Việc **nên làm trước khi mở cho người ngoài**: đặt sau HTTPS, đặt `TRUST_PROXY=1` nếu có proxy, sao lưu file `data/remi.sqlite`, thêm xác minh email và quên mật khẩu (hiện chưa có), cân nhắc đặt `ALLOW_REGISTRATION=0` khi chỉ dùng cho gia đình.
 
+## Nút hành động trên thông báo
+
+Thông báo của việc và thói quen đến giờ có hai nút (Android, Chrome, Edge; iPhone chưa hỗ trợ nút nên chỉ hiện thông báo thường):
+- **Nhắc lại sau 10 phút**: chạy thẳng trên máy chủ (`POST /api/reminders/snooze`), không cần mở app. Máy chủ sao chép lời nhắc thành bản `z:<khoá>`; bản này không bị dọn khi đồng bộ. Mất mạng hoặc phiên hết hạn thì mở app.
+- **Xong**: mở app (hoặc gửi tin cho app đang mở) và đánh dấu xong việc, hoặc ghi một lần cho thói quen hôm nay.
+Lời nhắc trước giờ, hạn dùng đồ và gọi dậy không có nút. Bản nhắc lại vẫn gửi dù bạn đã đánh dấu xong việc đó sau khi bấm nhắc lại.
+
 ## Triển khai lên Vercel (Next.js + Supabase)
 
 Repo này chạy được dưới **một ứng dụng Next.js duy nhất** trên Vercel. Giao diện (`web/`) được chép sang `public/` lúc build, API nằm ở `app/api/[...path]/route.js`, dữ liệu ở Supabase Postgres (schema `remi`, bật RLS). Bản Express + SQLite cũ vẫn giữ (`npm run start:legacy`, Docker) để dùng nội bộ.
@@ -204,6 +211,5 @@ Hướng dẫn đẩy lên GitHub ở `docs/GITHUB.md`, quy ước làm việc �
 
 1. Chạy thử trên điện thoại thật qua HTTPS, chỉnh độ tin cậy của thông báo và gọi dậy.
 2. Quên mật khẩu và xác minh email (cần dịch vụ gửi email).
-3. Nút hành động ngay trên thông báo: Xong, Nhắc lại sau 10 phút.
 4. Chia sẻ việc và danh sách đi chợ với người thân.
 5. Gộp theo từng trường nếu cần nhiều người sửa chung một việc.
