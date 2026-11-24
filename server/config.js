@@ -17,7 +17,10 @@ function loadConfig(env = process.env, overrides = {}) {
     // AI (Anthropic). Khóa chỉ nằm ở máy chủ, không bao giờ gửi xuống app.
     anthropicKey: env.ANTHROPIC_API_KEY || '',
     anthropicBase: (env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com').replace(/\/$/, ''),
-    aiModel: env.AI_MODEL || 'claude-haiku-5-5',
+    // Ưu tiên Gemini (có gói miễn phí) khi đặt GEMINI_API_KEY. AI_MODEL để trống thì dùng model mặc định của nhà cung cấp.
+    geminiKey: env.GEMINI_API_KEY || '',
+    geminiBase: env.GEMINI_BASE_URL || 'https://generativelanguage.googleapis.com',
+    aiModel: env.AI_MODEL || '',
     aiDailyLimit: Number(env.AI_DAILY_LIMIT) || 60,
     // Thông báo đẩy (Web Push / VAPID). Để trống: tự sinh khóa và lưu trong DB.
     vapidSubject: env.VAPID_SUBJECT || 'mailto:admin@example.com',
@@ -31,8 +34,8 @@ function loadConfig(env = process.env, overrides = {}) {
 /** Trả về danh sách vấn đề khiến máy chủ không nên khởi động. */
 function validateConfig(cfg) {
   const problems = [];
-  if (cfg.env === 'production' && !cfg.anthropicKey) {
-    problems.push('Thiếu ANTHROPIC_API_KEY. Remi dùng AI để hiểu câu nói của mọi người dùng nên bắt buộc có khóa khi chạy production.');
+  if (cfg.env === 'production' && !cfg.anthropicKey && !cfg.geminiKey) {
+    problems.push('Thiếu GEMINI_API_KEY hoặc ANTHROPIC_API_KEY. Remi dùng AI để hiểu câu nói của mọi người dùng nên bắt buộc có khóa khi chạy production.');
   }
   return problems;
 }
