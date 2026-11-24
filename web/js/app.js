@@ -1675,12 +1675,33 @@ function registerSW(){
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
   navigator.serviceWorker.addEventListener('message',e=>{
     if(e.data&&e.data.type==='push')alertUser('🔔',e.data.title||'Remi',e.data.body||'');
+    if(e.data&&e.data.type==='action')notifAction(e.data.action,e.data.key);
   });
+}
+/* Nút "Xong" trên thông báo: key là t:<id>:<iso>:due hoặc h:<id>:<ngày>:<giờ>, có thể có tiền tố z: (bản nhắc lại). */
+function notifAction(action,key){
+  if(action!=='done'||typeof key!=='string')return;
+  const p=key.replace(/^(z:)+/,'').split(':');
+  if(p[0]==='t'){
+    const t=state.tasks.find(x=>x.id===p[1]);
+    if(t&&!t.done){completeTask(t.id);alertUser('✓','Đã xong',t.title)}
+  }else if(p[0]==='h'){
+    const h=state.habits.find(x=>x.id===p[1]);
+    if(h&&p[2]===dKey(new Date())&&habitDone(h)<hTimes(h).length){addHabit(h.id,1);alertUser('✓','Đã ghi nhận',h.title)}
+  }
+}
+function readActionFromHash(){
+  const m=/^#act=(\w+)&key=(.+)$/.exec(location.hash);
+  if(!m)return;
+  try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  const act=m[1],key=decodeURIComponent(m[2]);
+  setTimeout(()=>notifAction(act,key),800);   // đợi app nạp xong dữ liệu
 }
 
 /* start */
 Sync.init();
 registerSW();
+readActionFromHash();
 render();tick();
 setInterval(tick,15000);
 tickClock();setInterval(tickClock,1000);
