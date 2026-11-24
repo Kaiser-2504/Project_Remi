@@ -10,11 +10,11 @@ Cần Node.js **22.13 trở lên**.
 
 ```bash
 npm install            # chỉ để cài web-push (thông báo đẩy)
-cp .env.example .env   # rồi điền ANTHROPIC_API_KEY nếu muốn có AI
+cp .env.example .env   # rồi điền GEMINI_API_KEY (hoặc ANTHROPIC_API_KEY) nếu muốn có AI
 npm start              # mở http://localhost:3000
 ```
 
-**Mọi người dùng đều dùng AI** để hiểu câu nói, không còn chế độ cơ bản. Vì vậy cần `ANTHROPIC_API_KEY` trong `.env`:
+**Mọi người dùng đều dùng AI** để hiểu câu nói, không còn chế độ cơ bản. Vì vậy cần `GEMINI_API_KEY` (hoặc `ANTHROPIC_API_KEY`) trong `.env`:
 
 - Chạy thử ở máy cá nhân mà chưa có khóa: app vẫn mở, câu nói chưa được hiểu, chỉ các nút tạo nhanh (Đặt nhắc hẹn, Hẹn lịch, Thêm thói quen) dùng được.
 - Chạy `NODE_ENV=production` (Docker) mà thiếu khóa: máy chủ **từ chối khởi động** và báo lý do.
@@ -154,7 +154,7 @@ Repo này chạy được dưới **một ứng dụng Next.js duy nhất** trê
 Các bước:
 
 1. **Supabase:** chạy `npm run db:migrate` (đặt `DATABASE_URL_DIRECT` trong `.env`) để áp `db/migrations/001_init.sql` và `002_app.sql`. Kiểm tra bằng `npm run db:verify-rls` và `npm run db:smoke`.
-2. **Vercel:** Import repo, Framework Preset *Next.js* (đã có `vercel.json`). Thêm biến môi trường: `DATABASE_URL` (Transaction pooler, cổng 6543), `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `ANTHROPIC_API_KEY`, và tuỳ chọn `AI_MODEL`, `AI_DAILY_LIMIT`, `ALLOW_REGISTRATION`. Đặt biến xong phải **Redeploy**.
+2. **Vercel:** Import repo, Framework Preset *Next.js* (đã có `vercel.json`). Thêm biến môi trường: `DATABASE_URL` (Transaction pooler, cổng 6543), `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `GEMINI_API_KEY` (gói miễn phí) hoặc `ANTHROPIC_API_KEY`, và tuỳ chọn `AI_MODEL`, `AI_DAILY_LIMIT`, `ALLOW_REGISTRATION`. Đặt biến xong phải **Redeploy**.
 3. **Nhắc việc:** mở `db/cron.sql`, thay địa chỉ web và `CRON_SECRET`, chạy trong SQL Editor của Supabase. pg_cron gọi `/api/cron/dispatch` mỗi phút. Nếu Vercel bật Deployment Protection cho production thì pg_net sẽ bị chặn: tắt nó hoặc dùng tên miền riêng.
 4. **Thử:** `https://<app>.vercel.app/api/health?db=1` phải trả `{"ok":true,...,"db":true}`; đăng ký tài khoản, đăng nhập, bật thông báo, gọi thử nhập nhanh.
 

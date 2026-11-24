@@ -71,7 +71,7 @@ if (require.main === module) {
   app.scheduler.start();
   app.listen().then((addr) => {
     console.log(`Remi chạy tại http://localhost:${addr.port}`);
-    if (!cfg.anthropicKey) console.log('[ai] Chưa có ANTHROPIC_API_KEY: câu nói chưa được AI hiểu. Điền khóa vào .env rồi chạy lại. Các nút tạo nhanh vẫn dùng được.');
+    if (!cfg.anthropicKey && !cfg.geminiKey) console.log('[ai] Chưa có GEMINI_API_KEY hoặc ANTHROPIC_API_KEY: câu nói chưa được AI hiểu. Điền khóa vào .env rồi chạy lại. Các nút tạo nhanh vẫn dùng được.');
   });
   const stop = () => app.close().then(() => process.exit(0));
   process.on('SIGINT', stop);
