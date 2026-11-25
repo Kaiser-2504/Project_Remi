@@ -1,6 +1,6 @@
 ## Việc này làm gì
 
-Liên kết issue: closes #
+Closes #<!-- số issue, bắt buộc; CI sẽ báo lỗi nếu thiếu -->
 
 ## Cách kiểm tra
 
@@ -17,3 +17,7 @@ Chỗ nào bạn chưa chắc, chỗ nào chưa kiểm tra được (ví dụ ch
 
 - [ ] Không có khóa API, mật khẩu hay dữ liệu thật trong mã và ảnh chụp màn hình
 - [ ] Nếu đụng dữ liệu người dùng: đã nghĩ tới quyền xem, xoá và xuất
+
+## Người duyệt
+
+- [ ] Đã có ít nhất 1 thành viên khác duyệt và chạy thử
