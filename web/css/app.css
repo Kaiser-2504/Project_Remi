@@ -626,3 +626,8 @@ nav.tabs div{grid-template-columns:repeat(6,1fr)}
 .bd.off{opacity:.6}
 .bd.off .bi{filter:grayscale(1);background:var(--bg)}
 .bd .pbar{width:100%;margin-top:6px}
+/* Tương phản: chữ trắng trên nền cam đậm hơn (Lighthouse, #29) */
+.cd.sel,.day.on,.wchip.on{background:#CC4A0C;border-color:#CC4A0C}
+.sbtns .pri,.pri2,.alert .acts button{background:#CC4A0C}
+.bd .bok{color:#08766A}
+:root[data-theme="dark"] .bd .bok{color:#6EE7D6}
