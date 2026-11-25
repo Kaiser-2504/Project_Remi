@@ -1,0 +1,250 @@
+{
+  "milestones": [
+    {
+      "key": "M4",
+      "title": "M4. Hoàn thiện theo chấm thử",
+      "due": "2026-12-03",
+      "description": "Lấy lại điểm Task 1–4 theo bản chấm thử 24/11."
+    },
+    {
+      "key": "M5",
+      "title": "M5. Góp ý chéo và nộp bài",
+      "due": "2026-12-07",
+      "description": "Task 5, video demo, nộp bài."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Họp chốt phân vai và điền biên bản",
+      "rubric": "1a",
+      "milestone": "M4",
+      "labels": [
+        "team"
+      ],
+      "todo": "Điền họ tên, mã SV vào docs/team/PHAN-CONG.md; họp theo chương trình trong docs/team/bien-ban/2026-11-26-chot-ke-hoach-cuoi.md.",
+      "criteria": [
+        "Biên bản có ngày, người có mặt, quyết định",
+        "PHAN-CONG.md đủ 5 người, có người phụ trách Task 4 và Task 5"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T2",
+      "title": "Duyệt wireframe 5 màn chính",
+      "rubric": "1b",
+      "milestone": "M4",
+      "labels": [
+        "team",
+        "design"
+      ],
+      "todo": "Cả nhóm xem docs/wireframes, góp ý, sửa make_wireframes.py nếu cần.",
+      "criteria": [
+        "Bảng Lịch sử duyệt trong docs/wireframes/README.md có ít nhất 1 dòng",
+        "Góp ý ghi trong biên bản"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T3",
+      "title": "Tạo milestone, issue và bảng Projects",
+      "rubric": "1c,1d",
+      "milestone": "M4",
+      "labels": [
+        "team"
+      ],
+      "todo": "Chạy node scripts/github-setup.js --run, rồi tạo bảng GitHub Projects (Kanban) và thêm các issue.",
+      "criteria": [
+        "Có milestone M4, M5 với hạn",
+        "Mỗi issue có người phụ trách"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T4",
+      "title": "Bật bảo vệ nhánh main",
+      "rubric": "1e",
+      "milestone": "M4",
+      "labels": [
+        "team"
+      ],
+      "todo": "Settings → Branches → main: Require a pull request, 1 approval, require status checks (CI).",
+      "criteria": [
+        "Không push thẳng lên main được",
+        "PR cần 1 review và CI xanh"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T5",
+      "title": "Tích hợp Tailwind CSS",
+      "rubric": "2b",
+      "milestone": "M4",
+      "labels": [
+        "frontend"
+      ],
+      "todo": "Cài Tailwind cho Next.js, dùng utility class cho bố cục các trang mới.",
+      "criteria": [
+        "Có tailwind.config và gói trong package.json",
+        "Ít nhất bố cục trang mới dùng Tailwind",
+        "test:responsive vẫn xanh"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T6",
+      "title": "Tách Lịch và Thống kê thành trang Next.js riêng",
+      "rubric": "2a,3c",
+      "milestone": "M4",
+      "labels": [
+        "frontend",
+        "backend"
+      ],
+      "todo": "Tạo app/lich/page.js, app/thong-ke/page.js đọc dữ liệu của người dùng từ PostgreSQL theo khoảng thời gian.",
+      "criteria": [
+        "Hai route riêng /lich, /thong-ke",
+        "Dữ liệu lấy từ CSDL, đúng người dùng đăng nhập",
+        "Có test"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T7",
+      "title": "Thêm trang Giới thiệu và Liên hệ",
+      "rubric": "2a",
+      "milestone": "M4",
+      "labels": [
+        "frontend"
+      ],
+      "todo": "Trang /gioi-thieu và /lien-he, có form liên hệ kiểm tra dữ liệu nhập.",
+      "criteria": [
+        "Có route riêng",
+        "Responsive ở 390px và 1440px"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T8",
+      "title": "Tách bảng CSDL và cập nhật ERD",
+      "rubric": "3a",
+      "milestone": "M4",
+      "labels": [
+        "backend",
+        "db"
+      ],
+      "todo": "Tách việc, thói quen, thực đơn, tủ đồ khỏi cột JSON states.data thành bảng riêng có khoá ngoại; migration 003; cập nhật ERD trong README.",
+      "criteria": [
+        "Migration chạy trên CI",
+        "ERD cập nhật",
+        "Ghi lại buổi rà soát lược đồ"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T9",
+      "title": "Đo Lighthouse và sửa theo gợi ý",
+      "rubric": "4a",
+      "milestone": "M4",
+      "labels": [
+        "perf"
+      ],
+      "todo": "Đo trang chủ, Lịch, Thói quen, Bếp, Thống kê (DevTools, bỏ chọn Clear storage). Lưu report vào docs/lighthouse/.",
+      "criteria": [
+        "Có report cho 5 màn",
+        "Sửa ít nhất các vấn đề Lighthouse nêu, đo lại"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T10",
+      "title": "Gắn Google Analytics và Sentry",
+      "rubric": "4b",
+      "milestone": "M4",
+      "labels": [
+        "perf",
+        "backend"
+      ],
+      "todo": "Thêm GA và Sentry, mở CSP trong next.config.js, gửi lỗi thử, chụp dashboard.",
+      "criteria": [
+        "Sự kiện hiện trên GA",
+        "Lỗi thử hiện trên Sentry",
+        "Ảnh chụp trong docs/"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T11",
+      "title": "Góp ý UI/UX cho 2 nhóm khác",
+      "rubric": "5a",
+      "milestone": "M5",
+      "labels": [
+        "review"
+      ],
+      "todo": "Mở issue góp ý trên repo của 2 nhóm: điểm mạnh, đề xuất theo usability, aesthetics, user-friendliness.",
+      "criteria": [
+        "2 issue góp ý trên repo nhóm khác",
+        "Link ghi trong docs/GOP-Y.md"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T12",
+      "title": "Nhận góp ý và sửa",
+      "rubric": "5b",
+      "milestone": "M5",
+      "labels": [
+        "review"
+      ],
+      "todo": "Trả lời từng góp ý nhận được, sửa bằng PR có Closes #n, ghi lý do nếu không làm theo.",
+      "criteria": [
+        "Mỗi góp ý có trả lời",
+        "Bảng quyết định trong docs/GOP-Y.md"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T13",
+      "title": "Dọn repo và sửa README",
+      "rubric": "—",
+      "milestone": "M5",
+      "labels": [
+        "chore"
+      ],
+      "todo": "Xoá file on, remi-env-fix.patch, __pycache__, bản sao nhap-nhanh/code; sửa đầu README cho khớp Next.js + Supabase.",
+      "criteria": [
+        "npm test vẫn xanh",
+        "README mô tả đúng kiến trúc hiện tại"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T14",
+      "title": "Bảng test thủ công và ảnh 3 cỡ màn hình",
+      "rubric": "2c,2d",
+      "milestone": "M5",
+      "labels": [
+        "test"
+      ],
+      "todo": "Bảng: thao tác, kết quả mong đợi, kết quả thực tế; ảnh ở điện thoại, tablet, desktop.",
+      "criteria": [
+        "docs/TEST-THU-CONG.md",
+        "Ảnh 3 cỡ màn hình"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "T15",
+      "title": "Quay video demo",
+      "rubric": "—",
+      "milestone": "M5",
+      "labels": [
+        "team"
+      ],
+      "todo": "Kịch bản demo các chức năng chính, mỗi người trình bày phần mình.",
+      "criteria": [
+        "Video dưới thời lượng quy định, link trong README"
+      ],
+      "assignee": ""
+    }
+  ]
+}
