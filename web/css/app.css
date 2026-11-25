@@ -626,3 +626,7 @@ nav.tabs div{grid-template-columns:repeat(6,1fr)}
 .bd.off{opacity:.6}
 .bd.off .bi{filter:grayscale(1);background:var(--bg)}
 .bd .pbar{width:100%;margin-top:6px}
+/* Liên kết sang các trang Next.js (/lich, /thong-ke) */
+.pagelink{margin:14px 0 0;font-size:14px}
+.pagelink a{color:var(--ai-text);font-weight:600;text-decoration:none}
+.pagelink a:hover{text-decoration:underline}

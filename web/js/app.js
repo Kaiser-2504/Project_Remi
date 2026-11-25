@@ -885,6 +885,7 @@ function renderStats(){
     }
     h+='</div>';
   }
+  h+='<p class="pagelink"><a href="/thong-ke">Mở trang thống kê đầy đủ →</a></p>';
   host.innerHTML=h;
 }
 /* ---------- huy hiệu (C3) ---------- */
@@ -1231,6 +1232,7 @@ function renderCal(){
   }
   h+='<div class="field" style="margin-top:14px"><label for="day-note">Ghi chú cho ngày này</label><textarea class="note" id="day-note" rows="3">'+esc(state.dayNotes[sel]||'')+'</textarea></div></div></div></div>';
   host.innerHTML=h;
+  host.insertAdjacentHTML('beforeend','<p class="pagelink"><a href="/lich">Xem lịch cả tháng dạng trang riêng →</a></p>');
   tickClock();
 }
 
