@@ -84,7 +84,7 @@ const KUI=window.RemiKitchenUI({
   save:()=>save(),render:()=>render(),closeSheet:()=>closeSheet(),
   alertUser:(a,b,c,d)=>alertUser(a,b,c,d),toast:m=>toast(m),pantryAdd:n=>pantryAdd(n),
   whenBlockHtml:(w,l,r,px)=>whenBlockHtml(w,l,r,px),bindWhenBlock:px=>bindWhenBlock(px),toLocal:d=>toLocal(d),
-  goTab:t=>{tab=t;render();window.scrollTo({top:0})}
+  goTab:t=>{tab=t;render();window.scrollTo({top:0});window.remiTrack&&remiTrack('tab_view',{tab:t})}
 });
 const openIds=new Set();
 
