@@ -5,7 +5,7 @@
 | `/` | Ứng dụng chính (PWA, trang tĩnh) | `GET/PUT /api/state` | `web/` → `public/` |
 | `/lich?thang=YYYY-MM` | Trang Next.js, render ở máy chủ | Đọc `remi.states` của người đang đăng nhập, dựng lịch tháng (việc, việc lặp, ghi chú ngày) | `app/lich/page.js`, `lib/pages.js` |
 | `/thong-ke?n=7\|30` | Trang Next.js, render ở máy chủ | Đọc `remi.states`, tính tỉ lệ hoàn thành, nước uống, chuỗi ngày, huy hiệu | `app/thong-ke/page.js`, `lib/pages.js` |
-| `/gioi-thieu` | Trang Next.js tĩnh | Không | `app/gioi-thieu/page.js` |
+| `/gioi-thieu` | Trang Next.js, render ở máy chủ | Không | `app/gioi-thieu/page.js` |
 | `/lien-he` | Trang Next.js + form | Ghi vào bảng `remi.contact_messages` qua `POST /api/contact` | `app/lien-he/page.js`, `web/js/lien-he.js` |
 
 ## Luồng dữ liệu của trang động
@@ -33,3 +33,7 @@ Công thức thống kê dùng chung `web/js/stats.js` với màn Thống kê tr
 - `npm test`: `lib/test/pages.test.js` (lịch, việc lặp, giờ Việt Nam, thống kê, đọc CSDL bằng repo giả) và `lib/test/api.test.js` (API liên hệ).
 - Migration `db/migrations/003_contact.sql` chạy trong CI cùng kiểm tra RLS.
 - Trang hiển thị ổn ở 390px và 1280px, không tràn ngang.
+
+## Giao diện
+
+Bốn trang Next.js dùng Tailwind CSS, xem [TAILWIND.md](TAILWIND.md).
