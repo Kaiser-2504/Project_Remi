@@ -53,7 +53,7 @@ button{cursor:pointer}
 .cbtns{display:flex;gap:8px;margin-left:auto}
 .icon-btn{width:46px;height:46px;border-radius:16px;border:0;display:grid;place-items:center;background:var(--bg);color:var(--ink)}
 .icon-btn.rec{background:var(--warn-soft);color:var(--warn)}
-.send{background:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;display:flex;align-items:center;font-weight:600;border-radius:16px;height:46px;border:0}
+.send{background:#CC4A0C;color:#fff;width:auto;padding:0 18px;gap:8px;display:flex;align-items:center;font-weight:600;border-radius:16px;height:46px;border:0}
 .send:disabled{opacity:.6}
 .thinking{display:none;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--ai-text);font-weight:500}
 .composer.busy .thinking{display:flex}
@@ -109,7 +109,7 @@ h2{font-size:17px;font-weight:700;margin:26px 0 12px;letter-spacing:-.01em}
 .chip{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted);font-weight:500}
 .chip.lead{background:var(--accent-soft);color:var(--accent-text)}
 .chip.ai{background:var(--ai-soft);color:var(--ai-text)}
-.chip.late{background:var(--warn-soft);color:var(--warn)}
+.chip.late{background:var(--warn-soft);color:var(--accent-text)}
 .check{width:40px;height:40px;border-radius:14px;border:2px solid var(--line);background:transparent;display:grid;place-items:center;color:transparent;transition:background .15s,border-color .15s}
 .check:hover{border-color:var(--ok)}
 .task.done .check{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -191,7 +191,7 @@ body.sheet-open .sheet{transform:none}
 .qtile{color:#fff;font-size:14px}
 .qtile b{font-weight:700}
 .qtile .qi{background:rgba(255,255,255,.96)}
-.t-rem{background:#E8500A}.t-cal{background:#5B4BF5}.t-hab{background:#0B8F7C}
+.t-rem{background:#C8460A}.t-cal{background:#5B4BF5}.t-hab{background:#0A7F6E}
 input[type=datetime-local]{display:block;width:100%;min-width:0;max-width:100%;text-align:left;-webkit-appearance:none;appearance:none}
 .sheet{overflow-x:hidden}
 .understood{padding:8px 12px;font-size:13px;border-radius:14px;align-items:center}
@@ -626,7 +626,8 @@ nav.tabs div{grid-template-columns:repeat(6,1fr)}
 .bd.off{opacity:.6}
 .bd.off .bi{filter:grayscale(1);background:var(--bg)}
 .bd .pbar{width:100%;margin-top:6px}
-/* Liên kết sang các trang Next.js (/lich, /thong-ke) */
-.pagelink{margin:14px 0 0;font-size:14px}
-.pagelink a{color:var(--ai-text);font-weight:600;text-decoration:none}
-.pagelink a:hover{text-decoration:underline}
+/* Tương phản: chữ trắng trên nền cam đậm hơn (Lighthouse, #29) */
+.cd.sel,.day.on,.wchip.on{background:#CC4A0C;border-color:#CC4A0C}
+.sbtns .pri,.pri2,.alert .acts button{background:#CC4A0C}
+.bd .bok{color:#08766A}
+:root[data-theme="dark"] .bd .bok{color:#6EE7D6}
