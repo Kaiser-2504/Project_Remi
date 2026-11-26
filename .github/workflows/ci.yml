@@ -50,13 +50,15 @@ jobs:
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "create role anon; create role authenticated;"
       - name: Migration, RLS, smoke
         run: |
-          for f in db/migrations/001_init.sql db/migrations/002_app.sql db/migrations/003_contact.sql db/verify-rls.sql db/smoke.sql; do
+          for f in db/migrations/001_init.sql db/migrations/002_app.sql db/migrations/003_contact.sql db/migrations/004_tach_bang.sql db/verify-rls.sql db/smoke.sql db/test-tach-bang.sql; do
             psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f "$f"
           done
       - name: Migration chạy lại không lỗi
         run: |
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f db/migrations/002_app.sql
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f db/migrations/003_contact.sql
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f db/migrations/004_tach_bang.sql
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f db/test-tach-bang.sql
 
   docker:
     runs-on: ubuntu-latest
