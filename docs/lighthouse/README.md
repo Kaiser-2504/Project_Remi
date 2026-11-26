@@ -7,8 +7,8 @@
 | Trang chủ (Hôm nay) | `/` | 76 | 100 | 96 | 100 | [trang-chu.html](trang-chu.html) |
 | Lịch tháng | `/lich` | 98 | 95 | 100 | 100 | [lich.html](lich.html) |
 | Thống kê | `/thong-ke` | 99 | 95 | 100 | 100 | [thong-ke.html](thong-ke.html) |
-| Bếp | `/?tab=kitchen` | _(chờ đo)_ | | | | `bep.html` |
-| Thói quen | `/?tab=habits` | _(chờ đo)_ | | | | `thoi-quen.html` |
+| Bếp | `/?tab=kitchen` | 84 | 100 | 96 | 100 | [bep.html](bep.html) |
+| Thói quen | `/?tab=habits` | 90 | 100 | 96 | 100 | [thoi-quen.html](thoi-quen.html) |
 
 Mở report: tải file `.html` về rồi mở bằng trình duyệt.
 
