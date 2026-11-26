@@ -2,6 +2,8 @@
 // lời nhắn lưu vào bảng remi.contact_messages.
 import { Page } from '../_components/Site.js';
 
+// middleware.js đặt CSP có nonce; nonce chỉ gắn được khi trang dựng theo từng yêu cầu. Dựng tĩnh thì script bị chặn và trang trắng.
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Liên hệ · Remi', description: 'Gửi góp ý, báo lỗi hoặc đề nghị hợp tác cho nhóm làm Remi.' };
 
 export default function LienHePage() {

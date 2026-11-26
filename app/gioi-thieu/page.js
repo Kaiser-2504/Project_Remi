@@ -1,6 +1,8 @@
 // /gioi-thieu — giới thiệu Remi, tính năng, công nghệ và nhóm làm.
 import { Page } from '../_components/Site.js';
 
+// middleware.js đặt CSP có nonce; nonce chỉ gắn được khi trang dựng theo từng yêu cầu. Dựng tĩnh thì script bị chặn và trang trắng.
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Giới thiệu · Remi', description: 'Remi là trợ lý nhắc việc và thói quen: nói một câu, AI tạo nhắc hẹn, danh sách đi chợ, thói quen.' };
 
 const FEATURES = [
