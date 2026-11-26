@@ -192,4 +192,10 @@ CI dựng PostgreSQL 16, chạy tất cả migration, các file kiểm tra, rồ
 
 | Ngày | Người rà soát | Nhận xét | Đã sửa |
 |---|---|---|---|
-| | | | |
+| 26/11/2026 | @Kaiser-2504 ([comment](https://github.com/Kaiser-2504/Project_Remi/issues/52#issuecomment-7183863420)) | Bếp: `recipe_items` tách đúng 1–n. `meal_plans.dish_id` là text vì món lấy từ hai nguồn | Đã ghi chú hai nguồn của `dish_id` (mục bên dưới) |
+| 26/11/2026 | @spector-255006 ([comment](https://github.com/Kaiser-2504/Project_Remi/issues/52#issuecomment-7184038363)) | Đồng bộ, thông báo, AI: `push_subs.endpoint` UNIQUE, `ai_usage` khoá kép đúng | Không cần sửa |
+| 26/11/2026 | @quangthong3005-ai ([tổng hợp](https://github.com/Kaiser-2504/Project_Remi/issues/52#issuecomment-7184069762)) | Đề xuất đổi `tasks.due_at` sang `timestamptz` và thêm index `sessions.expires_at` | Đã kiểm tra, **không sửa**: index `sessions_expires_idx` đã có từ `001_init.sql`; `due_at` cố ý là `timestamp` (giờ địa phương như app lưu, xem `004_tach_bang.sql`), đổi sang `timestamptz` sẽ làm lệch giờ nhắc |
+
+### Ghi chú: nguồn của `meal_plans.dish_id`
+
+`dish_id` nhận một trong hai loại giá trị: mã món có sẵn trong `web/data/dishes.json` (không nằm trong CSDL), hoặc `client_id` của một món trong `recipes` (món của tôi). Vì một nguồn nằm ngoài CSDL nên chưa đặt khoá ngoại. Nếu sau này đưa danh sách món có sẵn vào một bảng `dishes`, có thể thêm khoá ngoại cho cả hai nguồn.

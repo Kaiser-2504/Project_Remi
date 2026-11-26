@@ -4,7 +4,7 @@ Trợ lý nhắc việc và thói quen cho cá nhân: nói một câu tự nhiê
 
 Ứng dụng web cài được (PWA) chạy bằng **Next.js** trên **Vercel**, dữ liệu lưu ở **PostgreSQL (Supabase)**.
 
-**Bản đang chạy:** _(dán link Vercel vào đây)_
+**Bản đang chạy:** https://project-remi.vercel.app
 
 ## Chạy thử ở máy
 
