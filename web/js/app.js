@@ -77,7 +77,9 @@ function save(){
   persist();
   Sync.afterSave();
 }
-let tab='today';
+/* Mở thẳng một tab qua đường dẫn, ví dụ /?tab=kitchen (dùng cho link chia sẻ và đo Lighthouse từng màn). */
+const TABS=['today','cal','soon','habits','kitchen','stats'];
+let tab=(()=>{try{const t=new URLSearchParams(location.search).get('tab');return TABS.includes(t)?t:'today'}catch(e){return 'today'}})();
 /* Nhóm B: tab Bếp (thực đơn tuần, tủ đồ, món của tôi). Giao diện nằm ở kitchen-ui.js, logic ở kitchen.js. */
 const KUI=window.RemiKitchenUI({
   state:state,store:store,esc:esc,uid:uid,
