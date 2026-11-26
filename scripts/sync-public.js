@@ -24,4 +24,12 @@ if (missing.length) {
   console.error('Thiếu file trong public/: ' + missing.join(', '));
   process.exit(1);
 }
-console.log('Đã đồng bộ web/ -> public/');
+// Cấu hình theo dõi lấy từ biến môi trường lúc build (Vercel). Ghi thành file .js để CSP không phải cho phép script nội tuyến.
+const monitorCfg = {
+  gaId: process.env.NEXT_PUBLIC_GA_ID || '',
+  sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
+  env: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+  release: process.env.VERCEL_GIT_COMMIT_SHA || '',
+};
+fs.writeFileSync(path.join(dst, 'js', 'monitor-config.js'), 'window.REMI_MONITOR = ' + JSON.stringify(monitorCfg) + ';\n');
+console.log('Đã đồng bộ web/ -> public/' + (monitorCfg.gaId ? ' (có GA)' : '') + (monitorCfg.sentryDsn ? ' (có Sentry)' : ''));
