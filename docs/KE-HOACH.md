@@ -26,7 +26,7 @@ Mỗi dòng là một issue trên GitHub (tạo bằng `scripts/github-setup.js`
 
 | Mã | Việc | Mục rubric | Mốc | Người phụ trách |
 |---|---|---|---|---|
-| T1 | Họp chốt phân vai, điền biên bản | 1a | M4 | #1 |
+| T1 | Chốt phân vai, điền biên bản | 1a | M4 | Nguyễn Quang Thông |
 | T2 | Duyệt wireframe 5 màn, ghi góp ý | 1b | M4 | cả nhóm |
 | T3 | Tạo milestone và issue, gán người | 1c, 1d | M4 | #1 |
 | T4 | Bật bảo vệ nhánh `main`: cần 1 review, CI xanh | 1e | M4 | #1 |
