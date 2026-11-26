@@ -33,3 +33,7 @@ Công thức thống kê dùng chung `web/js/stats.js` với màn Thống kê tr
 - `npm test`: `lib/test/pages.test.js` (lịch, việc lặp, giờ Việt Nam, thống kê, đọc CSDL bằng repo giả) và `lib/test/api.test.js` (API liên hệ).
 - Migration `db/migrations/003_contact.sql` chạy trong CI cùng kiểm tra RLS.
 - Trang hiển thị ổn ở 390px và 1280px, không tràn ngang.
+
+## Giao diện
+
+Bốn trang Next.js dùng Tailwind CSS, xem [TAILWIND.md](TAILWIND.md).

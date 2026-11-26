@@ -1,112 +1,33 @@
-/* Giao diện cho các trang Next.js (/lich, /thong-ke, /gioi-thieu, /lien-he). Cùng bảng màu với web/css/app.css. */
-:root{
-  --bg:#FAFBFF; --surface:#FFFFFF; --ink:#131A2E; --muted:#5D6787; --line:#ECEFF7;
-  --accent:#EE5A14; --accent-soft:#FFEDE3; --accent-text:#B3410F;
-  --ai:#6A5CF0; --ai-soft:#EEEBFF; --ai-text:#4B3FD0;
-  --ok:#0FB5A0; --ok-soft:#DDF6F2; --bad:#C2410C;
-  --shadow:0 1px 2px rgba(19,26,46,.03),0 8px 24px rgba(106,92,240,.08);
-  color-scheme:light dark;
-}
-@media (prefers-color-scheme:dark){
-  :root{--bg:#0E1324;--surface:#171E35;--ink:#EEF1FA;--muted:#A3ACCB;--line:#26304F;--accent-soft:#3A2418;--accent-text:#FFB08A;--ai-soft:#262352;--ai-text:#BDB5FF;--ok-soft:#0F3A36;--shadow:none}
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-a{color:var(--ai-text)}
-h1{font-size:clamp(24px,4vw,32px);line-height:1.2;margin:0 0 6px}
-h2{font-size:19px;margin:0 0 12px}
-h3{font-size:16px;margin:8px 0 4px}
-.muted{color:var(--muted)}
-.small{font-size:14px}
-:focus-visible{outline:3px solid var(--ai);outline-offset:2px}
+/* CSS của các trang Next.js (/lich, /thong-ke, /gioi-thieu, /lien-he): Tailwind + bảng màu chung với web/css/app.css.
+   Bố cục viết bằng utility class ngay trong JSX; ở đây chỉ giữ biến màu và kiểu nền cho thẻ HTML. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* khung */
-.site-top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:10px clamp(14px,4vw,40px);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-size:18px}
-.site-top nav{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto;max-width:100%}
-.site-top nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:var(--muted);font-weight:500;white-space:nowrap}
-.site-top nav a:hover{background:var(--line)}
-.site-top nav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent-text);font-weight:600}
-.site-main{max-width:1100px;margin:0 auto;padding:24px clamp(14px,4vw,40px) 40px}
-.site-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:1100px;margin:0 auto;padding:18px clamp(14px,4vw,40px) 32px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
-
-/* thành phần */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
-.card.center{text-align:center;max-width:520px;margin:40px auto}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 18px;border-radius:14px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer}
-.btn.ghost{background:var(--surface);color:var(--accent-text);border-color:var(--line)}
-.btn:disabled{opacity:.6;cursor:wait}
-.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.page-head p{margin:0}
-.month-nav{display:flex;gap:8px;flex-wrap:wrap}
-.grid2{display:grid;grid-template-columns:1fr;gap:16px}
-@media (min-width:860px){.grid2{grid-template-columns:1fr 1fr}}
-.list{padding-left:18px;margin:0}
-.list li{margin:6px 0}
-.list.team{list-style:none;padding:0}
-.list.team li{display:flex;flex-direction:column;padding:8px 0;border-bottom:1px solid var(--line)}
-
-/* lịch tháng */
-.month{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
-.month-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
-.month-row.head span{padding:8px 6px;font-size:13px;font-weight:600;color:var(--muted);text-align:center;background:var(--bg);border-bottom:1px solid var(--line)}
-.day{min-height:96px;padding:6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px;min-width:0}
-.month-row .day:last-child{border-right:0}
-.day.out{background:var(--bg);color:var(--muted)}
-.day .num{font-size:13px;font-weight:600}
-.day.today .num{background:var(--accent);color:#fff;border-radius:999px;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center}
-.ev,.note,.more{font-size:12px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:6px;padding:2px 5px}
-.ev{background:var(--ai-soft);color:var(--ai-text)}
-.ev.done{text-decoration:line-through;opacity:.65}
-.ev.rep{font-style:italic}
-.note{background:var(--accent-soft);color:var(--accent-text)}
-.more{color:var(--muted)}
-.agenda{display:none}
-@media (max-width:640px){
-  .site-top nav{margin-left:0}
-  .site-top nav a{padding:6px 10px;font-size:15px}
-  .agenda{display:block;margin-top:16px}
-  .agenda h2{font-size:16px;margin:14px 0 6px}
-  .agenda ul{list-style:none;margin:0;padding:0}
-  .agenda li{padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:10px}
-  .agenda time{color:var(--muted);min-width:44px}
-  .day{min-height:64px;padding:4px}
-  .ev,.note{font-size:0;padding:0;height:6px;border-radius:3px} /* điện thoại: chỉ hiện vạch màu */
-  .more{font-size:10px;padding:0}
+@layer base {
+  :root {
+    --bg:#FAFBFF; --surface:#FFFFFF; --ink:#131A2E; --muted:#5D6787; --line:#ECEFF7;
+    --accent:#EE5A14; --accent-soft:#FFEDE3; --accent-text:#B3410F;
+    --ai:#6A5CF0; --ai-soft:#EEEBFF; --ai-text:#4B3FD0;
+    --ok:#0FB5A0; --bad:#C2410C;
+    --shadow:0 1px 2px rgba(19,26,46,.03),0 8px 24px rgba(106,92,240,.08);
+    color-scheme:light dark;
+  }
+  @media (prefers-color-scheme:dark) {
+    :root {
+      --bg:#0E1324; --surface:#171E35; --ink:#EEF1FA; --muted:#A3ACCB; --line:#26304F;
+      --accent-soft:#3A2418; --accent-text:#FFB08A; --ai-soft:#262352; --ai-text:#BDB5FF; --shadow:none;
+    }
+  }
+  html { @apply leading-[1.55]; }
+  body { @apply bg-bg font-sans text-[16px] text-ink; }
+  a { @apply text-ai-text underline; }
+  :focus-visible { @apply outline outline-[3px] outline-offset-2 outline-ai; }
 }
 
-/* thống kê */
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
-@media (min-width:860px){.kpis{grid-template-columns:repeat(4,1fr)}}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column}
-.kpi b{font-size:clamp(22px,3vw,28px)}
-.kpi span{color:var(--muted);font-size:14px}
-.chartbox svg{width:100%;height:auto;display:block}
-.chartbox .axis{stroke:var(--line)}
-.chartbox rect{fill:var(--ai)}
-.chartbox text{fill:var(--muted);font-size:10px}
-.prow{margin:12px 0}
-.ptop{display:flex;justify-content:space-between}
-.pbar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:6px 0 4px}
-.pbar i{display:block;height:100%;background:var(--ok);border-radius:999px}
-.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
-.badge{border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;display:flex;flex-direction:column;gap:2px}
-.badge .bi{font-size:30px}
-.badge.off{opacity:.55;filter:grayscale(1)}
-
-/* giới thiệu */
-.hero{padding:36px 0 18px;max-width:720px}
-.hero p{font-size:18px;color:var(--muted)}
-.features{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:8px}
-.ficon{font-size:28px}
-
-/* liên hệ */
-.form .field{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
-.form label{font-weight:600;font-size:14px}
-.form input,.form select,.form textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:44px}
-.form [aria-invalid="true"]{border-color:var(--bad)}
-.err{color:var(--bad);min-height:1em}
-.form-status{margin:10px 0 0;min-height:1.4em}
-.form-status.ok{color:var(--ok)}
-.form-status.bad{color:var(--bad)}
+@layer components {
+  /* web/js/lien-he.js gán lại className của ô trạng thái thành "form-status ok|bad", nên đây là lớp riêng. */
+  .form-status { @apply mt-2.5 min-h-[1.4em]; }
+  .form-status.ok { @apply text-ok; }
+  .form-status.bad { @apply text-bad; }
+}
