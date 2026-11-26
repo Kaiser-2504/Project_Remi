@@ -1,7 +1,7 @@
-# Điền tài khoản GitHub vào đây rồi bỏ dấu # để GitHub tự gán người duyệt.
-# Vì mỗi người làm một chức năng trên cùng vài tệp chung, cách đơn giản là mọi người cùng duyệt chéo nhau:
-#
-# * @thanh-vien-1 @thanh-vien-2 @thanh-vien-3 @thanh-vien-4 @thanh-vien-5
-#
-# Có thể siết riêng phần nhạy cảm (đăng nhập, chia sẻ) cho người phụ trách chức năng A:
-# /server/auth.js         @thanh-vien-A
+# Mọi PR tự động mời các thành viên duyệt chéo. Cần ít nhất 1 người duyệt (bật trong Settings → Branches).
+* @Kaiser-2504 @vubui240932-cell @quangthong3005-ai
+
+# Phần nhạy cảm: đăng nhập và CSDL
+/remi-next/lib/auth.ts   @vubui240932-cell @Kaiser-2504
+/remi-db/                @Kaiser-2504 @quangthong3005-ai
+/db/                     @Kaiser-2504 @quangthong3005-ai

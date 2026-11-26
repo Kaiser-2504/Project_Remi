@@ -28,11 +28,33 @@ Ba bộ test trình duyệt dùng Chrome do puppeteer tải về. Có sẵn Chro
 
 ## Quy trình mỗi việc
 
-1. Nhận một issue đã được gán cho bạn trên GitHub (cả nhóm trao đổi và thống nhất phân công trước).
-2. Tách nhánh từ `main`, đặt tên `<mã việc>-<mô tả ngắn>`, ví dụ `A1-quen-mat-khau`.
-3. Commit nhỏ, thông điệp nói rõ làm gì và vì sao.
-4. Mở pull request theo mẫu. **Đề xuất mặc định:** ít nhất một người khác duyệt, CI xanh mới gộp, gộp kiểu squash. Cả nhóm chốt lại quy ước này khi họp.
-5. Người duyệt chạy thử thật phần giao diện, không chỉ đọc mã.
+Kế hoạch và danh sách việc: [docs/KE-HOACH.md](docs/KE-HOACH.md). Phân vai: [docs/team/PHAN-CONG.md](docs/team/PHAN-CONG.md).
+
+1. **Có issue trước khi làm.** Mỗi việc là một issue có người phụ trách và milestone. Chưa có thì tạo theo mẫu *Việc cần làm*.
+2. Kéo thẻ sang *Đang làm* trên bảng GitHub Projects.
+3. Tách nhánh từ `main`, đặt tên `<mã việc>-<mô tả ngắn>`, ví dụ `T5-tailwind`.
+4. **Commit nhỏ, mỗi commit một ý**, theo Conventional Commits và ghi số issue:
+   ```
+   feat(lich): kéo thả việc sang ngày khác (#23)
+   fix(bep): gộp nguyên liệu trùng tên (#24)
+   docs(wireframe): thêm màn Thống kê (#2)
+   ```
+   Loại: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`.
+5. Mở pull request theo mẫu. Tiêu đề cũng theo dạng trên, thân PR có dòng `Closes #23`. **CI kiểm tra hai điều này** (`.github/workflows/pr-check.yml`).
+6. **Ít nhất một người khác duyệt** (nhánh `main` được bảo vệ). Người duyệt chạy thử thật phần giao diện và để lại nhận xét, không duyệt trong vài phút cho xong.
+7. CI xanh và đã được duyệt thì gộp kiểu squash. Issue tự đóng nhờ `Closes #n`.
+
+### Bật bảo vệ nhánh (trưởng nhóm làm một lần)
+
+Settings → Branches → Add rule cho `main`: *Require a pull request before merging* (1 approval), *Require status checks to pass* (chọn CI và PR check), *Do not allow bypassing*.
+
+### Tạo milestone và issue (làm một lần)
+
+```bash
+gh auth login
+node scripts/github-setup.js          # xem trước
+node scripts/github-setup.js --run    # tạo thật
+```
 
 ## Quy tắc
 
