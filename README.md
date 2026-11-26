@@ -6,6 +6,8 @@ Trợ lý nhắc việc và thói quen cho cá nhân: nói một câu tự nhiê
 
 **Bản đang chạy:** https://project-remi.vercel.app
 
+**Video demo:** [Xem video demo](https://drive.google.com/drive/folders/1gkxJf2uMjJyXffHviWsuoDHYWwOqyL6E?usp=sharing)
+
 ## Chạy thử ở máy
 
 Cần Node.js **22.13 trở lên** và một CSDL PostgreSQL (Supabase miễn phí là đủ).
