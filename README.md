@@ -2,24 +2,30 @@
 
 Trợ lý nhắc việc và thói quen cho cá nhân: nói một câu tự nhiên, AI hiểu và tạo nhắc hẹn, danh sách đi chợ, thói quen uống nước chia giờ theo lúc bạn thức dậy, gọi dậy buổi sáng, và gọi đúng tên bạn ("Xíu ơi, đến giờ uống nước rồi nè!").
 
-Đây là bản full stack đầu tiên: **một ứng dụng web cài được (PWA)** cùng **máy chủ Node.js**. Không cần framework hay bước build, chạy bằng một lệnh.
+Ứng dụng web cài được (PWA) chạy bằng **Next.js** trên **Vercel**, dữ liệu lưu ở **PostgreSQL (Supabase)**.
 
-## Chạy thử trong 2 phút
+**Bản đang chạy:** _(dán link Vercel vào đây)_
 
-Cần Node.js **22.13 trở lên**.
+## Chạy thử ở máy
+
+Cần Node.js **22.13 trở lên** và một CSDL PostgreSQL (Supabase miễn phí là đủ).
 
 ```bash
-npm install            # chỉ để cài web-push (thông báo đẩy)
-cp .env.example .env   # rồi điền GEMINI_API_KEY (hoặc ANTHROPIC_API_KEY) nếu muốn có AI
-npm start              # mở http://localhost:3000
+npm install
+cp .env.example .env   # điền DATABASE_URL, GEMINI_API_KEY (hoặc ANTHROPIC_API_KEY)
+npm run db:migrate     # tạo bảng lần đầu (cần DATABASE_URL_DIRECT)
+npm run dev            # mở http://localhost:3000
 ```
 
-**Mọi người dùng đều dùng AI** để hiểu câu nói, không còn chế độ cơ bản. Vì vậy cần `GEMINI_API_KEY` (hoặc `ANTHROPIC_API_KEY`) trong `.env`:
+- Chưa có khoá AI: app vẫn mở, câu nói chưa được hiểu, chỉ các nút tạo nhanh (Đặt nhắc hẹn, Hẹn lịch, Thêm thói quen) dùng được.
+- Không có CSDL mà chỉ muốn xem giao diện: `npm run start:legacy` chạy bản máy chủ Node cũ với SQLite.
 
-- Chạy thử ở máy cá nhân mà chưa có khóa: app vẫn mở, câu nói chưa được hiểu, chỉ các nút tạo nhanh (Đặt nhắc hẹn, Hẹn lịch, Thêm thói quen) dùng được.
-- Chạy `NODE_ENV=production` (Docker) mà thiếu khóa: máy chủ **từ chối khởi động** và báo lý do.
+## Tài liệu nhóm
 
-Không chạy `npm install` thì mọi thứ vẫn chạy, chỉ riêng thông báo đẩy bị tắt.
+- [Kế hoạch, milestone, việc còn lại](docs/KE-HOACH.md)
+- [Phân vai và trách nhiệm](docs/team/PHAN-CONG.md) · [Biên bản họp](docs/team/bien-ban/)
+- [Wireframe 5 màn chính](docs/wireframes/README.md)
+- [Quy trình issue, nhánh, commit, PR](CONTRIBUTING.md#quy-trình-mỗi-việc)
 
 ## Tính năng chính
 
@@ -65,18 +71,20 @@ Thêm: Lịch hiện tháng bên trái và chi tiết ngày bên phải, việc 
 
 ```
 Trình duyệt / app cài trên màn hình chính
- ├─ web/js/app.js   giao diện, logic nhắc việc, lưu cục bộ (chạy được khi mất mạng)
- ├─ web/js/api.js   gọi API
- └─ web/sw.js       mở app khi mất mạng + nhận thông báo đẩy
+ ├─ web/js/app.js      giao diện, logic nhắc việc, lưu cục bộ (chạy được khi mất mạng)
+ ├─ web/js/api.js      gọi API
+ └─ web/sw.js          mở app khi mất mạng + nhận thông báo đẩy
           │  HTTPS, cookie phiên
-Máy chủ Node.js (không cần thư viện ngoài, trừ web-push)
- ├─ server/routes.js     API
- ├─ server/auth.js       mật khẩu (scrypt), phiên, giới hạn thử
- ├─ server/ai.js         gọi Anthropic, khóa API chỉ nằm ở đây
- ├─ server/scheduler.js  quét lời nhắc đến hạn, gửi thông báo đẩy
- ├─ server/push.js       khóa VAPID + gửi Web Push
- └─ SQLite (node:sqlite) một file, cả dữ liệu lẫn lịch nhắc
+Next.js trên Vercel
+ ├─ app/api/[...path]/route.js  mọi API, chuyển cho lib/api.js
+ ├─ app/api/cron/dispatch       pg_cron gọi mỗi phút để gửi lời nhắc đến hạn
+ ├─ lib/auth.js                 mật khẩu (scrypt), phiên, giới hạn thử
+ ├─ lib/ai.js                   gọi Gemini/Anthropic, khoá API chỉ nằm ở máy chủ
+ ├─ lib/push.js                 Web Push (VAPID)
+ └─ lib/repo.js ── PostgreSQL (Supabase, schema remi, bật RLS)
 ```
+
+Giao diện nằm ở `web/` và được chép sang `public/` lúc build (`scripts/sync-public.js`). Thư mục `server/` là bản máy chủ Node + SQLite cũ, vẫn giữ để chạy thử không cần CSDL và cho các bài test trình duyệt.
 
 ### Dữ liệu và đồng bộ
 

@@ -84,7 +84,7 @@ const KUI=window.RemiKitchenUI({
   save:()=>save(),render:()=>render(),closeSheet:()=>closeSheet(),
   alertUser:(a,b,c,d)=>alertUser(a,b,c,d),toast:m=>toast(m),pantryAdd:n=>pantryAdd(n),
   whenBlockHtml:(w,l,r,px)=>whenBlockHtml(w,l,r,px),bindWhenBlock:px=>bindWhenBlock(px),toLocal:d=>toLocal(d),
-  goTab:t=>{tab=t;render();window.scrollTo({top:0})}
+  goTab:t=>{tab=t;render();window.scrollTo({top:0});window.remiTrack&&remiTrack('tab_view',{tab:t})}
 });
 const openIds=new Set();
 
@@ -885,6 +885,7 @@ function renderStats(){
     }
     h+='</div>';
   }
+  h+='<p class="pagelink"><a href="/thong-ke">Mở trang thống kê đầy đủ →</a></p>';
   host.innerHTML=h;
 }
 /* ---------- huy hiệu (C3) ---------- */
@@ -1231,6 +1232,7 @@ function renderCal(){
   }
   h+='<div class="field" style="margin-top:14px"><label for="day-note">Ghi chú cho ngày này</label><textarea class="note" id="day-note" rows="3">'+esc(state.dayNotes[sel]||'')+'</textarea></div></div></div></div>';
   host.innerHTML=h;
+  host.insertAdjacentHTML('beforeend','<p class="pagelink"><a href="/lich">Xem lịch cả tháng dạng trang riêng →</a></p>');
   tickClock();
 }
 

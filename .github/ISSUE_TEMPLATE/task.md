@@ -6,6 +6,10 @@ labels: ''
 
 **Chức năng hoặc phần nào của Remi:**
 
+**Mục rubric (nếu có):**
+
+**Người phụ trách / milestone:** gán ở cột bên phải
+
 ### Bối cảnh
 
 ### Việc cần làm

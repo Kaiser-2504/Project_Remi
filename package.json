@@ -20,6 +20,7 @@
     "db:smoke": "node --env-file-if-exists=.env db/run-sql.mjs db/smoke.sql",
     "test:db": "node --env-file-if-exists=.env --test db/test/repo.test.js",
     "icons": "node scripts/make-icons.js",
+    "sentry:test": "node --env-file-if-exists=.env scripts/sentry-test.js",
     "ml:data": "node ml/gen/generate.js --n 8000 --seed 1 --out ml/data/synth-train.jsonl && node ml/gen/generate.js --n 1500 --seed 2 --out ml/data/synth-val.jsonl && node ml/gen/generate.js --n 1500 --seed 3 --out ml/data/synth-test.jsonl && node ml/train/prepare.js --in ml/data/synth-train.jsonl --out ml/data/train.jsonl",
     "ml:eval": "node ml/eval/run.js --engine rules --data ml/data/gold.jsonl,ml/data/holdout.jsonl",
     "test:responsive": "node --disable-warning=ExperimentalWarning e2e/responsive.js",
