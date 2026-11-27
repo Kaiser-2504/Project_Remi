@@ -27,6 +27,7 @@ npm run dev            # mở http://localhost:3000
 - [Kế hoạch, milestone, việc còn lại](docs/KE-HOACH.md)
 - [Phân vai và trách nhiệm](docs/team/PHAN-CONG.md) · [Biên bản họp](docs/team/bien-ban/)
 - [Wireframe 5 màn chính](docs/wireframes/README.md)
+- [Góp ý chéo giữa các nhóm](docs/GOP-Y.md)
 - [Quy trình issue, nhánh, commit, PR](CONTRIBUTING.md#quy-trình-mỗi-việc)
 
 ## Tính năng chính
