@@ -76,6 +76,12 @@ function fakeAnthropic() {
       if (r.status() >= 400 || u.includes('/api/') || /\.js(\?|$)/.test(u))
         console.log(`[${name} http]`, r.status(), u);
     });
+    const cdp = await page.createCDPSession();
+    await cdp.send('Runtime.enable');
+    cdp.on('Runtime.exceptionThrown', ({ exceptionDetails: d }) => {
+      console.log(`[${name} vị trí lỗi]`, d.url || d.scriptId,
+        'dòng', d.lineNumber + 1, 'cột', d.columnNumber + 1);
+    });
     await page.goto(base);
     devices[name] = page;
     return page;
