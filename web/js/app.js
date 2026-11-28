@@ -1,4 +1,3 @@
-
 (function(){
 'use strict';
 const {parseQty,stepQty,scaleQty,canStep}=window.RemiQty;
@@ -103,7 +102,7 @@ function windowTimes(count,fromM,toM){
 }
 function calcSpread(sp){
   const ex=/^\d{2}:\d{2}$/;
-  if(ex.test(sp.from)&&ex.test(sp.to))return windowTimes(Math.max(1,sp.count),toMin(sp.from),toMin(sp.to));   // "từ 1h-5h chia 4 lần": giờ đầu và giờ cuối đều có nhắc
+  if(ex.test(sp.from)&&ex.test(sp.to))return windowTimes(Math.max(1,sp.count),toMin(sp.from),toMin(sp.to));
   const now=new Date(),nowM=now.getHours()*60+now.getMinutes();
   let start;
   if(sp.from==='now')start=nowM;
@@ -197,7 +196,6 @@ function findDish(title){
   Object.keys(state.dishes).forEach(d=>{if(d.length>=3&&(d===k||k.indexOf(d)>=0||d.indexOf(k)>=0)&&d.length>bl){best=d;bl=d.length}});
   return best?state.dishes[best]:null;
 }
-/** Món đã nhớ: bản cũ là mảng, bản mới là {s: số người, items: [...]}. */
 function dishRecord(v){
   if(!v)return null;
   if(Array.isArray(v))return {s:0,items:v};
@@ -380,7 +378,7 @@ let busy=false;
 async function submit(textArg){
   const text=(typeof textArg==='string'?textArg:$('#ta').value).trim();
   if(!text||busy)return;
-  if(/^(hôm nay|tối nay|trưa nay|nay)?\s*(nấu|ăn) gì( hôm nay| tối nay| trưa nay)?\s*\??$/i.test(text)){$('#ta').value='';KUI.openToday();return}   // nhóm B: hỏi nhanh "hôm nay nấu gì"
+  if(/^(hôm nay|tối nay|trưa nay|nay)?\s*(nấu|ăn) gì( hôm nay| tối nay| trưa nay)?\s*\??$/i.test(text)){$('#ta').value='';KUI.openToday();return}
   busy=true;$('#composer').classList.add('busy');$('#send').disabled=true;
   let parsed=null;
   try{
@@ -392,10 +390,10 @@ async function submit(textArg){
     alertUser('🤖',e.network?'Cần có mạng để Remi hiểu câu của bạn':'Remi chưa hiểu được lúc này',aiHelp(e));
   }
   busy=false;$('#composer').classList.remove('busy');$('#send').disabled=false;
-  if(parsed)openSheet(parsed,'ai');   // lỗi thì giữ nguyên câu đã gõ để thử lại
+  if(parsed)openSheet(parsed,'ai');
 }
 function aiHelp(e){
-  if(e.network)return 'Bạn vẫn dùng được các nút Đặt nhắc hẹn, Hẹn lịch và Thêm thói quen.';
+  if(e.network)return 'Bạn vẫn dùng được các nút Đặt nhắc hẹn, Đặt lịch hẹn và Thêm thói quen.';
   if(e.code==='ai_limit')return e.message;
   if(e.code==='ai_disabled')return 'Máy chủ này chưa bật AI. Nhờ người quản trị điền khóa AI nhé.';
   return 'Thử lại sau ít phút, hoặc dùng các nút tạo nhanh ở trên.';
@@ -403,7 +401,6 @@ function aiHelp(e){
 
 /* ---------- sheet ---------- */
 let draft=null;
-/* ---------- chọn ngày giờ: nút bấm lớn, ít thao tác ---------- */
 function timeWord(t){
   const a=t.split(':').map(Number),H=a[0],M=a[1];
   const pod=H<5?'đêm':H<11?'sáng':H<13?'trưa':H<18?'chiều':H<22?'tối':'đêm';
@@ -455,7 +452,7 @@ const REP_OPTS=[['none','Một lần'],['daily','Hằng ngày'],['weekly','Hằn
 const TIME_QUICK=['06:00','07:00','09:00','12:00','15:00','19:00','21:00'];
 const dayPlus=n=>{const d=new Date();d.setDate(d.getDate()+n);return dKey(d)};
 const shortDay=k=>{const d=new Date(k+'T00:00:00');return WDS[d.getDay()]+', '+d.getDate()+'/'+(d.getMonth()+1)};
-/** Khối "Ngày, Giờ, Nhắc trước, Lặp lại". Giá trị nằm trong 3 ô ẩn #px-when, #px-lead, #px-rep nên mã cũ đọc được như trước. */
+
 function whenBlockHtml(when,lead,repeat,px){
   lead=lead||0;repeat=repeat||'none';
   const lo=LEAD_OPTS.some(o=>o[0]===lead)?LEAD_OPTS:LEAD_OPTS.concat([[lead,leadText(lead)]]);
@@ -552,7 +549,7 @@ function bindWater(){
     $('#wt-pre').innerHTML=WATER_PRE.map(o=>'<button type="button" class="wchip'+(o[0]===w.total?' on':'')+'" data-v="'+o[0]+'">'+o[1]+'</button>').join('');
     $('#wt-win').hidden=w.mode!=='window';
     $('#wt-body').hidden=!w.on;
-    const tf=document.getElementById('hf-tf');if(tf)tf.hidden=w.on;     // đang chia nước thì giờ nhắc do Remi tự tính
+    const tf=document.getElementById('hf-tf');if(tf)tf.hidden=w.on;
     if(w.on){
       const per=Math.round(w.total/w.count);
       $('#wt-sum').innerHTML='<b>Mỗi lần '+(w.total%w.count?'khoảng ':'')+per+' ml</b><span>'+(w.mode==='auto'?'Chia đều từ '+(hf.once?'bây giờ':'lúc bạn thức dậy')+' đến giờ đi ngủ. ':'')+'Nhắc lúc '+hf.times.join(', ')+'</span>';
@@ -570,7 +567,6 @@ function bindWater(){
   bindChips('wt-mode',v=>{w.mode=v;refresh()});
   refresh();
 }
-
 
 function openSheet(p,mode){
   draft=p;
@@ -698,7 +694,6 @@ function initShop(){
     if(qb){it.qty=stepQty(it.qty,Number(qb.dataset.q));r();return}
     if(e.target.closest('[data-rm]')){it.on=false;r()}
   };
-  // Gõ tay số lượng: lưu ngay, chỉ bật/tắt nút +/- tại chỗ để không làm mất con trỏ
   $('#sh-sel').addEventListener('input',e=>{
     if(!e.target.classList.contains('qv'))return;
     const row=e.target.closest('.qrow'),it=shop.items[Number(row.dataset.i)];if(!it)return;
@@ -706,7 +701,6 @@ function initShop(){
     row.querySelectorAll('[data-q]').forEach(b=>{b.disabled=!canStep(it.qty)});
   });
   $('#sh-sel').addEventListener('change',e=>{if(e.target.classList.contains('qv'))r()});
-  // Đổi số người ăn: co giãn mọi định lượng theo tỉ lệ
   document.querySelector('.serv').addEventListener('click',e=>{
     const b=e.target.closest('[data-sv]');if(!b)return;
     const next=Math.max(1,Math.min(20,shop.servings+Number(b.dataset.sv)));
@@ -804,7 +798,6 @@ function daysText(d){
   return DAY_ORDER.filter(x=>d.indexOf(x)>=0).map(x=>DAY_LABEL[x]).join(' ');
 }
 function habitDone(h){return Math.min(hTimes(h).length,h.log[dKey(new Date())]||0)}
-/** Dòng "🔥 chuỗi ngày · tỉ lệ" cho thẻ thói quen. Một ngày tính là xong khi đủ số lần. */
 function habitStreakLine(h){
   const S=window.RemiStats;
   if(!S||h.once)return '';
@@ -843,11 +836,11 @@ function habitCard(h,full){
   if(full) h2+='<button class="linkbtn" data-act="hdel" data-id="'+h.id+'">Xoá thói quen</button>';
   return h2+'</div>';
 }
+
 /* ---------- thống kê ---------- */
 let statRange=7;
 const waterMlOn=k=>state.habits.reduce((s,h)=>s+(h.portionMl?(h.log[k]||0)*h.portionMl:0),0);
 const habitTimesOn=k=>state.habits.reduce((s,h)=>s+(h.portionMl?0:(h.log[k]||0)),0);
-/** Tỉ lệ hoàn thành n ngày gần nhất, không tính những ngày trước khi thói quen có dữ liệu đầu tiên. */
 function habitStats(h,n){
   const S=window.RemiStats;
   const goal=hTimes(h).length;
@@ -887,12 +880,12 @@ function renderStats(){
   }
   host.innerHTML=h;
 }
+
 /* ---------- huy hiệu (C3) ---------- */
 function badgeList(){
   const S=window.RemiStats;
   return S?S.evaluateBadges(state.habits,new Date(),{goalOf:h=>hTimes(h).length}):[];
 }
-/** Mở khoá huy hiệu mới. Lần chạy đầu chỉ ghi nhận thầm những huy hiệu đã đạt từ trước (không báo). Trả về true nếu có thay đổi. */
 function checkBadges(){
   const list=badgeList();
   if(!list.length)return false;
@@ -937,7 +930,6 @@ function sortTasks(a,b){return (a.when||'9')<(b.when||'9')?-1:1}
 
 function render(){
   const now=new Date(),tk=dKey(now);
-  /* header */
   const hr=now.getHours();
   $('#greet').textContent=(hr<11?'Chào buổi sáng':hr<14?'Chào buổi trưa':hr<18?'Chào buổi chiều':'Chào buổi tối')+(nm()?', '+nm():'');
   $('#me').textContent=(nm()||'?').charAt(0).toUpperCase();
@@ -946,7 +938,6 @@ function render(){
   $('#next').innerHTML=upcoming?'<span class="dot"></span><span>Tiếp theo: <b>'+hm(new Date(upcoming.when))+' '+esc(upcoming.title)+'</b></span>':'<span class="dot"></span><span>Chưa có việc nào sắp tới</span>';
 
   renderSleep();
-  /* today */
   const todayTasks=state.tasks.filter(t=>!t.when||dKey(new Date(t.when))<=tk);
   const open=todayTasks.filter(t=>!t.done).sort(sortTasks),done=todayTasks.filter(t=>t.done).sort(sortTasks);
   let h='';
@@ -962,7 +953,6 @@ function render(){
   h=KUI.todayBanner()+h;
   $('#view-today').innerHTML=h;
 
-  /* soon */
   const fut=state.tasks.filter(t=>t.when&&!t.done&&dKey(new Date(t.when))>tk).sort(sortTasks);
   let s='<h2>Sắp tới<span class="sub">'+fut.length+' việc</span></h2>';
   if(!fut.length)s+='<div class="empty"><b>Chưa có việc nào sắp tới</b>Thử nói: “Mai họp với khách lúc 9h30”.</div>';
@@ -974,7 +964,6 @@ function render(){
   }
   $('#view-soon').innerHTML=s;
 
-  /* habits */
   let hb='<h2>Thói quen</h2>';
   hb+=state.habits.length?state.habits.map(x=>habitCard(x,true)).join(''):'<div class="empty"><b>Chưa có thói quen nào</b>Thử nói: “Nhắc tôi uống nước 2l mỗi ngày”.</div>';
   hb+='<button class="send" style="margin-top:6px" data-act="newhabit" type="button">Thêm thói quen</button>';
@@ -1011,7 +1000,7 @@ function openTask(id){
   const rList=()=>{
     const L=t.checklist||[];
     $('#t-list').innerHTML=L.length?'<div class="lh"><span></span><span>Món</span><span>Số lượng</span><span></span></div>'+
-      L.map((c,i)=>'<div class="lrow"><input type="checkbox" data-ti="'+i+'"'+(c.done?' checked':'')+' aria-label="Đã xong"><span class="ln'+(c.done?' d':'')+'">'+esc(c.item)+'</span><div class="qs"><button type="button" data-qm="'+i+'" aria-label="Giảm '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>−</button><input class="lq" data-qi="'+i+'" value="'+esc(c.qty||'')+'" maxlength="24" aria-label="Số lượng '+esc(c.item)+'"><button type="button" data-qp="'+i+'" aria-label="Tăng '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>+</button></div><button type="button" class="lx" data-xi="'+i+'" aria-label="Xoá '+esc(c.item)+'">×</button></div>').join(''):'<p class="dhint" style="margin:0 0 6px">Chưa có mục nào.</p>';
+      L.map((c,i)=>'<div class="lrow"><input type="checkbox" data-ti="'+i+'"'+(c.done?' checked':'')+' aria-label="Đã xong"><span class="ln'+(c.done?' d':'')+'">'+esc(c.item)+'</span><div class="qs"><button type="button" data-qm="'+i+'" aria-label="Giảm '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>−</button><input class="lq" data-qi="'+i+'" value="'+esc(c.qty||'')+'" maxlength="24" aria-label="Số lượng '+esc(c.item)+'"><button type="button" data-qp="'+i+'" aria-label="Tăng '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>+</button></div><button type="button" class="lx" data-xi="'+i+'" aria-label="Xoá '+esc(c.item)+'">×</button></div>').join':p class="dhint" style="margin:0 0 6px">Chưa có mục nào.</p>';
   };
   rList();
   $('#t-x').onclick=closeSheet;
@@ -1258,6 +1247,7 @@ const CUI=window.RemiCalUI({
   alertUser:(a,b,c,d)=>alertUser(a,b,c,d),
   sheet:()=>$('#sheet'),closeSheet:()=>closeSheet()
 });
+
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
   const ex=e.target.closest('[data-ex]');
@@ -1287,7 +1277,7 @@ document.addEventListener('click',e=>{
   else if(act==='caladd'){openManual('reminder',calSel);fromCal=true}
   else if(act==='hdel'){state.habits=state.habits.filter(h=>h.id!==id);save();render()}
   else if(act==='newhabit'){openManual('habit')}
-    else if(act==='strange'){statRange=Number(el.dataset.n);render()}
+  else if(act==='strange'){statRange=Number(el.dataset.n);render()}
   else if(act==='notif'){enablePush()}
   else if(act.indexOf('cx-')===0){CUI.act(act,el)}
 });
@@ -1371,7 +1361,6 @@ const API=window.RemiAPI;
 let me=store.get('remi.me',null);
 const sigOf=o=>JSON.stringify(Object.assign({},o,{u:0}));
 
-/** Gộp hai bản dữ liệu (máy này và máy chủ): từng mục theo dấu thời gian `u`, xoá được ghi bằng "bia mộ". */
 function mergeSnapshots(L,R){
   L=L||{};R=R||{};
   const out={v:1};
@@ -1421,7 +1410,6 @@ const Sync={
   dirty:store.get('remi.dirty',false),
   sig:{t:{},h:{},dn:{},dish:{},st:{},rc:{},meal:{},profile:'',sleep:''},
   timer:null,busy:false,started:false,lastFull:0,
-  /** Ghi lại "chữ ký" hiện tại để không đóng dấu lại dữ liệu đã có. */
   init(){
     this.sig.t={};state.tasks.forEach(t=>{this.sig.t[t.id]=sigOf(t)});
     this.sig.h={};state.habits.forEach(h=>{this.sig.h[h.id]=sigOf(h)});
@@ -1434,7 +1422,6 @@ const Sync={
     this.sig.sleep=JSON.stringify(state.sleep);
     this.sig.bd=JSON.stringify(state.badges);
   },
-  /** So với lần trước, mục nào đổi thì đóng dấu thời gian; mục nào mất thì ghi bia mộ. */
   stamp(){
     const now=Date.now(),m=state.meta;let changed=false;
     const items=(arr,sg)=>{
@@ -1533,7 +1520,6 @@ const Sync={
   }
 };
 
-/** Lịch nhắc 48 giờ tới, gửi kèm dữ liệu để máy chủ đẩy thông báo kể cả khi app đã đóng. */
 function spreadTimes(sp,startMin){
   if(/^\d{2}:\d{2}$/.test(sp.from)&&/^\d{2}:\d{2}$/.test(sp.to))return windowTimes(Math.max(1,sp.count),toMin(sp.from),toMin(sp.to));
   const end=Math.min(1435,sp.to==='bed'?toMin(profileBed()):toMin(sp.to));
@@ -1569,7 +1555,7 @@ function buildSchedule(){
       });
     }
   });
-  window.RemiKitchen.expiryReminders(state.kitchen.stock,now).forEach(r=>add(r.key,r.at,r.title,r.body));   // nhóm B: đồ sắp hết hạn
+  window.RemiKitchen.expiryReminders(state.kitchen.stock,now).forEach(r=>add(r.key,r.at,r.title,r.body));
   if(!state.sleep.awake){
     const wp=wakePlan();
     if(wp){
@@ -1602,6 +1588,8 @@ function showLoading(){
   const w=$('#welcome');w.hidden=false;
   w.innerHTML='<div class="wbox"><div class="wicon">'+LOGO_SVG+'</div><p>Đang tải…</p></div>';
 }
+
+/* Xử lý form đăng ký/đăng nhập (Mục 1 Issue #55: bổ sung nút con mắt ẩn/hiện mật khẩu và dòng chú thích độ dài) */
 function showAuth(mode){
   const reg=mode==='register',w=$('#welcome');w.hidden=false;
   w.innerHTML='<div class="wbox"><div class="wicon">'+LOGO_SVG+'</div><h1>'+(reg?'Tạo tài khoản Remi':'Chào mừng trở lại')+'</h1>'+
@@ -1609,11 +1597,31 @@ function showAuth(mode){
     '<form id="auth-form" novalidate>'+
     (reg?'<label class="wl" for="a-name">Remi nên gọi bạn là gì?</label><input id="a-name" maxlength="20" autocomplete="nickname">':'')+
     '<label class="wl" for="a-email">Email</label><input id="a-email" type="email" autocomplete="email" inputmode="email">'+
-    '<label class="wl" for="a-pw">Mật khẩu</label><input id="a-pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'">'+
+    '<label class="wl" for="a-pw">Mật khẩu</label>'+
+    '<div style="position:relative;display:flex;align-items:center;">'+
+      '<input id="a-pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'" style="width:100%;padding-right:40px;">'+
+      '<button type="button" id="a-pw-toggle" style="position:absolute;right:8px;background:none;border:none;cursor:pointer;color:#888;display:flex;align-items:center;padding:4px;" aria-label="Hiện mật khẩu">'+
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+
+      '</button>'+
+    '</div>'+
+    (reg?'<p class="dhint" style="margin:4px 0 0;font-size:12px;color:#777;">Tối thiểu 8 ký tự</p>':'')+
     '<p class="werr" id="a-err" role="alert"></p>'+
     '<button class="pri2" id="a-go" type="submit">'+(reg?'Tạo tài khoản':'Đăng nhập')+'</button></form>'+
     '<button class="wlink" id="a-sw" type="button">'+(reg?'Đã có tài khoản? Đăng nhập':'Chưa có tài khoản? Tạo mới')+'</button></div>';
   $('#a-sw').onclick=()=>showAuth(reg?'login':'register');
+
+  const pwToggle=$('#a-pw-toggle'),pwIn=$('#a-pw');
+  if(pwToggle&&pwIn){
+    pwToggle.onclick=()=>{
+      const isPass=pwIn.type==='password';
+      pwIn.type=isPass?'text':'password';
+      pwToggle.setAttribute('aria-label',isPass?'Ẩn mật khẩu':'Hiện mật khẩu');
+      pwToggle.innerHTML=isPass
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    };
+  }
+
   $('#auth-form').addEventListener('submit',async e=>{
     e.preventDefault();
     const err=$('#a-err'),email=$('#a-email').value.trim(),pw=$('#a-pw').value,name=reg?$('#a-name').value.trim():'';
@@ -1629,12 +1637,13 @@ function showAuth(mode){
   });
   const tok=(showAuth.n=(showAuth.n||0)+1);
   setTimeout(()=>{
-    if(showAuth.n!==tok)return;                                   // form này đã bị thay bằng form khác
+    if(showAuth.n!==tok)return;
     const a=document.activeElement;
-    if(a&&a!==document.body&&w.contains(a))return;                // người dùng đã tự chọn một ô, đừng giành con trỏ
+    if(a&&a!==document.body&&w.contains(a))return;
     const f=$(reg?'#a-name':'#a-email');if(f)f.focus();
   },150);
 }
+
 async function onLoggedIn(user){
   const prev=store.get('remi.me',null);
   if(prev&&prev.id!==user.id){wipeLocal();store.set('remi.me',user);location.reload();return}
@@ -1678,7 +1687,6 @@ function registerSW(){
     if(e.data&&e.data.type==='action')notifAction(e.data.action,e.data.key);
   });
 }
-/* Nút "Xong" trên thông báo: key là t:<id>:<iso>:due hoặc h:<id>:<ngày>:<giờ>, có thể có tiền tố z: (bản nhắc lại). */
 function notifAction(action,key){
   if(action!=='done'||typeof key!=='string')return;
   const p=key.replace(/^(z:)+/,'').split(':');
@@ -1695,7 +1703,7 @@ function readActionFromHash(){
   if(!m)return;
   try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   const act=m[1],key=decodeURIComponent(m[2]);
-  setTimeout(()=>notifAction(act,key),800);   // đợi app nạp xong dữ liệu
+  setTimeout(()=>notifAction(act,key),800);
 }
 
 /* start */
