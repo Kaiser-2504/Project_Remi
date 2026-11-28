@@ -30,13 +30,15 @@
   <section class="composer" id="composer" aria-label="Nhập việc cần nhớ">
     <div class="cwrap">
       <span class="spark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7L12 2zm7 12l1 2.9 2.9 1-2.9 1-1 2.9-1-2.9-2.9-1 2.9-1 1-2.9z"/></svg></span>
-      <textarea id="ta" rows="1" aria-label="Nói hoặc gõ điều bạn cần nhớ"></textarea>
+      <!-- Mục 2: Thêm placeholder gợi ý người dùng -->
+      <textarea id="ta" rows="1" aria-label="Nói hoặc gõ điều bạn cần nhớ" placeholder="Ví dụ: Nhắc tôi uống nước lúc 15:00..."></textarea>
       <div class="cbtns">
         <button class="icon-btn" id="mic" aria-label="Nói bằng giọng" type="button">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v4"/></svg>
         </button>
+        <!-- Mục 2: Đổi nhãn nút hành động sang 'Tạo việc' -->
         <button class="send" id="send" type="button">
-          Thêm
+          Tạo việc
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </button>
       </div>
@@ -73,7 +75,8 @@
 
   <section class="quick" id="quick" aria-label="Tạo nhanh">
     <button class="qtile t-rem" type="button" data-new="reminder"><span class="qi">⏰</span><b>Đặt nhắc hẹn</b></button>
-    <button class="qtile t-cal" type="button" data-new="event"><span class="qi">📅</span><b>Hẹn lịch</b></button>
+    <!-- Mục 3: Đổi từ 'Hẹn lịch' thành 'Đặt lịch hẹn' -->
+    <button class="qtile t-cal" type="button" data-new="event"><span class="qi">📅</span><b>Đặt lịch hẹn</b></button>
     <button class="qtile t-hab" type="button" data-new="habit"><span class="qi">🌱</span><b>Thêm thói quen</b></button>
   </section>
 
@@ -92,8 +95,9 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
       Lịch
     </button>
+    <!-- Mục 4: Đổi icon sang đồng hồ (Clock) để phân biệt rõ với icon Lịch -->
     <button role="tab" aria-selected="false" data-tab="soon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Sắp tới
     </button>
     <button role="tab" aria-selected="false" data-tab="habits">
