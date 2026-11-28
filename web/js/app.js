@@ -1003,7 +1003,7 @@ function openTask(id){
   const rList=()=>{
     const L=t.checklist||[];
     $('#t-list').innerHTML=L.length?'<div class="lh"><span></span><span>Món</span><span>Số lượng</span><span></span></div>'+
-      L.map((c,i)=>'<div class="lrow"><input type="checkbox" data-ti="'+i+'"'+(c.done?' checked':'')+' aria-label="Đã xong"><span class="ln'+(c.done?' d':'')+'">'+esc(c.item)+'</span><div class="qs"><button type="button" data-qm="'+i+'" aria-label="Giảm '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>−</button><input class="lq" data-qi="'+i+'" value="'+esc(c.qty||'')+'" maxlength="24" aria-label="Số lượng '+esc(c.item)+'"><button type="button" data-qp="'+i+'" aria-label="Tăng '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>+</button></div><button type="button" class="lx" data-xi="'+i+'" aria-label="Xoá '+esc(c.item)+'">×</button></div>').join':p class="dhint" style="margin:0 0 6px">Chưa có mục nào.</p>';
+      L.map((c,i)=>'<div class="lrow"><input type="checkbox" data-ti="'+i+'"'+(c.done?' checked':'')+' aria-label="Đã xong"><span class="ln'+(c.done?' d':'')+'">'+esc(c.item)+'</span><div class="qs"><button type="button" data-qm="'+i+'" aria-label="Giảm '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>−</button><input class="lq" data-qi="'+i+'" value="'+esc(c.qty||'')+'" maxlength="24" aria-label="Số lượng '+esc(c.item)+'"><button type="button" data-qp="'+i+'" aria-label="Tăng '+esc(c.item)+'"'+(canStep(c.qty)?'':' disabled')+'>+</button></div><button type="button" class="lx" data-xi="'+i+'" aria-label="Xoá '+esc(c.item)+'">×</button></div>').join(''):'<p class="dhint" style="margin:0 0 6px">Chưa có mục nào.</p>';
   };
   rList();
   $('#t-x').onclick=closeSheet;

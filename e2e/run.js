@@ -67,6 +67,21 @@ function fakeAnthropic() {
     page.click = async (sel, ...a) => {
       try { return await rawClick(sel, ...a); } catch (e) { throw new Error(`click(${sel}) trên máy ${name}: ${e.message}`); }
     };
+    page.on('console', (m) => console.log(`[${name} console]`, m.type(), m.text()));
+    page.on('pageerror', (e) => console.log(`[${name} pageerror]`, e.stack || e.message));
+    page.on('requestfailed', (r) =>
+      console.log(`[${name} requestfailed]`, r.url(), r.failure()?.errorText));
+    page.on('response', (r) => {
+      const u = r.url();
+      if (r.status() >= 400 || u.includes('/api/') || /\.js(\?|$)/.test(u))
+        console.log(`[${name} http]`, r.status(), u);
+    });
+    const cdp = await page.createCDPSession();
+    await cdp.send('Runtime.enable');
+    cdp.on('Runtime.exceptionThrown', ({ exceptionDetails: d }) => {
+      console.log(`[${name} vị trí lỗi]`, d.url || d.scriptId,
+        'dòng', d.lineNumber + 1, 'cột', d.columnNumber + 1);
+    });
     await page.goto(base);
     devices[name] = page;
     return page;
@@ -276,6 +291,14 @@ function fakeAnthropic() {
     console.log('\nTẤT CẢ ĐỀU QUA');
   } catch (e) {
     console.error('\nTHẤT BẠI:', e.message);
+    console.error(' lỗi trình duyệt:', errors);
+    for (const [n, pg] of Object.entries(devices)) {
+      try {
+        console.error(' welcome', n, await pg.evaluate(() =>
+          document.querySelector('#welcome')?.outerHTML.slice(0, 1000)));
+        await pg.screenshot({ path: `e2e-fail-${n}.png`, fullPage: true });
+      } catch (x) { console.error(' không chụp được máy', n, x.message); }
+    }
     for (const [n, pg] of Object.entries(devices)) {
       try {
         console.error(' trạng thái máy', n, await pg.evaluate(() => ({ sheetOpen: document.body.classList.contains('sheet-open'), welcomeHidden: document.querySelector('#welcome').hidden, tab: [...document.querySelectorAll('nav.tabs button')].find((b) => b.getAttribute('aria-selected') === 'true')?.dataset.tab, sheet: document.querySelector('#sheet').innerText.slice(0, 120), alerts: [...document.querySelectorAll('.alert')].map((a) => a.innerText) })));
